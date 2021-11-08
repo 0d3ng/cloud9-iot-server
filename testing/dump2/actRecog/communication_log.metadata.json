@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"actRecog.communication_log"}],"uuid":"6d3bdac3380841d7a9264826d4b86b17"}

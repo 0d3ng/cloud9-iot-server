@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"actRecog.mqtt-y27i8m6424m2sc4ss"}],"uuid":"384414a0e67b446f8cf0c9fe70a577c1"}

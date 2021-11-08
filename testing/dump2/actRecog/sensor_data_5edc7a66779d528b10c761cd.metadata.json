@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"actRecog.sensor_data_5edc7a66779d528b10c761cd"}],"uuid":"857217407bf74ba2aeaeb853553bb34d"}
