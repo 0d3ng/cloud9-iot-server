@@ -193,10 +193,14 @@ class getdata(RequestHandler):
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
             query = data
+            query["device_code"] = device
             exclude = {'raw_message':0}
             collection = 'sensor_data_'+groupData['id']
             result = sensorController.find(collection,query,exclude,limit,skip,sort)
-            response = {"status":True, 'message':'Success','data':result['data']}    
+            if not result['status']:
+                response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+            else:
+                response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
 
 def checkKeyAccess(key,execpt=""):

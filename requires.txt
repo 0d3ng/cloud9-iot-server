@@ -1,10 +1,11 @@
-pip install paho-mqtt
-pip install pymongo
-pip install cryptography
-pip install nats-python setuptools_rust
-pip install pycryptodomex
-pip install python-slugify
-pip install tornado
-pip install pytz
-pip install elasticsearch
-pip install kafka-python
+paho-mqtt
+pymongo
+cryptography
+nats-python
+setuptools_rust
+pycryptodomex
+python-slugify
+tornado
+pytz
+elasticsearch
+kafka-python

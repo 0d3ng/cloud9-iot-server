@@ -9,7 +9,6 @@ from controller import deviceController
 from pytz import timezone
 import copy
 import base64
-from base64 import decodestring
 import os
 
 sensors = []

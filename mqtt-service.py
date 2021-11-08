@@ -16,6 +16,8 @@ password = "hdMFWDGTnfbhfoxoW7YXU8IwyAhFbD"
 
 
 def on_connect(client, userdata, flags, rc):
+    print("rc: "+str(rc))
+    sys.stdout.flush()
     if rc == 0:
         print("Connected to broker")
         sys.stdout.flush()
@@ -24,6 +26,7 @@ def on_connect(client, userdata, flags, rc):
         subscribe_list()             
     else:
         print("Connection failed")
+        sys.stdout.flush()
  
 def on_message(client, userdata, message):
     raw_msg = message.payload.decode("utf-8")
@@ -132,7 +135,7 @@ def message_insert(topic,message,messageStr):
 
 
 client = mqttClient.Client("Python3")               
-#client.username_pw_set(username=user, password=password)    #set username and password
+# client.username_pw_set(username=user, password=password)    #set username and password
 client.on_connect= on_connect                      
 client.on_message= on_message                      
 client.connect(broker_address, port=port)          
