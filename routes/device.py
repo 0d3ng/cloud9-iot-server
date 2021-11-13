@@ -270,6 +270,20 @@ class countdata(RequestHandler):
                 skip = limit * (page_num - 1)
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
+            if 'date' in data:
+                date_time_str = str(data['date'])
+                datesrc_str = datetime.strptime(date_time_str+" 00:00",'%Y-%m-%d %H:%M')
+                datesrc_end = datetime.strptime(date_time_str+" 23:59",'%Y-%m-%d %H:%M')
+                data['date_add_server'] = {"$gte":datesrc_str, "$lt":datesrc_end }
+                del data['date']
+            if 'date_start' in data and 'date_end' in data:
+                date_time_str = str(data['date_start'])
+                date_time_end = str(data['date_end'])
+                datesrc_str = datetime.strptime(date_time_str+" 00:00",'%Y-%m-%d %H:%M')
+                datesrc_end = datetime.strptime(date_time_end+" 23:59",'%Y-%m-%d %H:%M')
+                data['date_add_server'] = {"$gte":datesrc_str, "$lt":datesrc_end }
+                del data['date_start']
+                del data['date_end']
             query = data
             query["device_code"] = device
             exclude = {'raw_message':0}
