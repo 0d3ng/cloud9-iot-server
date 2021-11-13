@@ -20,6 +20,7 @@ define_url = [
     ['edit/','update'],
     ['delete/','delete'],
     ['data/([^/]+)/','getdata'],
+    ['data/([^/]+)/count','countdata'],
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -239,6 +240,47 @@ class getdata(RequestHandler):
             else:
                 response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
+
+class countdata(RequestHandler):
+  def post(self,device):    
+    data = json.loads(self.request.body)
+    query = {"device_code":device}
+    deviceData = deviceController.findOne(query)
+    if not deviceData['status']:
+        response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
+    else:
+        deviceData = deviceData['data']
+        query = {"code_name":deviceData['group_code_name']}
+        groupData = groupSensorController.findOne(query)
+        if not groupData['status']:
+            response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)} 
+        else:        
+            groupData = groupData['data']
+            limit =  None
+            skip = None
+            sort = ('date_add_server',-1)
+            if 'limit' in data:
+                limit = data['limit']
+                del data['limit']
+                if 'page_num' in data:
+                    page_num = data['page_num']
+                    del data['page_num']
+                else:
+                    page_num = 1
+                skip = limit * (page_num - 1)
+            if 'sort' in data:
+                sort = (data['sort']['field'],data['sort']['type'])            
+            query = data
+            query["device_code"] = device
+            exclude = {'raw_message':0}
+            collection = 'sensor_data_'+groupData['id']
+            result = sensorController.find(collection,query,exclude,limit,skip,sort)
+            if not result['status']:
+                response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+            else:
+                response = {"status":True, 'message':'Success','data':result['data']}
+    self.write(response)
+
 
 def checkKeyAccess(key,execpt=""):
     if execpt:
