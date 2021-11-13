@@ -37,6 +37,17 @@ class add(RequestHandler):
 class list(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
+    if 'name' in data:
+        data['name'] = {"$regex": data['name']}
+    if 'location' in data:
+        data['information.location'] = {"$regex": data['location']}
+        del data['location']
+    if 'detail' in data:
+        data['information.detail'] = {"$regex": data['detail']}
+        del data['detail']
+    if 'purpose' in data:
+        data['information.purpose'] = {"$regex": data['purpose']}
+        del data['purpose']
     query = data
     if "id" in query :
         try:
@@ -54,6 +65,17 @@ class list(RequestHandler):
 class count(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
+    if 'name' in data:
+        data['name'] = {"$regex": data['name']}
+    if 'location' in data:
+        data['information.location'] = {"$regex": data['location']}
+        del data['location']
+    if 'detail' in data:
+        data['information.detail'] = {"$regex": data['detail']}
+        del data['detail']
+    if 'purpose' in data:
+        data['information.purpose'] = {"$regex": data['purpose']}
+        del data['purpose']
     query = data
     if "id" in query :
         try:

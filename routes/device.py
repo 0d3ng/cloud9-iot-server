@@ -7,6 +7,7 @@ from function import *
 from controller import deviceController
 from controller import groupSensorController
 from controller import sensorController
+from datetime import datetime
 
 groups = []
 
@@ -63,7 +64,18 @@ class add(RequestHandler):
 class list(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    query = data
+    if 'name' in data:
+        data['name'] = {"$regex": data['name']}
+    if 'location' in data:
+        data['information.location'] = {"$regex": data['location']}
+        del data['location']
+    if 'detail' in data:
+        data['information.detail'] = {"$regex": data['detail']}
+        del data['detail']
+    if 'purpose' in data:
+        data['information.purpose'] = {"$regex": data['purpose']}
+        del data['purpose']
+    query = data    
     result = deviceController.find(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -74,6 +86,17 @@ class list(RequestHandler):
 class count(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
+    if 'name' in data:
+        data['name'] = {"$regex": data['name']}
+    if 'location' in data:
+        data['information.location'] = {"$regex": data['location']}
+        del data['location']
+    if 'detail' in data:
+        data['information.detail'] = {"$regex": data['detail']}
+        del data['detail']
+    if 'purpose' in data:
+        data['information.purpose'] = {"$regex": data['purpose']}
+        del data['purpose']
     query = data
     if "id" in query :
         try:
@@ -81,7 +104,6 @@ class count(RequestHandler):
             del query["id"]
         except:
             del query["id"]
-            
     query = data
     result = deviceController.find(query)
     if not result['status']:
@@ -183,7 +205,7 @@ class getdata(RequestHandler):
             sort = ('date_add_server',-1)
             if 'limit' in data:
                 limit = data['limit']
-                del data['limit']
+                del data['limit']                
                 if 'page_num' in data:
                     page_num = data['page_num']
                     del data['page_num']
@@ -192,10 +214,25 @@ class getdata(RequestHandler):
                 skip = limit * (page_num - 1)
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
+            if 'date' in data:
+                date_time_str = str(data['date'])
+                datesrc_str = datetime.strptime(date_time_str+" 00:00",'%Y-%m-%d %H:%M')
+                datesrc_end = datetime.strptime(date_time_str+" 23:59",'%Y-%m-%d %H:%M')
+                data['date_add_server'] = {"$gte":datesrc_str, "$lt":datesrc_end }
+                del data['date']
+            if 'date_start' in data and 'date_end' in data:
+                date_time_str = str(data['date_start'])
+                date_time_end = str(data['date_end'])
+                datesrc_str = datetime.strptime(date_time_str+" 00:00",'%Y-%m-%d %H:%M')
+                datesrc_end = datetime.strptime(date_time_end+" 23:59",'%Y-%m-%d %H:%M')
+                data['date_add_server'] = {"$gte":datesrc_str, "$lt":datesrc_end }
+                del data['date_start']
+                del data['date_end']
             query = data
             query["device_code"] = device
             exclude = {'raw_message':0}
             collection = 'sensor_data_'+groupData['id']
+            print(query)
             result = sensorController.find(collection,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
