@@ -20,7 +20,7 @@ define_url = [
     ['edit/','update'],
     ['delete/','delete'],
     ['data/([^/]+)/','getdata'],
-    ['data/([^/]+)/count','countdata'],
+    ['data/([^/]+)/count/','countdata'],
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -189,6 +189,7 @@ class delete(RequestHandler):
 class getdata(RequestHandler):
   def post(self,device):    
     data = json.loads(self.request.body)
+    print(data)
     query = {"device_code":device}
     deviceData = deviceController.findOne(query)
     if not deviceData['status']:
@@ -206,13 +207,16 @@ class getdata(RequestHandler):
             sort = ('date_add_server',-1)
             if 'limit' in data:
                 limit = data['limit']
-                del data['limit']                
-                if 'page_num' in data:
-                    page_num = data['page_num']
-                    del data['page_num']
+                del data['limit']
+                if 'page_number' in data:
+                    page_num = data['page_number']
+                    del data['page_number']
                 else:
                     page_num = 1
                 skip = limit * (page_num - 1)
+            if 'skip' in data:
+                skip = data['skip']
+                del data['skip']
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
             if 'date' in data:
@@ -262,12 +266,15 @@ class countdata(RequestHandler):
             if 'limit' in data:
                 limit = data['limit']
                 del data['limit']
-                if 'page_num' in data:
-                    page_num = data['page_num']
-                    del data['page_num']
+                if 'page_number' in data:
+                    page_num = data['page_number']
+                    del data['page_number']
                 else:
                     page_num = 1
                 skip = limit * (page_num - 1)
+            if 'skip' in data:
+                skip = data['skip']
+                del data['skip']
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
             if 'date' in data:
@@ -285,14 +292,15 @@ class countdata(RequestHandler):
                 del data['date_start']
                 del data['date_end']
             query = data
+            print(query)
             query["device_code"] = device
             exclude = {'raw_message':0}
             collection = 'sensor_data_'+groupData['id']
             result = sensorController.find(collection,query,exclude,limit,skip,sort)
             if not result['status']:
-                response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+                response = {"status":False, "message":"Data Not Found",'data':0}               
             else:
-                response = {"status":True, 'message':'Success','data':result['data']}
+                response = {"status":True, 'message':'Success','data':len(result['data'])}
     self.write(response)
 
 
