@@ -21,6 +21,8 @@ define_url = [
     ['delete/','delete'],
     ['data/([^/]+)/','getdata'],
     ['data/([^/]+)/count/','countdata'],
+    ['add/other/','addOther'],
+    ['edit/other/','updateOther'],
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -303,6 +305,62 @@ class countdata(RequestHandler):
                 response = {"status":True, 'message':'Success','data':len(result['data'])}
     self.write(response)
 
+class addOther(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)
+    print(data)
+    sys.stdout.flush()
+
+    if 'key_access' not in data:
+        data['key_access'] = generateAccess();
+    else:
+        if checkKeyAccess(data['key_access']):
+            response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
+            self.write(response)
+            return
+            
+    if 'device_code' not in data:
+        data['device_code'] = generateCode();
+
+    insert = deviceController.addOther(data)    
+    if not insert['status']:
+        response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
+    else:
+        response = {'message':'Success','status':True}    
+    self.write(response)
+
+class updateOther(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    if 'id' not in data:
+        response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    try:
+        query = {"_id":ObjectId(data["id"])}
+    except:
+        response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
+        self.write(response) 
+        return
+
+    if 'key_access' in data:
+        if checkKeyAccess(data['key_access'],query['_id']):
+            response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
+            self.write(response)
+            return
+
+
+    result = deviceController.findOne(query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        update = deviceController.updateOther(query,data)
+        if not update['status']:
+            response = {"status":False, "message":"Failed to update","data":json.loads(self.request.body)}
+        else:
+            response = {"status":True, 'message':'Update Success'}
+    self.write(response)
 
 def checkKeyAccess(key,execpt=""):
     if execpt:
@@ -319,8 +377,11 @@ def checkKeyAccess(key,execpt=""):
     else:
         return False
 
-def generateCode(code):
-    code = code+"-"+cloud9Lib.randomOnlyString(2)+cloud9Lib.randomNumber(2)
+def generateCode(code=""):
+    if code == "":
+        code = cloud9Lib.randomOnlyString(2)+cloud9Lib.randomNumber(2)
+    else:
+        code = code+"-"+cloud9Lib.randomOnlyString(2)+cloud9Lib.randomNumber(2)
     #check if exist
     query = {"device_code":code}
     result = deviceController.findOne(query)
