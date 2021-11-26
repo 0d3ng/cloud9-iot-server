@@ -83,6 +83,7 @@ def delete(query):
 
 def addOther(fillData):  
     insertQuery = {
+        'group_code_name':fillData.get('group_code_name', None),
         'key_access':fillData.get('key_access', None),
         'device_code':fillData.get('device_code', None),
         'name':fillData.get('name', None),
