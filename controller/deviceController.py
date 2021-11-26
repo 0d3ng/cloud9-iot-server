@@ -142,13 +142,16 @@ def updateOther(query,data):
 
     return cloud9Lib.jsonObject(response)
 
-def deleteOther(query):            
+def deleteOther(query,itemData):            
     result = db.deleteData(collection,query)
     if not result:
         response = {"status":False, "message":"DELETE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
-
+        deleteComm = {
+            'device_code':itemData['device_code']
+        }
+        comChannelController.deleteOther(deleteComm)
     return cloud9Lib.jsonObject(response)
 
 def communication_add(fillData):

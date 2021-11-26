@@ -88,7 +88,7 @@ def update(query,data):
     return cloud9Lib.jsonObject(response)
 
 def delete(query):            
-    result = db.deleteData(collection,query)
+    result = db.deleteDataMany(collection,query)
     if not result:
         response = {"status":False, "message":"DELETE FAILED"}               
     else:
@@ -194,6 +194,19 @@ def updateOther(query,data):
             if updateData['active'] == False and ( updateData['channel_type'] == 'mqtt'):
                 triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'nonactive')
 
+    return cloud9Lib.jsonObject(response)
+
+def deleteOther(query):
+    listData = find(query)['data']            
+    result = db.deleteDataMany(collection,query)
+    if not result:
+        response = {"status":False, "message":"DELETE FAILED"}               
+    else:
+        response = {'status':True,'message':'Success','data':result}
+        for i in listData: 
+            listItem = i
+            if listItem['active'] == True and ( listItem['channel_type'] == 'mqtt'):
+                    triggerOther(listItem['channel_type'],listItem['server'],listItem['port'],listItem['topic'],listItem['channel_code'],'nonactive')
     return cloud9Lib.jsonObject(response)
 
 def triggerOther(channel_type,server,port,topic,channel_code,status):
