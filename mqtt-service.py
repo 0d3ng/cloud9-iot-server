@@ -131,7 +131,7 @@ def message_insert(topic,message,messageStr):
     else:
         response = {'message':'Success','status':True}    
     insertLog['response'] = response
-    commLogController.add(insertLog);
+    commLogController.add(insertLog)
 
 
 client = mqttClient.Client("Python3")               

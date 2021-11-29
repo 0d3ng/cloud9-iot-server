@@ -193,18 +193,25 @@ class getdata(RequestHandler):
   def post(self,device):    
     data = json.loads(self.request.body)
     print(data)
+    response = ""
     query = {"device_code":device}
     deviceData = deviceController.findOne(query)
     if not deviceData['status']:
         response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
     else:
         deviceData = deviceData['data']
-        query = {"code_name":deviceData['group_code_name']}
-        groupData = groupSensorController.findOne(query)
-        if not groupData['status']:
-            response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)} 
-        else:        
-            groupData = groupData['data']
+        if deviceData['group_code_name'] != "other":
+            query = {"code_name":deviceData['group_code_name']}
+            groupData = groupSensorController.findOne(query)
+            if not groupData['status']:
+                response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)} 
+            else:
+                groupData = groupData['data']
+                collection = 'sensor_data_'+groupData['id']
+        else:
+            collection = 'sensor_data_'+deviceData['device_code']
+        
+        if response == "":
             limit =  None
             skip = None
             sort = ('date_add_server',-1)
@@ -239,7 +246,6 @@ class getdata(RequestHandler):
             query = data
             query["device_code"] = device
             exclude = {'raw_message':0}
-            collection = 'sensor_data_'+groupData['id']
             print(query)
             result = sensorController.find(collection,query,exclude,limit,skip,sort)
             if not result['status']:
@@ -251,18 +257,26 @@ class getdata(RequestHandler):
 class countdata(RequestHandler):
   def post(self,device):    
     data = json.loads(self.request.body)
+    print(data)
+    response = ""
     query = {"device_code":device}
     deviceData = deviceController.findOne(query)
     if not deviceData['status']:
         response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
     else:
         deviceData = deviceData['data']
-        query = {"code_name":deviceData['group_code_name']}
-        groupData = groupSensorController.findOne(query)
-        if not groupData['status']:
-            response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)} 
-        else:        
-            groupData = groupData['data']
+        if deviceData['group_code_name'] != "other":
+            query = {"code_name":deviceData['group_code_name']}
+            groupData = groupSensorController.findOne(query)
+            if not groupData['status']:
+                response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)} 
+            else:
+                groupData = groupData['data']
+                collection = 'sensor_data_'+groupData['id']
+        else:
+            collection = 'sensor_data_'+deviceData['device_code']
+        
+        if response == "":
             limit =  None
             skip = None
             sort = ('date_add_server',-1)
@@ -295,10 +309,9 @@ class countdata(RequestHandler):
                 del data['date_start']
                 del data['date_end']
             query = data
-            print(query)
             query["device_code"] = device
             exclude = {'raw_message':0}
-            collection = 'sensor_data_'+groupData['id']
+            print(query)
             result = sensorController.find(collection,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':0}               

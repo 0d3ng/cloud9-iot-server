@@ -221,9 +221,9 @@ def triggerOther(channel_type,server,port,topic,channel_code,status):
             'channel_code':channel_code
         }
         if status == 'active':
-            mqttcom.publish("mqtt/service/subscribeother",send)
+            mqttcom.publish("mqtt/service-other/subscribe",send)
             return
         else:
-            mqttcom.publish("mqtt/service/unsubscribeother",send)
+            mqttcom.publish("mqtt/service-other/unsubscribe",send)
             return
 

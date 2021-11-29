@@ -9,19 +9,172 @@ from pytz import timezone
 
 comm_list = {} 
 comm_subs = {}
+Connected = False
+broker_address= "localhost" #"161.117.58.227"
+port = 1883
+
+
+class Comm:
+    def __init__(self, code, broker, port, topic, device_code, collection, index_log):
+        self.code = code
+        self.broker = broker
+        self.port = int(port)
+        self.topic = topic
+        self.device_code = device_code
+        self.collection = collection
+        self.index_log = index_log
+        self.Conected = False
+        
+    
+    def on_connect(self,client, userdata, flags, rc):
+        print("rc: "+str(rc))
+        sys.stdout.flush()
+        if rc == 0:
+            print("Connected to broker:"+self.broker)
+            sys.stdout.flush()
+            self.Conected=True  
+            self.client.subscribe(self.topic)
+            print("Connected to topic:"+self.topic)
+            print("-------------------------------")
+            sys.stdout.flush()
+        else:
+            print("Connection failed")
+            sys.stdout.flush()
+    
+    def on_message(self,client, userdata, message):
+        raw_msg = message.payload.decode("utf-8")
+        print(self.device_code)
+        print(raw_msg)
+        print("-------------------------------------------")
+        sys.stdout.flush()
+        insertLog = {
+            'topic' : message.topic,
+            'channel_type':'mqtt',
+        } 
+        infoMqtt = insertLog  
+        try:
+            raw_object = json.loads(raw_msg)
+            insertLog['raw_message'] = raw_object
+        except:
+            raw_object = {}
+            insertLog['raw_message'] = raw_msg
+        message_obj = raw_object
+        insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj)
+        if not insert['status']:
+            response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
+        else:
+            response = {'message':'Success','status':True}   
+        insertLog['response'] = response
+        commLogController.add(insertLog)   
+
+    def connect(self):
+        self.client = mqttClient.Client(self.code)
+        self.client.on_connect=self.on_connect
+        self.client.on_message=self.on_message
+        try:
+            self.client.connect(self.broker,self.port) #connect to broker
+            self.client.loop_start()
+            print("Connecting to broker:"+self.broker)
+            sys.stdout.flush()
+        except:
+            print(self.broker+": connection failed")
+            self.client.loop_stop()
+
+    def disconnect(self):
+        self.client.loop_stop()    #Stop loop
+        self.client.disconnect() # disconnect
+        print("Diconnecting from broker:"+self.broker)
+        print("-------------------------------------------")
+        sys.stdout.flush()
 
 def subscribe_list():
     query = {
         "active":True,
         "channel_type": "mqtt",
-        "server":{ "$nin": [ null, "" ] },
-        "port":{ "$nin": [ null, "" ] },
-        "topic":{ "$nin": [ null, "" ] }
+        "server":{ "$nin": [ None, "" ] },
+        "port":{ "$nin": [ None, "" ] },
+        "topic":{ "$nin": [ None, "" ] }
     }
     result = comChannelController.find(query)
     if result['status']:        
         for val in result['data']:
-            comm_list[val['token_access']] = val
-            # client.subscribe(val['topic'])
+            comm_list[val['channel_code']] = {
+                'server':val['server'],
+                'port':val['port'],
+                'topic':val['topic'],
+                'collection_name':val['collection_name'],
+                'device_code':val['device_code']
+            }
+            comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
+            comm_subs[val['channel_code']].connect()
+
+def on_connect(client, userdata, flags, rc):
+    print("rc: "+str(rc))
+    sys.stdout.flush()
+    if rc == 0:
+        print("Connected to broker")
+        print("------------------------------------")
+        sys.stdout.flush()
+        global Connected                
+        Connected = True   
+        subscribe_list()             
+    else:
+        print("Connection failed")
+        sys.stdout.flush()
+ 
+def on_message(client, userdata, message):
+    raw_msg = message.payload.decode("utf-8")
+    try:
+        raw_object = json.loads(raw_msg)
+    except:
+        raw_object = {"failed":True}
+    if message.topic == 'mqtt/service-other/subscribe' :
+        on_message_subscribe(raw_object)
+    elif message.topic == 'mqtt/service-other/unsubscribe' :
+        on_message_unsubscribe(raw_object)
+    else :
+        message_insert(message.topic,raw_object,raw_msg)
+    
+    
+def on_message_subscribe(message):
+    channel_code = message['channel_code']
+    if(channel_code):
+        query = {
+            "channel_code": channel_code
+        }
+        result = comChannelController.findOne(query)
+        if result['status']: 
+            val = result['data']
             print("Subscribe Topic: "+val['topic'])
-            sys.stdout.flush()
+            comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
+            comm_subs[val['channel_code']].connect()
+
+def on_message_unsubscribe(message):
+    channel_code = message['channel_code']
+    try:
+        comm_subs[channel_code].disconnect()
+        del topic_list[topic]
+    except KeyError:
+        pass
+
+client = mqttClient.Client("Python3-Other")               
+# client.username_pw_set(username=user, password=password)    #set username and password
+client.on_connect= on_connect                      
+client.on_message= on_message                      
+client.connect(broker_address, port=port)          
+client.loop_start()        
+ 
+while Connected != True:    #Wait for connection
+    time.sleep(0.1)
+ 
+client.subscribe("mqtt/service-other/subscribe")
+client.subscribe("mqtt/service-other/unsubscribe")
+
+try:
+    while True:
+        time.sleep(1)
+ 
+except KeyboardInterrupt:
+    print("exiting")
+    client.disconnect()
+    client.loop_stop()
