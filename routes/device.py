@@ -313,7 +313,7 @@ class addOther(RequestHandler):
     sys.stdout.flush()
 
     if 'key_access' not in data:
-        data['key_access'] = generateAccess();
+        data['key_access'] = generateAccess()
     else:
         if checkKeyAccess(data['key_access']):
             response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
@@ -321,7 +321,10 @@ class addOther(RequestHandler):
             return
             
     if 'device_code' not in data:
-        data['device_code'] = generateCode();
+        data['device_code'] = generateCode()
+
+    if 'group_code_name' not in data:
+        data['group_code_name'] = "other"
 
     insert = deviceController.addOther(data)    
     if not insert['status']:
