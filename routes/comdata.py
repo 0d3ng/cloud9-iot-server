@@ -44,7 +44,7 @@ class add(RequestHandler):
     if not resultChannel['status']:
         response = {"status":False, "message":"Token Access not match",'data':json.loads(self.request.body)} 
         insertLog['response'] = response
-        commLogController.add(insertLog);
+        commLogController.add(insertLog)
         self.write(response)
         return              
     else:
@@ -60,9 +60,9 @@ class add(RequestHandler):
             if(isinstance(data['date_add'],int)):
                 infoHttp['date_add_sensor_unix'] = data['date_add']
                 try:
-                    today = datetime.fromtimestamp(round(data['date_add']),timezone('Asia/Jakarta')) #datetime.fromtimestamp(round(message['date_add']))
+                    today = datetime.fromtimestamp(round(data['date_add']),timezone('Asia/Tokyo')) #datetime.fromtimestamp(round(message['date_add']))
                 except:
-                    today = datetime.fromtimestamp(round(data['date_add']/1000),timezone('Asia/Jakarta')) #datetime.fromtimestamp(round(message['date_add']/1000))
+                    today = datetime.fromtimestamp(round(data['date_add']/1000),timezone('Asia/Tokyo')) #datetime.fromtimestamp(round(message['date_add']/1000))
                 infoHttp['date_add_sensor'] = today
             else:
                 infoHttp['date_add_sensor'] = datetime.strptime(data['date_add'],'%Y-%m-%d %H:%M:%S')
@@ -74,6 +74,8 @@ class add(RequestHandler):
 
     if 'device_code' in data :
         insert = commETLController.etl(channelData['collection_name'],channelData['index_log'],infoHttp,data['device_code'],data)
+    elif 'device_code' in channelData :
+        insert = commETLController.etl(channelData['collection_name'],channelData['index_log'],infoHttp,channelData['device_code'],data)
     else :
         insert = commETLController.nonetl(channelData['collection_name'],channelData['index_log'],infoHttp,data)
     
@@ -82,5 +84,5 @@ class add(RequestHandler):
     else:
         response = {'message':'Success','status':True}    
     insertLog['response'] = response
-    commLogController.add(insertLog);
+    commLogController.add(insertLog)
     self.write(response)

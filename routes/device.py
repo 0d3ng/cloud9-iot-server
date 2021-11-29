@@ -23,6 +23,7 @@ define_url = [
     ['data/([^/]+)/count/','countdata'],
     ['add/other/','addOther'],
     ['edit/other/','updateOther'],
+    ['delete/other/','deleteOther'],
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -360,6 +361,32 @@ class updateOther(RequestHandler):
             response = {"status":False, "message":"Failed to update","data":json.loads(self.request.body)}
         else:
             response = {"status":True, 'message':'Update Success'}
+    self.write(response)
+
+class deleteOther(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    if 'id' not in data:
+        response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    try:
+        query = {"_id":ObjectId(data["id"])}
+    except:
+        response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
+        self.write(response) 
+        return
+    
+    result = deviceController.findOne(query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}            
+    else:
+        delete = deviceController.deleteOther(query,result['data'])
+        if not delete['status']:
+            response = {"status":False, "message":"Failed to delete","data":json.loads(self.request.body)}
+        else:
+            response = {"status":True, 'message':'Delete Success'}
     self.write(response)
 
 def checkKeyAccess(key,execpt=""):
