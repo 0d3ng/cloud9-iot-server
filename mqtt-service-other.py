@@ -56,7 +56,7 @@ class Comm:
             raw_object = json.loads(raw_msg)
             insertLog['raw_message'] = raw_object
         except:
-            raw_object = {}
+            raw_object = cloud9Lib.delimeterExtract(raw_msg)
             insertLog['raw_message'] = raw_msg
         message_obj = raw_object
         insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj)

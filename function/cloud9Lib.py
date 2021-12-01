@@ -50,3 +50,43 @@ def validEmail(email):
         return True            
     else:  
         return False
+
+def delimeterExtract(msg):
+    filter = msg.split(":")
+    print("-------Filter-------")
+    print(filter)
+    print("--------------------")
+    sys.stdout.flush()
+    result = {}
+    for val in filter:
+        item = val.split("=")
+        if(len(item) == 2):  
+            key = item[0]
+            if is_int(item[1]):
+                value = int(item[1])
+            elif is_float(item[1]):
+                value = float(item[1])
+            else:
+                value = item[1]
+            result[key] = value
+    print("-------Result-------")
+    print(result)
+    print("--------------------")
+    return jsonObject(result)
+
+def is_int(n):
+    try:
+        float_n = float(n)
+        int_n = int(float_n)
+    except ValueError:
+        return False
+    else:
+        return float_n == int_n
+
+def is_float(n):
+    try:
+        float_n = float(n)
+    except ValueError:
+        return False
+    else:
+        return True

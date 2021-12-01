@@ -9,7 +9,7 @@ import sys
 
 broker="127.0.0.1"
 port=1883
-topic= 'message/sensor/jd2090'
+topic= 'message/sensor/l0v2p5'
 
 def on_publish(client,userdata,result): #create function for callback
     print("data published")
@@ -23,17 +23,13 @@ client1.connect(broker,port) #establish connection
 for x in range(1000):
     today = datetime.today() #current-datetime
     msg = {
-        "device_code":"jd2090-sv94",
+        "device_code":"l0v2p5-co62",
         "date_add":round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
-        "indoor_temperature":random.randint(1500,3500) / 100,
-        "indoor_humidity":random.randint(4000,10000) / 100,
-        "indoor_di":0,
-        "ac_state":1,
-        "outdoor_temperature":15,
-        "outdoor_humidity":83.4,
-        "outdoor_di":0,
+        "layanan_kependudukan":random.randint(2,100),
+        "layanan_catatan_cipil":random.randint(2,100),
     }
     payload = json.dumps(msg)
+    payload = "::rc=80000000:lq=54:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=-004:y=0004:z=0095::ts=9774"
     print(msg)
     sys.stdout.flush()
     client1.publish(topic,payload=payload) #publish
