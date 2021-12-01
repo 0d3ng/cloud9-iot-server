@@ -90,3 +90,6 @@ def is_float(n):
         return False
     else:
         return True
+
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")

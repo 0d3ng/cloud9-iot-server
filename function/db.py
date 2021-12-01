@@ -125,6 +125,15 @@ class dbmongo:
         if(x['nModified'] > 0):
             return True
         return False
+        
+    def renameField(self,col,filter,values):
+        if not self.checkCollections(col):
+            return False
+        self.col = self.db[col]
+        x = self.col.update_one(filter,{ "$rename": values })
+        if(x['nModified'] > 0):
+            return True
+        return False
 #        sys.stdout.flush()
 
 if __name__ == "__main__":
