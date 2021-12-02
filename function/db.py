@@ -69,10 +69,6 @@ class dbmongo:
             return False
         self.col = self.db[col]
         x = self.col.delete_one(filter)
-        print("***********************")
-        print (x.deleted_count)
-        print("***********************")
-        sys.stdout.flush()
         if x.deleted_count > 0:
             return True
         return False
@@ -82,10 +78,6 @@ class dbmongo:
             return False
         self.col = self.db[col]
         x = self.col.delete_many(filter)
-        print("***********************")
-        print (x.deleted_count)
-        print("***********************")
-        sys.stdout.flush()
         if x.deleted_count > 0:
             return True
         return False

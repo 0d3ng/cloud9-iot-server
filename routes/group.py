@@ -77,7 +77,13 @@ class list(RequestHandler):
 class detail(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    query = data
+    query = data    
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
     result = groupController.findOne(query)
     print(result)
     print("------------------")

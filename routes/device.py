@@ -119,7 +119,13 @@ class count(RequestHandler):
 class detail(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    query = data
+    query = data    
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
     result = deviceController.findOne(query)    
     # print(remote_ip)
     # print("------------------")

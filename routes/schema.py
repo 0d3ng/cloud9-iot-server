@@ -7,8 +7,10 @@ from function import *
 from controller import schemaController
 from controller import schemaDataController
 from datetime import datetime
+from pytz import timezone
 
 groups = []
+prefix_collection = "schema_data_"
 
 #PRIMARY VARIABLE - DONT DELETE
 define_url = [
@@ -17,7 +19,12 @@ define_url = [
     ['count/','count'],
     ['detail/','detail'],
     ['edit/','update'],
-    ['delete/','delete']
+    ['delete/','delete'],
+    ['data/([^/]+)/','getSchemaData'],
+    ['data/([^/]+)/count/','countSchemaData'],
+    ['data/([^/]+)/add/','addSchemaData'],
+    ['data/([^/]+)/edit/','updateSchemaData'],
+    ['data/([^/]+)/delete/','deleteSchemaData']
 ]
 
 class add(RequestHandler):
@@ -83,7 +90,13 @@ class count(RequestHandler):
 class detail(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    query = data
+    query = data    
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
     result = schemaController.findOne(query)    
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -149,8 +162,12 @@ class delete(RequestHandler):
             response = {"status":True, 'message':'Delete Success'}
     self.write(response)
 
-class getdata(RequestHandler):
+class getSchemaData(RequestHandler):
   def post(self,code):    
+    if not code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
     data = json.loads(self.request.body)
     print(data)
     response = ""
@@ -160,8 +177,6 @@ class getdata(RequestHandler):
         response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
     else:
         schemaData = schemaData['data']
-        collection = 'schema_data_'+schemaData['schema_code']
-        
         if response == "":
             limit =  None
             skip = None
@@ -195,19 +210,24 @@ class getdata(RequestHandler):
                 del data['date_start']
                 del data['date_end']
             query = data
-            query["schema_code"] = device
-            exclude = {'raw_message':0}
+            exclude = None
             print(query)
-            result = schemaDataController.find(collection,query,exclude,limit,skip,sort)
+            result = schemaDataController.find(prefix_collection+code,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
             else:
                 response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
 
-class countdata(RequestHandler):
-  def post(self,device):    
+class countSchemaData(RequestHandler):
+  def post(self,code):    
     data = json.loads(self.request.body)
+
+    if not code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
     print(data)
     response = ""
     query = {"schema_code":code}
@@ -216,8 +236,6 @@ class countdata(RequestHandler):
         response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
     else:
         schemaData = schemaData['data']
-        collection = 'schema_data_'+schemaData['schema_code']
-        
         if response == "":
             limit =  None
             skip = None
@@ -251,14 +269,103 @@ class countdata(RequestHandler):
                 del data['date_start']
                 del data['date_end']
             query = data
-            query["schema_code"] = device
-            exclude = {'raw_message':0}
-            print(query)
-            result = schemaDataController.find(collection,query,exclude,limit,skip,sort)
+            exclude = None
+            result = schemaDataController.find(prefix_collection+code,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
             else:
                 response = {"status":True, 'message':'Success','data':len(result['data'])}
+    self.write(response)
+
+class addSchemaData(RequestHandler):
+  def post(self,schema_code):    
+    data = json.loads(self.request.body)
+    if not schema_code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    # filter = schemaDataController.filterAdd(schema_code,data)
+    # if filter['status']:
+    #     response = {'message':'Success','status':True} 
+    # else:
+    #     response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}  
+    filter = schemaDataController.filter(schema_code,data)
+    if filter['status']:
+        data = filter['data']
+        data["date_add_auto"] = datetime.now(timezone('Asia/Tokyo'))
+        insert = schemaDataController.add(prefix_collection+schema_code,data)
+        if insert['status']:
+            response = {'status':True, 'message':"Success"}
+        else:
+            response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}
+    else:
+        response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}
+    self.write(response)
+
+class updateSchemaData(RequestHandler):
+  def post(self,schema_code):    
+    data = json.loads(self.request.body)
+    if not schema_code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    
+    if 'id' not in data:
+        response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    try:
+        query = {"_id":ObjectId(data["id"])}
+    except:
+        response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
+        self.write(response) 
+        return
+
+    result = schemaDataController.findOne(prefix_collection+schema_code,query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        filter = schemaDataController.filter(schema_code,data)
+        if filter['status']:
+            data = filter['data']
+            update = schemaDataController.update(prefix_collection+schema_code,query,data)
+            if update['status']:
+                response = {'status':True, 'message':"Success"}
+            else:
+                response = {"status":False, "message":"Failed to update", 'data':json.loads(self.request.body)}
+        else:
+            response = {"status":False, "message":"Failed to update", 'data':json.loads(self.request.body)}
+    self.write(response)
+
+class deleteSchemaData(RequestHandler):
+  def post(self,schema_code):        
+    data = json.loads(self.request.body)
+    if not schema_code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    if 'id' not in data:
+        response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    try:
+        query = {"_id":ObjectId(data["id"])}
+    except:
+        response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
+        self.write(response) 
+        return
+    
+    result = schemaDataController.findOne(prefix_collection+schema_code,query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}            
+    else:
+        delete = schemaDataController.delete(prefix_collection+schema_code,query)
+        if not delete['status']:
+            response = {"status":False, "message":"Failed to delete","data":json.loads(self.request.body)}
+        else:
+            response = {"status":True, 'message':'Delete Success'}
     self.write(response)
 
 def generateCode(code=""):

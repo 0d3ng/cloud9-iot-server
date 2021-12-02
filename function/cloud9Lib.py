@@ -1,7 +1,8 @@
 import json, sys
 from types import SimpleNamespace as Namespace
 import random,string
-
+from datetime import datetime
+from pytz import timezone
 from cryptography.fernet import Fernet
 from Cryptodome.Cipher import AES
 
@@ -93,3 +94,35 @@ def is_float(n):
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
+
+def cv2datetime(v):
+    if(isinstance(v,int)):
+        try:
+            result = datetime.fromtimestamp(round(v),timezone('Asia/tokyo')) 
+        except:
+            result = datetime.fromtimestamp(round(v/1000),timezone('Asia/tokyo'))
+    else:
+        result = datetime.strptime(v,'%Y-%m-%d %H:%M:%S')
+    return result
+
+def cv2date(v):
+    if(isinstance(v,int)):
+        try:
+            result = datetime.fromtimestamp(round(v),timezone('Asia/tokyo')) 
+        except:
+            result = datetime.fromtimestamp(round(v/1000),timezone('Asia/tokyo'))
+        result = result.strftime("%Y-%m-%d")
+    else:
+        result = datetime.strptime(v,'%Y-%m-%d').date()
+    return result
+
+def cv2time(v):
+    if(isinstance(v,int)):
+        try:
+            result = datetime.fromtimestamp(round(v),timezone('Asia/tokyo')) 
+        except:
+            result = datetime.fromtimestamp(round(v/1000),timezone('Asia/tokyo'))
+        result = result.strftime("%H:%M:%S")
+    else:
+        result = datetime.strptime(v,'%H:%M:%S').time()
+    return result

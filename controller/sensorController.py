@@ -36,17 +36,16 @@ def findOne(collection,query, exclude = None, limit = None, skip = None, sort=('
 def update(collection,query,data):    
     if data == []:
         return {"status":False, "message":"UPDATE NONE"}    
-    result = db.updateData(collection,query,query)
-    if result == []:
+    result = db.updateData(collection,query,data)
+    if not result :
         response = {"status":False, "message":"UPDATE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
     return cloud9Lib.jsonObject(response)
 
-def delete(collection,id):        
-    query = {"_id":ObjectId(id)}
+def delete(collection,query):        
     result = db.deleteData(collection,query)
-    if result == []:
+    if not result :
         response = {"status":False, "message":"DELETE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
