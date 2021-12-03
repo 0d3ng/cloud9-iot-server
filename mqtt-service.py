@@ -63,7 +63,8 @@ def on_message_unsubscribe(message):
 def subscribe_list():
     query = {
         "active":True,
-        "channel_type": "mqtt"
+        "channel_type": "mqtt",
+        "server":{'$exists': False}
     }
     result = comChannelController.find(query)
     if result['status']:        
@@ -80,7 +81,7 @@ def message_insert(topic,message,messageStr):
     sys.stdout.flush()
     insertLog = {
         'topic' : topic,
-        'channel_type':'mqtt',
+        'channel_type':'mqtt'
     }
     if 'failed' in message :
         insertLog['raw_message'] = messageStr
@@ -134,7 +135,7 @@ def message_insert(topic,message,messageStr):
     commLogController.add(insertLog)
 
 
-client = mqttClient.Client("Python3")               
+client = mqttClient.Client("Python3"+cloud9Lib.randomOnlyString(4))               
 # client.username_pw_set(username=user, password=password)    #set username and password
 client.on_connect= on_connect                      
 client.on_message= on_message                      

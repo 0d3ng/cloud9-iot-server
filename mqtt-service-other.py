@@ -68,7 +68,7 @@ class Comm:
         commLogController.add(insertLog)   
 
     def connect(self):
-        self.client = mqttClient.Client(self.code)
+        self.client = mqttClient.Client(self.code+cloud9Lib.randomOnlyString(4))
         self.client.on_connect=self.on_connect
         self.client.on_message=self.on_message
         try:
@@ -157,7 +157,7 @@ def on_message_unsubscribe(message):
     except KeyError:
         pass
 
-client = mqttClient.Client("Python3-Other")               
+client = mqttClient.Client("Python3-Other_"+cloud9Lib.randomOnlyString(4))               
 # client.username_pw_set(username=user, password=password)    #set username and password
 client.on_connect= on_connect                      
 client.on_message= on_message                      
