@@ -21,7 +21,7 @@ def add(data):
 def find():  
     result = db.find(collection,query,{})
     if result == []:
-        response = {"status":False, "data":data}               
+        response = {"status":False, "data":result}               
     else:
         response = {'status':True, 'data':result}
     return response
@@ -29,7 +29,7 @@ def find():
 def findOne(query):  
     result = db.findOne(collection,query,{})
     if result == []:
-        response = {"status":False, "data":data}               
+        response = {"status":False, "data":result}               
     else:
         response = {'message':'Success','list':result}
     return response

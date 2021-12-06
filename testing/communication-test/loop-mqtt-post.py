@@ -7,7 +7,7 @@ import random
 from datetime import datetime
 import sys
 
-broker="127.0.0.1"
+broker="103.106.72.188"
 port=1883
 topic= 'message/sensor/jd2090'
 
@@ -23,15 +23,18 @@ client1.connect(broker,port) #establish connection
 for x in range(1000):
     today = datetime.today() #current-datetime
     msg = {
-        "device_code":"jd2090-sv94",
-        "date_add":round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
-        "indoor_temperature":random.randint(1500,3500) / 100,
-        "indoor_humidity":random.randint(4000,10000) / 100,
-        "indoor_di":0,
-        "ac_state":1,
-        "outdoor_temperature":15,
-        "outdoor_humidity":83.4,
-        "outdoor_di":0,
+        "device_code":"jd2090-go52",
+        "date_add_sensor":round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
+        "sensing_time":today.strftime("%H:%M:%S"),
+        "co2_value":random.randint(1500,3500) / 100,
+        "window_state":0,
+        "door_state":1,
+        "person_num":2,
+        "ventilate_state":1,
+        "temperature_in":random.randint(500,3500) / 100,
+        "humidity_in":random.randint(500,3500) / 100,
+        "di_in":random.randint(500,3500) / 100,
+        "ac_state":1
     }
     payload = json.dumps(msg)
     print(msg)

@@ -28,7 +28,7 @@ def add(fillData):
 def find(query):  
     result = db.find(collection,query)
     if result == []:
-        response = {"status":False, "data":data}               
+        response = {"status":False, "data":result}               
     else:
         response = {'status':True, 'data':result}    
     return cloud9Lib.jsonObject(response)
