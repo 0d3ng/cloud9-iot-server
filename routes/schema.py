@@ -22,6 +22,7 @@ define_url = [
     ['delete/','delete'],
     ['data/([^/]+)/','getSchemaData'],
     ['data/([^/]+)/count/','countSchemaData'],
+    ['data/([^/]+)/detail/','detailSchemaData'],
     ['data/([^/]+)/add/','addSchemaData'],
     ['data/([^/]+)/edit/','updateSchemaData'],
     ['data/([^/]+)/delete/','deleteSchemaData']
@@ -277,6 +278,32 @@ class countSchemaData(RequestHandler):
                 response = {"status":True, 'message':'Success','data':len(result['data'])}
     self.write(response)
 
+class detailSchemaData(RequestHandler):
+  def post(self,schema_code):    
+    data = json.loads(self.request.body)
+    if not schema_code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    query = {"schema_code":schema_code}
+    schemaData = schemaController.findOne(query)
+    if not schemaData['status']:
+        response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}      
+        return         
+    query = data    
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
+    result = schemaDataController.findOne(prefix_collection+schema_code,query)    
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        response = {"status":True, 'message':'Success','data':result['data']}
+    self.write(response)
+
 class addSchemaData(RequestHandler):
   def post(self,schema_code):    
     data = json.loads(self.request.body)
@@ -349,7 +376,6 @@ class deleteSchemaData(RequestHandler):
         response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
         self.write(response)
         return
-
     try:
         query = {"_id":ObjectId(data["id"])}
     except:

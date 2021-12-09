@@ -93,7 +93,9 @@ def is_float(n):
         return True
 
 def str2bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
+    if(v == ""):
+        return ""
+    return v.lower() in ("yes", "true", "t", "1")
 
 def cv2datetime(v):
     if(isinstance(v,int)):
@@ -102,7 +104,10 @@ def cv2datetime(v):
         except:
             result = datetime.fromtimestamp(round(v/1000),timezone('Asia/tokyo'))
     else:
-        result = datetime.strptime(v,'%Y-%m-%d %H:%M:%S')
+        try:
+            result = datetime.strptime(v,'%Y-%m-%d %H:%M:%S')
+        except:
+            result = ""
     return result
 
 def cv2date(v):
@@ -113,7 +118,10 @@ def cv2date(v):
             result = datetime.fromtimestamp(round(v/1000),timezone('Asia/tokyo'))
         result = result.strftime("%Y-%m-%d")
     else:
-        result = datetime.strptime(v,'%Y-%m-%d').date()
+        try:
+            result = datetime.strptime(v,'%Y-%m-%d').date()
+        except:
+            result = ""
     return result
 
 def cv2time(v):
@@ -124,5 +132,8 @@ def cv2time(v):
             result = datetime.fromtimestamp(round(v/1000),timezone('Asia/tokyo'))
         result = result.strftime("%H:%M:%S")
     else:
-        result = datetime.strptime(v,'%H:%M:%S').time()
+        try:
+            result = datetime.strptime(v,'%H:%M:%S').time()
+        except:
+            result = ""
     return result
