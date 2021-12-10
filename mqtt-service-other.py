@@ -6,12 +6,15 @@ from controller import commETLController
 from controller import commLogController
 from datetime import datetime
 from pytz import timezone
-
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
+#Config
 comm_list = {} 
 comm_subs = {}
 Connected = False
-broker_address= "localhost" #"161.117.58.227"
-port = 1883
+broker_address= config["MQTT"]["broker"]
+port = int(config["MQTT"]["port"])
 
 
 class Comm:
@@ -128,9 +131,9 @@ def on_message(client, userdata, message):
         raw_object = json.loads(raw_msg)
     except:
         raw_object = {"failed":True}
-    if message.topic == 'mqtt/service-other/subscribe' :
+    if message.topic == config["MQTT"]["other_subscribe"] :
         on_message_subscribe(raw_object)
-    elif message.topic == 'mqtt/service-other/unsubscribe' :
+    elif message.topic == config["MQTT"]["other_unsubscribe"] :
         on_message_unsubscribe(raw_object)
     else :
         message_insert(message.topic,raw_object,raw_msg)
@@ -167,8 +170,8 @@ client.loop_start()
 while Connected != True:    #Wait for connection
     time.sleep(0.1)
  
-client.subscribe("mqtt/service-other/subscribe")
-client.subscribe("mqtt/service-other/unsubscribe")
+client.subscribe(config["MQTT"]["other_subscribe"])
+client.subscribe(config["MQTT"]["other_unsubscribe"])
 
 try:
     while True:

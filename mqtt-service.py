@@ -6,13 +6,16 @@ from controller import commETLController
 from controller import commLogController
 from datetime import datetime
 from pytz import timezone
-
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
+#Config
 topic_list = {} 
 Connected = False
-broker_address= "localhost" #"161.117.58.227"
-port = 1883                         
-user = "OGRhNTI5MzE1YjY0ZWRlN2EwNjI2Mzg1"
-password = "hdMFWDGTnfbhfoxoW7YXU8IwyAhFbD"
+broker_address= config["MQTT"]["broker"]
+port = int(config["MQTT"]["port"])                         
+user = config["MQTT"]["user"]
+password = config["MQTT"]["pass"]
 
 
 def on_connect(client, userdata, flags, rc):
@@ -34,9 +37,9 @@ def on_message(client, userdata, message):
         raw_object = json.loads(raw_msg)
     except:
         raw_object = {"failed":True}
-    if message.topic == 'mqtt/service/subscribe' :
+    if message.topic == config["MQTT"]["subscribe"] :
         on_message_subscribe(raw_object)
-    elif message.topic == 'mqtt/service/unsubscribe' :
+    elif message.topic == config["MQTT"]["unsubscribe"] :
         on_message_unsubscribe(raw_object)
     else :
         message_insert(message.topic,raw_object,raw_msg)
@@ -145,8 +148,8 @@ client.loop_start()
 while Connected != True:    #Wait for connection
     time.sleep(0.1)
  
-client.subscribe("mqtt/service/subscribe")
-client.subscribe("mqtt/service/unsubscribe")
+client.subscribe(config["MQTT"]["subscribe"])
+client.subscribe(config["MQTT"]["unsubscribe"])
 
 try:
     while True:

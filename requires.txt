@@ -9,3 +9,4 @@ tornado
 pytz
 elasticsearch
 kafka-python
+configparser

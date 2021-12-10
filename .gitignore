@@ -8,6 +8,7 @@
 controller/__pycache__/
 function/__pycache__/
 routes/__pycache__/
+config.ini
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 # Learn more about Git LFS for large files:

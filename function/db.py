@@ -4,13 +4,15 @@ import pymongo
 from bson.objectid import ObjectId
 from bson.json_util import loads, dumps
 import json
-
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
 #Config
-host="localhost"
-port = 27017
-uname = "*"
-pwd = "*"
-db = "iot-server"
+host    = config["DB"]["host"]
+port    = int(config["DB"]["port"])
+uname   = config["DB"]["uname"]
+pwd     = config["DB"]["pwd"]
+db      = config["DB"]["db"]
 client = pymongo.MongoClient(host=host,port=port, authSource=db)
 db = client[db]
 

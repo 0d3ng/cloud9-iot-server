@@ -1,12 +1,16 @@
 import sys, json, time
 import paho.mqtt.client as mqttClient #Must Install Req
 import datetime
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
+#Config
 mqttConnect = False
-broker_address= "localhost"
-port = 1883                         
-# user = "yourUser"
-# password = "yourPassword"
-client = mqttClient.Client("Python")  
+broker_address= config["MQTT"]["broker"]
+port = int(config["MQTT"]["port"])                         
+# user = config["MQTT"]["user"]
+# password = config["MQTT"]["pass"]
+client = mqttClient.Client("CloudIoTMQTT")  
 
 def default(o):
     if isinstance(o, (datetime.date, datetime.datetime)):

@@ -8,8 +8,11 @@ import json
 import sys
 import asyncio
 import os
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
 
-
+port = config["SERVER"]["port"]
 db = dbmongo()
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -21,7 +24,7 @@ def make_app():
   
 if __name__ == '__main__':
   app = make_app()
-  app.listen(3001)
+  app.listen(port)
   print("***********************")
   print ("Restart App")
   print("***********************")

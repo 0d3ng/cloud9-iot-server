@@ -1,9 +1,12 @@
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
 
-sender_email = "iotserver@deltadigitalid.com"#"kaze.service8@gmail.com"
-password = "iotserver123"#"K@ze1234"
+sender_email = config["MAIL"]["sender"]
+password = config["MAIL"]["password"]
 
 def send(receiver_email,subject,content):
 	message = MIMEMultipart("alternative")
