@@ -33,7 +33,7 @@ class Comm:
         print("rc: "+str(rc))
         sys.stdout.flush()
         if rc == 0:
-            print("Connected to broker:"+self.broker)
+            print("Connected to broker:"+self.broker+":"+str(self.port))
             sys.stdout.flush()
             self.Conected=True  
             self.client.subscribe(self.topic)
@@ -77,7 +77,7 @@ class Comm:
         try:
             self.client.connect(self.broker,self.port) #connect to broker
             self.client.loop_start()
-            print("Connecting to broker:"+self.broker)
+            print("Connecting to broker:"+self.broker+":"+str(self.port))
             sys.stdout.flush()
         except:
             print(self.broker+": connection failed")
@@ -86,7 +86,7 @@ class Comm:
     def disconnect(self):
         self.client.loop_stop()    #Stop loop
         self.client.disconnect() # disconnect
-        print("Diconnecting from broker:"+self.broker)
+        print("Diconnecting from:"+self.topic+"@"+self.broker+":"+str(self.port))
         print("-------------------------------------------")
         sys.stdout.flush()
 
@@ -148,7 +148,7 @@ def on_message_subscribe(message):
         result = comChannelController.findOne(query)
         if result['status']: 
             val = result['data']
-            print("Subscribe Topic: "+val['topic'])
+            print("New Subscribe to: "+val['topic']+"@"+val['server']+":"+str(val['port']))
             comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
             comm_subs[val['channel_code']].connect()
 
@@ -156,7 +156,7 @@ def on_message_unsubscribe(message):
     channel_code = message['channel_code']
     try:
         comm_subs[channel_code].disconnect()
-        del topic_list[topic]
+        del comm_subs[channel_code]
     except KeyError:
         pass
 

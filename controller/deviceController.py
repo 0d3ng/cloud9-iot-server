@@ -215,7 +215,7 @@ def communication_update(fillData):
         }
         commdata = comChannelController.findOne(query)['data']
         if commdata :
-            if commdata['active'] != fillData['mqtt'] : 
+            if ( commdata['active'] != fillData['mqtt']) or ( commdata['server'] != fillData['server']) or ( commdata['port'] != fillData['port']) or ( commdata['topic'] != fillData['topic'])  : 
                 updateMqtt = query
                 updateMqtt['active'] = fillData['mqtt']
                 updateMqtt['channel_type'] = 'mqtt'

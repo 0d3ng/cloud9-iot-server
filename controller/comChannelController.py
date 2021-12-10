@@ -194,6 +194,10 @@ def updateOther(query,data):
             if updateData['active'] == False and ( updateData['channel_type'] == 'mqtt'):
                 triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'nonactive')
 
+        if (last['server'] !=  updateData['server']) or (last['port'] !=  updateData['port']) or (last['topic'] !=  updateData['topic']):
+            triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'nonactive')
+            triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'active')
+
     return cloud9Lib.jsonObject(response)
 
 def deleteOther(query):
