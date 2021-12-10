@@ -69,8 +69,19 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
     # print(collection)
     # print(insertQuery)
     # print("------------------")
-    sys.stdout.flush()
-    result = db.insertData(collection,insertQuery)
+    # sys.stdout.flush()
+    
+    # result = db.insertData(collection,insertQuery)
+    ### CODINGHACK ####
+    hack = False
+    if 'ts' in insertQuery and 'id' in insertQuery:
+        if insertQuery['id'] == None:
+            hack = True
+    if hack:
+        result = []
+    else:
+        result = db.insertData(collection,insertQuery)  
+    ### END CODINGHACK #### 
     if result == []:
         response = {'status':False, 'message':"Add Failed"}               
     else:        

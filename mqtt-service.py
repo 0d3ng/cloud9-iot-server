@@ -131,7 +131,7 @@ def message_insert(topic,message,messageStr):
         insert = commETLController.nonetl(channelData['collection_name'],channelData['index_log'],infoMqtt,message)
     
     if not insert['status']:
-        response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Failed to add", 'data':messageStr}               
     else:
         response = {'message':'Success','status':True}    
     insertLog['response'] = response

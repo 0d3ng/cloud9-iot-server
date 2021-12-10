@@ -64,7 +64,7 @@ class Comm:
         message_obj = raw_object
         insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj)
         if not insert['status']:
-            response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
+            response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
         else:
             response = {'message':'Success','status':True}   
         insertLog['response'] = response
