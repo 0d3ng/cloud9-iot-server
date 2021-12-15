@@ -46,10 +46,9 @@ class Comm:
     
     def on_message(self,client, userdata, message):
         raw_msg = message.payload.decode("utf-8")
-        print(self.device_code)
-        print(raw_msg)
-        print("-------------------------------------------")
-        sys.stdout.flush()
+        # print(self.device_code)
+        # print("--RAW MESSAGE---")
+        # print(raw_msg)
         insertLog = {
             'topic' : message.topic,
             'channel_type':'mqtt',
@@ -61,14 +60,22 @@ class Comm:
         except:
             raw_object = cloud9Lib.delimeterExtract(raw_msg)
             insertLog['raw_message'] = raw_msg
-        message_obj = raw_object
-        insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj)
-        if not insert['status']:
-            response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
-        else:
-            response = {'message':'Success','status':True}   
-        insertLog['response'] = response
-        commLogController.add(insertLog)   
+        # print("--RAW OBJECT---")
+        # print(raw_object)
+        # print("-------------------------------------------")
+        # sys.stdout.flush()
+        hack = False
+        if ('ts' in raw_object) and (len(raw_object) == 1) :
+            hack = True        
+        if hack == False:
+            message_obj = raw_object
+            insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj)
+            if not insert['status']:
+                response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
+            else:
+                response = {'message':'Success','status':True}   
+            insertLog['response'] = response
+            commLogController.add(insertLog)   
 
     def connect(self):
         self.client = mqttClient.Client(self.code+cloud9Lib.randomOnlyString(4))

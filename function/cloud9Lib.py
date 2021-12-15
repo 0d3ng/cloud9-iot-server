@@ -54,25 +54,21 @@ def validEmail(email):
 
 def delimeterExtract(msg):
     filter = msg.split(":")
-    print("-------Filter-------")
-    print(filter)
-    print("--------------------")
-    sys.stdout.flush()
     result = {}
     for val in filter:
         item = val.split("=")
         if(len(item) == 2):  
             key = item[0]
-            if is_int(item[1]):
-                value = int(item[1])
-            elif is_float(item[1]):
-                value = float(item[1])
-            else:
+            try:
+                if is_int(item[1]):
+                    value = int(item[1])
+                elif is_float(item[1]):
+                    value = float(item[1])
+                else:
+                    value = item[1]
+            except:
                 value = item[1]
             result[key] = value
-    print("-------Result-------")
-    print(result)
-    print("--------------------")
     return jsonObject(result)
 
 def is_int(n):

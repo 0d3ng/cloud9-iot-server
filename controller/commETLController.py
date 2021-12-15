@@ -43,41 +43,43 @@ def save_image(message,field,group,device_name):
 def etl(collection,elastic_index,info,device_code,message):  #info --> , channel_type,topic,token_access,ip_sender,date_add_sensor
     insertQuery = info
     insertQuery['raw_message'] = message
-    print("------------------")
-    sys.stdout.flush()
+    insertElastic = copy.copy(insertQuery)
     insertQuery['date_add_server'] = datetime.datetime.now(timezone('Asia/Tokyo')) #datetime.datetime.utcnow() #datetime.datetime.utcnow()
     insertQuery['date_add_server_unix'] = round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000) #round(datetime.datetime.utcnow().timestamp() * 1000) #datetime.datetime.utcnow()
     insertQuery['device_code'] = device_code
-    print(insertQuery['date_add_server'])
-    print(insertQuery['date_add_server_unix'])
+    # print("------------------")
+    # sys.stdout.flush()    
+    # print(insertQuery['date_add_server'])
+    # print(insertQuery['date_add_server_unix'])
 
     queryDevice = {
         'device_code' : device_code
     }
     deviceData = deviceController.findOne(queryDevice)
+    state = False
     if deviceData['status'] == True :
         deviceData = deviceData['data']['field']
-
         for fieldData in deviceData:
             if type(fieldData) is dict:
                 fieldName = list(fieldData.keys())[0]
             else:
                 fieldName = fieldData
-            insertQuery[fieldName] = extract_etl(fieldData,message,collection,device_code)
+            insertQuery[fieldName],state = extract_etl(fieldData,message,collection,device_code,state)
 
-    insertElastic = copy.copy(insertQuery)
+    
+    # print("------------------")
     # print(collection)
     # print(insertQuery)
     # print("------------------")
     # sys.stdout.flush()
-    
     # result = db.insertData(collection,insertQuery)
     ### CODINGHACK ####
-    hack = False
-    if 'ts' in insertQuery and 'id' in insertQuery:
-        if insertQuery['id'] == None:
-            hack = True
-    if hack:
+    # hack = False
+    # if 'ts' in insertQuery and 'id' in insertQuery:
+    #     if insertQuery['id'] == None:
+    #         hack = True
+    # if hack:
+    if state == False:
         result = []
     else:
         result = db.insertData(collection,insertQuery)  
@@ -86,15 +88,15 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
         response = {'status':False, 'message':"Add Failed"}               
     else:        
         response = {'status':True,'message':'Success','data':result}   
+        del insertElastic['raw_message']
         mqttcom.publish("mqtt/output/"+elastic_index,insertElastic)    
         # elastic.insertOne(elastic_index,insertElastic) 
-        del insertElastic['raw_message']
         # mqttcom.publish("message/ouput/"+elastic_index,insertElastic)    
-    print(response)
-    sys.stdout.flush()
+    # print(response)
+    # sys.stdout.flush()
     return cloud9Lib.jsonObject(response)
 
-def extract_etl(field,data,collection,device_code):
+def extract_etl(field,data,collection,device_code,state=False):
     if type(field) is dict:
         fieldName = list(field.keys())[0]
         if fieldName in data:
@@ -107,15 +109,16 @@ def extract_etl(field,data,collection,device_code):
                         itemName = list(item.keys())[0]
                     else:
                         itemName = item                
-                    result[item] = extract_etl(item,data[fieldName],collection,device_code)
+                    result[item],state = extract_etl(item,data[fieldName],collection,device_code,state)
             return result
         else:
             return None
     else:
         if field in data:
-            return data[field]
+            state = True
+            return data[field],state
         else:
-            return None
+            return None,state
 
 
 def nonetl(collection,elastic_index,info,message):  #info --> device_code, channel_type,topic,token_access,ip_sender,date_add_sensor
