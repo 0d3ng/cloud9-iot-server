@@ -24,9 +24,9 @@ for x in range(1000):
     today = datetime.today() #current-datetime
     msg = {
         "device_code":"l0v2p5-co62",
-        "date_add":round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
-        "layanan_kependudukan":random.randint(2,100),
-        "layanan_catatan_cipil":random.randint(2,100),
+        # "date_add":round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
+        # "layanan_kependudukan":random.randint(2,100),
+        # "layanan_catatan_cipil":random.randint(2,100),
     }
     payload = json.dumps(msg)
     print(msg)

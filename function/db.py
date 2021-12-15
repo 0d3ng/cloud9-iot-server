@@ -42,8 +42,11 @@ class dbmongo:
             res = self.col.find(filter,exclude).skip(skip).sort(sort1,sort2)     
         response = []
         for document in res:
-            document['id'] = str(document['_id'])
-            del document['_id']
+            if('id' in document):
+                document['_id'] = str(document['_id'])
+            else:
+                document['id'] = str(document['_id'])
+                del document['_id']
             response.append(document)
         return json.loads(dumps(response))
 
