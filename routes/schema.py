@@ -290,8 +290,13 @@ class detailSchemaData(RequestHandler):
     if not schemaData['status']:
         response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}      
         return         
-    query = data    
-    if "id" in query :
+    query = data
+    if "_id" in query :
+        try:
+            query["_id"] = ObjectId(query["_id"])
+        except:
+            del query["_id"]   
+    elif "id" in query :
         try:
             query["_id"] = ObjectId(query["id"])
             del query["id"]
@@ -337,13 +342,18 @@ class updateSchemaData(RequestHandler):
         self.write(response)
         return
     
-    if 'id' not in data:
+    if 'id' not in data or '_id' not in data:
         response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
         self.write(response)
         return
-
+    
     try:
-        query = {"_id":ObjectId(data["id"])}
+        if "_id" in data :
+            query = {"_id":ObjectId(data["_id"])}
+            del data["_id"]
+        elif "id" in data :
+            query = {"_id":ObjectId(data["id"])}
+            del data["id"]
     except:
         response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
         self.write(response) 
