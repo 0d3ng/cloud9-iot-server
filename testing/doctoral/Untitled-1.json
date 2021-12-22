@@ -1,0 +1,66 @@
+{
+    "_id": ObjectId("61bbfa756efc8fdf2fafc0de"),
+    "schema_code": "7kz6ba",
+    "name": "FILS",
+    "field": [
+        {
+            "id": "key"
+        },
+        {
+            "lq1": ["vy00","lq","id"]
+        },
+        {
+            "lq2": ["zi05","lq","id"]
+        },
+        {
+            "lq3": ["wc64","lq","id"]
+        },
+        {
+            "lq4": ["as50","lq","id"]
+        },
+        {
+            "lq5": ["dn56","lq","id"]
+        }
+    ],
+    "option": [        
+        {
+            "lq1": "average"
+        },
+        {
+            "lq2": "average"
+        },
+        {
+            "lq3": "average"
+        },
+        {
+            "lq4": "average"
+        },
+        {
+            "lq5": "average"
+        }
+    ],
+    "value": [        
+        {
+            "lq1": 5
+        },
+        {
+            "lq2": 5
+        },
+        {
+            "lq3": 5
+        },
+        {
+            "lq4": 5
+        },
+        {
+            "lq5": 5
+        }
+    ]
+    "date_add": ISODate("2021-12-17T02:48:21Z"),
+    "add_by": "618494667dc7ea09fd36bc46",
+    "active": true,
+    "information": {
+        "detail": "-",
+        "purpose": "-"
+    }
+}

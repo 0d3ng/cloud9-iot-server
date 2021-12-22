@@ -10,3 +10,4 @@ pytz
 elasticsearch
 kafka-python
 configparser
+numpy
