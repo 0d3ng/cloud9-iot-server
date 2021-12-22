@@ -30,7 +30,7 @@ class dbmongo:
     def find(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
         (sort1,sort2) = sort
         if not self.checkCollections(col):
-            return False
+            return []
         self.col = self.db[col] 
         if (limit is None) and (skip is None):
             res = self.col.find(filter,exclude).sort(sort1,sort2)            

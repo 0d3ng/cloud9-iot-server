@@ -11,3 +11,4 @@ elasticsearch
 kafka-python
 configparser
 numpy
+pandas

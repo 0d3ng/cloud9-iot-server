@@ -4,69 +4,49 @@
             "id": "key"
         },
         {
-            "lq1": [
-                {
-                    "data":["vy00","lq","id"]
-                },
-                {
-                    "option":"average"
-                },
-                {
-                    "default":5
-                }
-            ]
+            "lq1":{
+                "data":["vy00","lq","id"],
+                "option":"average",
+                "default":5,
+                "min":5,
+                "max":150
+            }
         },
         {
-            "lq2": [
-                {
-                    "data":["zi05","lq","id"]
-                },
-                {
-                    "option":"average"
-                },
-                {
-                    "default":5
-                }
-            ]
+            "lq2": {
+                "data":["zi05","lq","id"],
+                "option":"average",
+                "default":5,
+                "min":5,
+                "max":150
+            }
         },
         {
-            "lq3": [
-                {
-                    "data":["wc64","lq","id"]
-                },
-                {
-                    "option":"average"
-                },
-                {
-                    "default":5
-                }
-            ]
+            "lq3": {
+                "data":["wc64","lq","id"],
+                "option":"average",
+                "default":5,
+                "min":5,
+                "max":150
+            }
         },
         {
-            "lq4": [
-                {
-                    "data":["as50","lq","id"]
-                },
-                {
-                    "option":"average"
-                },
-                {
-                    "default":5
-                }
-            ]
+            "lq4": {
+                "data":["as50","lq","id"],
+                "option":"average",
+                "default":5,
+                "min":5,
+                "max":150
+            }
         },
         {
-            "lq5": [
-                {
-                    "data":["dn56","lq","id"]
-                },
-                {
-                    "option":"average"
-                },
-                {
-                    "default":5
-                }
-            ]
+            "lq5": {
+                "data":["dn56","lq","id"],
+                "option":"average",
+                "default":5,
+                "min":5,
+                "max":150
+            }
         }
     ]
 
