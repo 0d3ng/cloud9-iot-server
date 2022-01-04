@@ -34,7 +34,7 @@ class add(RequestHandler):
     print(data)
     sys.stdout.flush()
     if 'schema_code' not in data:
-        data['schema_code'] = generateCode();
+        data['schema_code'] = generateCode()
 
     insert = schemaController.add(data)    
     if not insert['status']:

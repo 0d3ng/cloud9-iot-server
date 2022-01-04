@@ -45,7 +45,6 @@ def grouping(datalist):
         if not key  in d:
             d[key] = []
         d[key].append(val)
-
     return d 
 
 def averagedata(datalist):
@@ -53,7 +52,7 @@ def averagedata(datalist):
         datalist[key] = sum(datalist[key]) / len(datalist[key])
     return datalist 
 
-timesrc = "2021-12-15 17:47"
+timesrc = "2021-12-16 17:47"
 insertData = {}
 for fieldData in field:
     fieldName = list(fieldData.keys())[0]

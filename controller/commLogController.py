@@ -52,3 +52,15 @@ def delete(query):
         response = {'status':True,'message':'Success','data':result}
     return cloud9Lib.jsonObject(response)
 
+def averageData(datalist):
+    for key in datalist:
+        datalist[key] = sum(datalist[key]) / len(datalist[key])
+    return datalist 
+
+def grouping(datalist):
+    d = {}
+    for key, val in datalist:
+        if not key  in d:
+            d[key] = []
+        d[key].append(val)
+    return d 

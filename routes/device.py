@@ -59,7 +59,7 @@ class add(RequestHandler):
 
 
     if 'device_code' not in data:
-        data['device_code'] = generateCode(data['group_code_name']);
+        data['device_code'] = generateCode(data['group_code_name'])
 
     insert = deviceController.add(data)    
     if not insert['status']:
@@ -201,7 +201,6 @@ class delete(RequestHandler):
 class getdata(RequestHandler):
   def post(self,device):    
     data = json.loads(self.request.body)
-    print(data)
     response = ""
     query = {"device_code":device}
     deviceData = deviceController.findOne(query)

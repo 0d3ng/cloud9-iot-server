@@ -71,6 +71,7 @@ def subscribe_list():
     }
     result = comChannelController.find(query)
     if result['status']:        
+
         for val in result['data']:
             topic_list[val['topic']] = val['channel_code']
             client.subscribe(val['topic'])
@@ -99,7 +100,7 @@ def message_insert(topic,message,messageStr):
     if not resultChannel['status']:
         response = {"status":False, "message":"Wrong communication topic",'data':json.loads(self.request.body)} 
         insertLog['response'] = response
-        commLogController.add(insertLog);
+        commLogController.add(insertLog)
     else:
         channelData = resultChannel['data']
 
