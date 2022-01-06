@@ -68,7 +68,8 @@ def filter(schema_code,value):
             fieldType = fieldData[fieldName]
             if fieldName in value:
                 if fieldType == "int":
-                    val = int(value[fieldName])
+                    # val = int(value[fieldName])
+                    val = round(float(value[fieldName]))
                 elif fieldType == "float":
                     val = float(value[fieldName])
                 elif fieldType == "str":
