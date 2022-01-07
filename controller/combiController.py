@@ -9,6 +9,7 @@ import pandas as pd
 from controller import schemaDataController
 from controller import sensorController
 from pytz import timezone
+import statistics
 
 sensors = []
 db = db.dbmongo()
@@ -118,9 +119,14 @@ def grouping(datalist):
 
 def averagedata(datalist):
     for key in datalist:
-        datalist[key] = sum(datalist[key]) / len(datalist[key])
+        # datalist[key] = sum(datalist[key]) / len(datalist[key])
+        datalist[key] = statistics.mean(datalist[key])
     return datalist
 
+def variancedata(datalist):
+    for key in datalist:
+        datalist[key] = statistics.variance(datalist[key])
+    return datalist
 
 def generateDate(time_str,time_end,freq):
     time_str = datetime.datetime.strptime(time_str,'%Y-%m-%d %H:%M')
@@ -150,6 +156,8 @@ def combiProcess(schema_code,field,time_start,time_end,batch_code = None):
             datalist = grouping(datalist)
             if(method == "average"):
                 datalist = averagedata(datalist)
+            if(method == "variance"):
+                datalist = variancedata(datalist)
             for key in datalist:
                 if not key in insertData:
                     insertData[key] = {}

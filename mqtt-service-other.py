@@ -144,8 +144,7 @@ def on_message(client, userdata, message):
         on_message_unsubscribe(raw_object)
     else :
         message_insert(message.topic,raw_object,raw_msg)
-    
-    
+      
 def on_message_subscribe(message):
     channel_code = message['channel_code']
     if(channel_code):
