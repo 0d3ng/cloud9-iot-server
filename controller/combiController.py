@@ -141,7 +141,7 @@ def generateDate(time_str,time_end,freq):
     )
     return l
 
-def combiProcess(schema_code,field,time_start,time_end,batch_code = None):
+def combiProcess(schema_code,field,time_start,time_end,batch_code = None,send_result = None):
     insertCount = 0
     insertData = {}
     for fieldData in field:
@@ -180,8 +180,9 @@ def combiProcess(schema_code,field,time_start,time_end,batch_code = None):
             insertQuery = filter['data']
             if batch_code is not None :
                 insertQuery["batch_code"] = batch_code
-            insertQuery["date_add_batch"] = datetime.datetime.now(timezone('Asia/Tokyo'))
-            insertQuery["date_add_auto"] = datetime.datetime.strptime(time_end,'%Y-%m-%d %H:%M')
+            if send_result is None:
+                insertQuery["date_add_batch"] = datetime.datetime.now(timezone('Asia/Tokyo'))
+            insertQuery["date_add_auto"] = datetime.datetime.strptime(time_end,'%Y-%m-%d %H:%M')            
             insert = schemaDataController.add(prefix_collection_schema+schema_code,insertQuery)
             if insert['status']:
                 insertCount = insertCount + 1

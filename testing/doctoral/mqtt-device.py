@@ -48,11 +48,11 @@ msg = {
 }
 
 msg2 = {
-    "combi_code":"xawer2",
+    "combi_code":"tcj3xa",
     "time_loop":1
 }
 
 
-# sendMQTT2("combi/service/start",msg)
-sendMQTT2("combi/service/stop",msg)
+sendMQTT2("combi/service/start",msg2)
+# sendMQTT2("combi/service/stop",msg2)
 stopMQTT()

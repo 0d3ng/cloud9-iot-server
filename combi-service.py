@@ -1,8 +1,7 @@
 import multiprocessing
 import sys, json, time
 import paho.mqtt.client as mqttClient #Must Install Req
-sys.path.append('../../')
-from function import cloud9Lib
+from function import *
 from controller import combiController
 from datetime import datetime,timedelta
 from configparser import ConfigParser
