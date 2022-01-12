@@ -11,6 +11,10 @@ from controller import sensorController
 from pytz import timezone
 import statistics
 
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
+
 sensors = []
 db = db.dbmongo()
 td = datetime.timedelta(hours=9)
@@ -37,6 +41,8 @@ def add(fillData):
         response = {'status':False, 'message':"Add Failed"}               
     else:
         response = {'status':True,'message':'Success','data':result}
+        if insertQuery['stream'] == True:
+            triggerService(insertQuery["combi_code"],insertQuery["time_loop"],True)
     return cloud9Lib.jsonObject(response)
 
 def find(query):  
@@ -72,21 +78,48 @@ def update(query,data):
     if 'updated_by' in data: updateData['updated_by'] = data['updated_by']
 
     if updateData == []:
-        return {"status":False, "message":"UPDATE NONE"}        
+        return {"status":False, "message":"UPDATE NONE"}   
+    last = findOne(queryUpdate)['data'] 
+    # print(updateData)
+    # print(last)
+    # sys.stdout.flush()    
     result = db.updateData(collection,queryUpdate,updateData)
     if not result :
         response = {"status":False, "message":"UPDATE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
+        if last['stream'] !=  updateData['stream']:
+            if 'time_loop' in updateData: 
+                time_loop =  updateData['time_loop']
+            else:
+                time_loop = last['time_loop']
+            if updateData['stream'] == True:
+                triggerService(last["combi_code"],time_loop,True)
+            if updateData['stream'] == False:
+                triggerService(last["combi_code"],time_loop,False)
     return cloud9Lib.jsonObject(response)
 
-def delete(query):            
+def delete(query): 
+    listData = findOne(query)['data']           
     result = db.deleteData(collection,query)
     if not result:
         response = {"status":False, "message":"DELETE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
+        triggerService(listData["combi_code"],listData["time_loop"],False)
     return cloud9Lib.jsonObject(response)
+
+def triggerService(combi_code,time_loop,status):
+    send = {
+        "combi_code":combi_code,
+        "time_loop":time_loop
+    }
+    if status :
+        mqttcom.publish(config["MQTT"]["combi_stream_start"],send)
+        return
+    else:
+        mqttcom.publish(config["MQTT"]["combi_stream_stop"],send)
+        return
 
 def getSensorData(time_str,time_end,code,key,value):
     collection = prefix_collection_sensor+str(code)

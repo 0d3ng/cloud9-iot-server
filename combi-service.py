@@ -44,17 +44,19 @@ def on_message(client, userdata, message):
       
 def on_message_subscribe(message):
     combi_code = message['combi_code']
-    time_loop = message['time_loop']    
-    comm_subs[combi_code] = multiprocessing.Process(target=worker, args=(combi_code,time_loop))
-    comm_subs[combi_code].start()
+    time_loop = message['time_loop']
+    if combi_code not in comm_subs:    
+        comm_subs[combi_code] = multiprocessing.Process(target=worker, args=(combi_code,time_loop))
+        comm_subs[combi_code].start()
 
 def on_message_unsubscribe(message):
     combi_code = message['combi_code']
     print("Stop Service : ",combi_code)
     sys.stdout.flush()
-    comm_subs[combi_code].terminate()
-    comm_subs[combi_code].join()
-    del comm_subs[combi_code]
+    if combi_code in comm_subs:
+        comm_subs[combi_code].terminate()
+        comm_subs[combi_code].join()
+        del comm_subs[combi_code]
 
 def worker(code, time_loop):
     last_time = datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -76,6 +78,7 @@ def worker(code, time_loop):
                 # print("Totall Insert ",code," : ",item)
                 # sys.stdout.flush()
                 #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
+                time_loop = combiData["time_loop"]
             next_time = datetime.now() + timedelta(minutes=int(time_loop))
             next_time = next_time.strftime('%Y-%m-%d %H:%M')
             last_time = curentTime
