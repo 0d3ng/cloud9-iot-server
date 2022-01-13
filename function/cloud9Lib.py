@@ -58,7 +58,7 @@ def delimeterExtract(msg):
     for val in filter:
         item = val.split("=")
         if(len(item) == 2):  
-            key = item[0]
+            key = item[0].strip()
             try:
                 if is_int(item[1]):
                     value = int(item[1])

@@ -19,6 +19,7 @@ def add(fillData):
         'topic':fillData.get('topic', None), 
         'channel_type':fillData.get('channel_type', None),
         'raw_message':fillData.get('raw_message', None),
+        'response':fillData.get('response', None),
         'date_server': datetime.datetime.utcnow()        
     }
     result = db.insertData(collection,insertQuery)

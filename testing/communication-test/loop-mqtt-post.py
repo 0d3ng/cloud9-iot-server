@@ -7,7 +7,7 @@ import random
 from datetime import datetime
 import sys
 
-broker="103.106.72.188"
+broker="localhost"
 port=1883
 topic= 'message/sensor/jd2090'
 

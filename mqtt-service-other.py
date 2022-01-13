@@ -52,14 +52,16 @@ class Comm:
         insertLog = {
             'topic' : message.topic,
             'channel_type':'mqtt',
+            'raw_message' : message.payload.decode("utf-8")
         } 
-        infoMqtt = insertLog  
+        infoMqtt = insertLog.copy()
         try:
             raw_object = json.loads(raw_msg)
-            insertLog['raw_message'] = raw_object
+            # insertLog['raw_message'] = raw_object
         except:
+            raw_msg = raw_msg.replace('\u0000', '')
             raw_object = cloud9Lib.delimeterExtract(raw_msg)
-            insertLog['raw_message'] = raw_msg
+            # insertLog['raw_message'] = raw_msg
         # print("--RAW OBJECT---")
         # print(raw_object)
         # print("-------------------------------------------")

@@ -85,12 +85,13 @@ def message_insert(topic,message,messageStr):
     sys.stdout.flush()
     insertLog = {
         'topic' : topic,
-        'channel_type':'mqtt'
+        'channel_type':'mqtt',
+        'raw_message' : messageStr
     }
-    if 'failed' in message :
-        insertLog['raw_message'] = messageStr
-    else:
-        insertLog['raw_message'] = message
+    # if 'failed' in message :
+    #     insertLog['raw_message'] = messageStr
+    # else:
+    #     insertLog['raw_message'] = message
     #End Log Insert#
     queryChanel = {
         'channel_code' : topic_list[topic],
