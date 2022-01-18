@@ -121,8 +121,11 @@ def triggerService(combi_code,time_loop,status):
         mqttcom.publish(config["MQTT"]["combi_stream_stop"],send)
         return
 
-def getSensorData(time_str,time_end,code,key,value):
-    collection = prefix_collection_sensor+str(code)
+def getSensorData(time_str,time_end,code,key,value,collectid=None):
+    if(collectid):
+        collection = prefix_collection_sensor+str(collectid)
+    else:
+        collection = prefix_collection_sensor+str(code)
     datesrc_str = datetime.datetime.strptime(time_str+":00",'%Y-%m-%d %H:%M:%S') - td
     datesrc_end = datetime.datetime.strptime(time_end+":59",'%Y-%m-%d %H:%M:%S') - td
     query = {
@@ -131,9 +134,18 @@ def getSensorData(time_str,time_end,code,key,value):
     exclude = {
         str(key):1,
         str(value):1,
-        "date_add_server":14
+        "date_add_server":1
     }
+    if(collectid):
+        query["device_code"] = str(code)
+    print("--------------------")
+    print(collection)
+    print(query)
+    
     result = sensorController.find(collection,query,exclude)
+    print(result)
+    print("-------++++---------")
+    sys.stdout.flush()
     if not result['status']:
         response = []               
     else:
@@ -185,7 +197,10 @@ def combiProcess(schema_code,field,time_start,time_end,batch_code = None,send_re
             field_val_search = fieldValue["data"][1]
             field_key_search = fieldValue["data"][2]
             method = fieldValue["option"]
-            datalist = getSensorData(time_start,time_end,code,field_key_search,field_val_search)
+            if "collectid" in fieldValue:
+                datalist = getSensorData(time_start,time_end,code,field_key_search,field_val_search,fieldValue["collectid"])
+            else :
+                datalist = getSensorData(time_start,time_end,code,field_key_search,field_val_search)
             datalist = grouping(datalist)
             if(method == "average"):
                 datalist = averagedata(datalist)
