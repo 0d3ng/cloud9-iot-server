@@ -145,7 +145,8 @@ def on_message(client, userdata, message):
     elif message.topic == config["MQTT"]["other_unsubscribe"] :
         on_message_unsubscribe(raw_object)
     else :
-        message_insert(message.topic,raw_object,raw_msg)
+        # message_insert(message.topic,raw_object,raw_msg)
+        print("undefined messages")
       
 def on_message_subscribe(message):
     channel_code = message['channel_code']

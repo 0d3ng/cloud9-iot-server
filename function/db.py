@@ -5,6 +5,7 @@ from bson.objectid import ObjectId
 from bson.json_util import loads, dumps
 import json
 from configparser import ConfigParser
+import time
 config = ConfigParser()
 config.read("config.ini")
 #Config
@@ -131,7 +132,30 @@ class dbmongo:
         if(x['nModified'] > 0):
             return True
         return False
-#        sys.stdout.flush()
+
+    def count(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
+        (sort1,sort2) = sort
+        if not self.checkCollections(col):
+            return []
+        self.col = self.db[col] 
+        if (limit is None) and (skip is None):
+            res = self.col.find(filter,exclude).sort(sort1,sort2).count()            
+        elif not ( (limit is None) or (skip is None) ):
+            res = self.col.find(filter,exclude).limit(limit).skip(skip).sort(sort1,sort2).count()
+        elif not (limit is None):
+            res = self.col.find(filter,exclude).limit(limit).sort(sort1,sort2).count()
+        elif not (skip is None):
+            res = self.col.find(filter,exclude).skip(skip).sort(sort1,sort2).count()     
+        
+        return res 
+
 
 if __name__ == "__main__":
     mongo = dbmongo()    
+
+# t = time.time()
+# elapsed_time = time.time() - t
+# print("**Count***")
+# print(col)
+# print(elapsed_time)
+# print("**********")

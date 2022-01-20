@@ -88,8 +88,8 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
         response = {'status':False, 'message':"Add Failed"}               
     else:        
         response = {'status':True,'message':'Success','data':result}   
-        del insertElastic['raw_message']
-        mqttcom.publish("mqtt/output/"+elastic_index,insertElastic)    
+        del insertQuery['raw_message']
+        mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)    
         # elastic.insertOne(elastic_index,insertElastic) 
         # mqttcom.publish("message/ouput/"+elastic_index,insertElastic)    
     # print(response)
@@ -115,7 +115,9 @@ def extract_etl(field,data,collection,device_code,state=False):
             return None
     else:
         if field in data:
-            state = True
+            if state == False :
+                if len(str(data[field])) > 0:
+                    state = True
             return data[field],state
         else:
             return None,state

@@ -12,6 +12,8 @@ from pytz import timezone
 import statistics
 
 from configparser import ConfigParser
+
+from function import cloud9Lib
 config = ConfigParser()
 config.read("config.ini")
 
@@ -129,7 +131,9 @@ def getSensorData(time_str,time_end,code,key,value,collectid=None):
     datesrc_str = datetime.datetime.strptime(time_str+":00",'%Y-%m-%d %H:%M:%S') - td
     datesrc_end = datetime.datetime.strptime(time_end+":59",'%Y-%m-%d %H:%M:%S') - td
     query = {
-        'date_add_server' : {"$gte":datesrc_str, "$lt":datesrc_end }
+        'date_add_server' : {"$gte":datesrc_str, "$lt":datesrc_end } ,
+        str(key):{"$ne":None},
+        str(value):{"$ne":None}
     }
     exclude = {
         str(key):1,
@@ -138,13 +142,13 @@ def getSensorData(time_str,time_end,code,key,value,collectid=None):
     }
     if(collectid):
         query["device_code"] = str(code)
-    print("--------------------")
-    print(collection)
-    print(query)
+    # print("--------------------")
+    # print(collection)
+    # print(query)
     
     result = sensorController.find(collection,query,exclude)
-    print(result)
-    print("-------++++---------")
+    # print(result)
+    # print("-------++++---------")
     sys.stdout.flush()
     if not result['status']:
         response = []               
@@ -154,10 +158,13 @@ def getSensorData(time_str,time_end,code,key,value,collectid=None):
             response.append([item[str(key)],item[str(value)]])
     return response
 
-def grouping(datalist):
+def grouping(datalist,method):
     d = {}
     for key, val in datalist:
-        if not key  in d:
+        if method == "average" or method == "variance" :
+            if not cloud9Lib.is_float(val) :
+                continue
+        if not key in d:
             d[key] = []
         d[key].append(val)
     return d 
@@ -165,12 +172,24 @@ def grouping(datalist):
 def averagedata(datalist):
     for key in datalist:
         # datalist[key] = sum(datalist[key]) / len(datalist[key])
-        datalist[key] = statistics.mean(datalist[key])
+        try:
+            datalist[key] = statistics.mean(datalist[key])        
+        except:
+            print(datalist)
+            print("ERROR")
+            datalist[key] = 0
+            sys.stdout.flush()
     return datalist
 
 def variancedata(datalist):
     for key in datalist:
-        datalist[key] = statistics.variance(datalist[key])
+        try:
+            datalist[key] = statistics.variance(datalist[key])        
+        except:
+            print(datalist)
+            print("ERROR")
+            datalist[key] = 0
+            sys.stdout.flush()
     return datalist
 
 def generateDate(time_str,time_end,freq):
@@ -201,11 +220,11 @@ def combiProcess(schema_code,field,time_start,time_end,batch_code = None,send_re
                 datalist = getSensorData(time_start,time_end,code,field_key_search,field_val_search,fieldValue["collectid"])
             else :
                 datalist = getSensorData(time_start,time_end,code,field_key_search,field_val_search)
-            datalist = grouping(datalist)
-            if(method == "average"):
+            datalist = grouping(datalist,method)
+            if(method == "average"):            
                 datalist = averagedata(datalist)
             if(method == "variance"):
-                datalist = variancedata(datalist)
+                datalist = variancedata(datalist)            
             for key in datalist:
                 if not key in insertData:
                     insertData[key] = {}
@@ -230,8 +249,15 @@ def combiProcess(schema_code,field,time_start,time_end,batch_code = None,send_re
                 insertQuery["batch_code"] = batch_code
             if send_result is None:
                 insertQuery["date_add_batch"] = datetime.datetime.now(timezone('Asia/Tokyo'))
-            insertQuery["date_add_auto"] = datetime.datetime.strptime(time_end,'%Y-%m-%d %H:%M')            
-            insert = schemaDataController.add(prefix_collection_schema+schema_code,insertQuery)
-            if insert['status']:
-                insertCount = insertCount + 1
+            insertQuery["date_add_auto"] = datetime.datetime.strptime(time_end,'%Y-%m-%d %H:%M') - td            
+            try:
+                insert = schemaDataController.add(prefix_collection_schema+schema_code,insertQuery)
+                if insert['status']: 
+                    insertCount = insertCount + 1
+            except:
+                print(schema_code)
+                print(insertQuery)
+                print("ERROR")
+                sys.stdout.flush()
+
     return insertCount

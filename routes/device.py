@@ -320,11 +320,11 @@ class countdata(RequestHandler):
             query["device_code"] = device
             exclude = {'raw_message':0}
             print(query)
-            result = sensorController.find(collection,query,exclude,limit,skip,sort)
+            result = sensorController.count(collection,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':0}               
             else:
-                response = {"status":True, 'message':'Success','data':len(result['data'])}
+                response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
 
 class addOther(RequestHandler):

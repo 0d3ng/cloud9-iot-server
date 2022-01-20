@@ -74,14 +74,24 @@ def worker(code, time_loop):
                 # print("Process for ",code," ",last_time," ",next_time)
                 next_time = datetime.strptime(next_time,'%Y-%m-%d %H:%M') - timedelta(minutes=1) #To get second data.
                 next_time = next_time.strftime('%Y-%m-%d %H:%M')
-                item = combiController.combiProcess(combiData["schema_code"],combiData["field"],last_time,next_time,"",True)
-                # print("Totall Insert ",code," : ",item)
-                # sys.stdout.flush()
+                try:
+                    item = combiController.combiProcess(combiData["schema_code"],combiData["field"],last_time,next_time,"",True)
+                except:
+                    print("------++++++------")
+                    print(code)
+                    print(next_time)
+                    print("Error")
+                    print("------------------")
+                    sys.stdout.flush()
+                # print("Totall Insert ",code," : ",item)                
                 #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
                 time_loop = combiData["time_loop"]
             next_time = datetime.now() + timedelta(minutes=int(time_loop))
             next_time = next_time.strftime('%Y-%m-%d %H:%M')
             last_time = curentTime
+            # print(code)
+            # print(next_time)
+            # sys.stdout.flush()
 
 def stream_list():
     query = {

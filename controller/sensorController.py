@@ -50,3 +50,11 @@ def delete(collection,query):
     else:
         response = {'status':True,'message':'Success','data':result}
     return cloud9Lib.jsonObject(response)
+
+def count(collection,query, exclude = None, limit = None, skip = None, sort=('$natural',1)):  
+    result = db.count(collection,query,exclude,limit,skip,sort)
+    if result == []:
+        response = {"status":False, "data":query}               
+    else:
+        response = {'status':True, 'data':result}    
+    return cloud9Lib.jsonObject(response)

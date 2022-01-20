@@ -21,6 +21,11 @@ def publish(topic,message):
 		client.connect(broker_address, port=port)
 		time.sleep(0.5)
 		client.publish(topic,json.dumps(message,default=default))
+		print("------MQTT------")
+		print(topic)
+		print(message)
+		print("----------------")
+		sys.stdout.flush()
 		client.disconnect()
 	except  Exception as e:
 		print("failed")
