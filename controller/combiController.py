@@ -19,7 +19,7 @@ config.read("config.ini")
 
 sensors = []
 db = db.dbmongo()
-td = datetime.timedelta(hours=9)
+td = datetime.timedelta(hours=int(config["SERVER"]["timediff"]))
 
 collection = "combi"
 prefix_collection = "combi_"
@@ -132,7 +132,7 @@ def getSensorData(time_str,time_end,code,key,value,collectid=None):
     datesrc_end = datetime.datetime.strptime(time_end+":59",'%Y-%m-%d %H:%M:%S') - td
     query = {
         'date_add_server' : {"$gte":datesrc_str, "$lt":datesrc_end } ,
-        str(key):{"$ne":None},
+        str(key):{"$ne":None,"$ne":""},
         str(value):{"$ne":None}
     }
     exclude = {

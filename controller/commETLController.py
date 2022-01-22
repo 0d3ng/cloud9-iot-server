@@ -11,6 +11,7 @@ import copy
 import base64
 import os
 
+
 sensors = []
 db = db.dbmongo()
 elastic = elastic.elastic()
