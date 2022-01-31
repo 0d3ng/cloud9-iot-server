@@ -34,6 +34,6 @@ msg = {
 	"z":random.randint(4000,10000) / 100
 }
 payload = json.dumps(msg)
-payload = "::rc=80000000:lq=59\u0000:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=1:y=1 :z=1::ts=9774"
-# payload = "::rc=8000\u00000000:lq=\u0000"
+# payload = "::rc=80000000:lq=59\u0000:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=1:y=1 :z=1::ts=9774"
+payload = "::rc=8000\u00000000:lq=\u0000"
 ret= client1.publish(topic,payload=payload) #publish

@@ -132,7 +132,7 @@ def getSensorData(time_str,time_end,code,key,value,collectid=None):
     datesrc_end = datetime.datetime.strptime(time_end+":59",'%Y-%m-%d %H:%M:%S') - td
     query = {
         'date_add_server' : {"$gte":datesrc_str, "$lt":datesrc_end } ,
-        str(key):{"$ne":None,"$ne":""},
+        "$and":[{str(key):{"$ne":None}},{str(key):{"$ne":""}}],
         str(value):{"$ne":None}
     }
     exclude = {
@@ -169,26 +169,26 @@ def grouping(datalist,method):
         d[key].append(val)
     return d 
 
-def averagedata(datalist):
+def averagedata(datalist,defaultval):
     for key in datalist:
         # datalist[key] = sum(datalist[key]) / len(datalist[key])
         try:
             datalist[key] = statistics.mean(datalist[key])        
         except:
             print(datalist)
-            print("ERROR")
-            datalist[key] = 0
+            print("ERROR Average")
+            datalist[key] = defaultval
             sys.stdout.flush()
     return datalist
 
-def variancedata(datalist):
+def variancedata(datalist,defaultval):
     for key in datalist:
         try:
             datalist[key] = statistics.variance(datalist[key])        
         except:
-            print(datalist)
-            print("ERROR")
-            datalist[key] = 0
+            # print(datalist)
+            # print("ERROR")
+            datalist[key] = defaultval
             sys.stdout.flush()
     return datalist
 
@@ -222,9 +222,9 @@ def combiProcess(schema_code,field,time_start,time_end,batch_code = None,send_re
                 datalist = getSensorData(time_start,time_end,code,field_key_search,field_val_search)
             datalist = grouping(datalist,method)
             if(method == "average"):            
-                datalist = averagedata(datalist)
+                datalist = averagedata(datalist,fieldValue["default"])
             if(method == "variance"):
-                datalist = variancedata(datalist)            
+                datalist = variancedata(datalist,fieldValue["default"])            
             for key in datalist:
                 if not key in insertData:
                     insertData[key] = {}
