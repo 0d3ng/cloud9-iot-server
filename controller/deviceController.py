@@ -202,8 +202,9 @@ def communication_update(fillData):
         query = {
             'channel_code': 'http-post-'+fillData['token_access']
         }
-        commdata = comChannelController.findOne(query)['data']
-        if commdata :
+        commdata = comChannelController.findOne(query)
+        if commdata['status']:
+            commdata = commdata['data']
             if commdata['active'] != fillData['http-post'] : 
                 updateHttp = query
                 updateHttp['active'] = fillData['http-post']
@@ -214,8 +215,9 @@ def communication_update(fillData):
         query = {
             'channel_code': 'mqtt-'+fillData['token_access']
         }
-        commdata = comChannelController.findOne(query)['data']
-        if commdata :
+        commdata = comChannelController.findOne(query)
+        if commdata['status']:
+            commdata = commdata['data']
             if ( commdata['active'] != fillData['mqtt']) or ( commdata['server'] != fillData['server']) or ( commdata['port'] != fillData['port']) or ( commdata['topic'] != fillData['topic'])  : 
                 updateMqtt = query
                 updateMqtt['active'] = fillData['mqtt']

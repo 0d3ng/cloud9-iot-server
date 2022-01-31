@@ -1,10 +1,14 @@
 import sys
+from numpy import insert
 sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
 from function import *
 from controller import deviceController
+from controller import deviceController
+from controller import commETLController
+from controller import groupSensorController
 from controller import sensorController
 from datetime import datetime
 
@@ -21,7 +25,8 @@ groups = []
 define_url = [
     ['add/','add'],
     ['edit/','update'],
-    ['delete/','delete']
+    ['delete/','delete'],
+    ['batch/([^/]+)/','batch']
 ]
 
 class add(RequestHandler):
@@ -187,4 +192,66 @@ class delete(RequestHandler):
         response = {'message':'Delete Success','status':True}    
     self.write(response)
 
+    
+class batch(RequestHandler):
+  def post(self,device):
+    data = json.loads(self.request.body)
+    query = {"device_code":device}
+    deviceData = deviceController.findOne(query)
+    if not deviceData['status']:
+        response = {"status":False, "message":"Device not found",'data':json.loads(self.request.body)}               
+    if 'field_process' not in deviceData["data"]:
+        response = {"status":False, "message":"Process for Device not found",'data':json.loads(self.request.body)}               
+    else:
+        deviceData = deviceData["data"]
+        deviceProcess = deviceData['field_process']
+        if 'date_start' not in data:
+            response = {"status":False, "message":"Date Start Not Found",'data':json.loads(self.request.body)}               
+            self.write(response)
+            return
+        if 'date_end' not in data:
+            response = {"status":False, "message":"Date End Not Found",'data':json.loads(self.request.body)}               
+            self.write(response)
+            return 
+
+        if deviceData['group_code_name'] != "other":
+            query = {"code_name":deviceData['group_code_name']}
+            groupData = groupSensorController.findOne(query)
+            if not groupData['status']:
+                response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)} 
+                self.write(response)
+                return
+            else:
+                groupData = groupData['data']
+                collection = 'sensor_data_'+groupData['id']
+        else:
+            collection = 'sensor_data_'+deviceData['device_code']
+        
+        datesrc_str = datetime.strptime(str(data['date_start'])+":00",'%Y-%m-%d %H:%M:%S') - td
+        datesrc_end = datetime.strptime(str(data['date_end'])+":59",'%Y-%m-%d %H:%M:%S') - td
+        query = {
+           'date_add_server': {"$gte":datesrc_str, "$lt":datesrc_end },
+           'device_code':device
+        }
+        result = sensorController.find(collection,query)
+        insertCount = 0
+        if result['status']:
+            for document in result['data']:
+                updateData = {}
+                for fieldkey in deviceProcess:
+                    fielditem = deviceProcess[fieldkey]
+                    updateData[fieldkey] = commETLController.preproces(document,fielditem)
+                try:                        
+                    if "_id" in document:
+                        query = {"_id" : ObjectId(document["_id"]) }
+                    else:
+                        query = {"_id" : ObjectId(document["id"]) }
+                    update = sensorController.update(collection,query,updateData)     
+                    if update['status']:
+                        insertCount = insertCount + 1
+                except:
+                    print("Error")
+
+        response = {"status":True,"data":{"insert_count":insertCount}}
+    self.write(response)        
     

@@ -20,7 +20,7 @@ d = {
 }
 
 def preproces(insert,data):
-    # try: 
+    try: 
         exec(data['pre'])
         var = []
         for x in range(len(data['var'])):
@@ -30,9 +30,12 @@ def preproces(insert,data):
                 var.append(0)
         print(var)
         return eval(data['process'])
-    # except:
-    #     return 0 
+    except:
+        return 0 
 
-res = preproces(data,d)
-print(res)
+# res = preproces(data,d)
+# print(res)
+for k in d:
+    print(k)
+    print(d[k])
 sys.stdout.flush()

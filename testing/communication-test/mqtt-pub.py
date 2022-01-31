@@ -6,7 +6,7 @@ import random
 
 broker="localhost" #"161.117.58.227"
 port=1883
-topic= 'Project_IPS/client4'#'message/sensor/xzhu2l'
+topic= 'Project_IPS/client1'#'message/sensor/xzhu2l'
 
 def on_publish(client,userdata,result): #create function for callback
     print("data published")
@@ -27,13 +27,13 @@ msg = {
     # "temperature": 25.5,
     # "fuel":900
     "ts": round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
-	"id":"xzhu2l-so62",
+	"id":"11",
 	"lq":random.randint(0,100),
 	"x":random.randint(4000,10000) / 100,
 	"y":random.randint(4000,10000) / 100,
 	"z":random.randint(4000,10000) / 100
 }
 payload = json.dumps(msg)
-payload = "::rc=80000000:lq=59\u0000:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=-004:y=-0004 :z=0095::ts=9774"
+payload = "::rc=80000000:lq=59\u0000:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=1:y=1 :z=1::ts=9774"
 # payload = "::rc=8000\u00000000:lq=\u0000"
 ret= client1.publish(topic,payload=payload) #publish

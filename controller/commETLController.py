@@ -59,6 +59,7 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
     deviceData = deviceController.findOne(queryDevice)
     state = False
     if deviceData['status'] == True :
+        deviceProcess = deviceData['data']['field_process']
         deviceData = deviceData['data']['field']
         for fieldData in deviceData:
             if type(fieldData) is dict:
@@ -66,8 +67,11 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
             else:
                 fieldName = fieldData
             insertQuery[fieldName],state = extract_etl(fieldData,message,collection,device_code,state)
+        if state :
+            for fieldkey in deviceProcess:
+                fielditem = deviceProcess[fieldkey]
+                insertQuery[fieldkey] = preproces(insertQuery,fielditem)
 
-    
     # print("------------------")
     # print(collection)
     # print(insertQuery)
@@ -137,3 +141,17 @@ def nonetl(collection,elastic_index,info,message):  #info --> device_code, chann
         # elastic.insertOne(elastic_index,insertElastic)
         mqttcom.publish("mqtt/output/"+elastic_index,insertElastic)    
     return cloud9Lib.jsonObject(response)
+
+
+def preproces(insert,data):
+    try: 
+        exec(data['pre'])
+        var = []
+        for x in range(len(data['var'])):
+            if str(data['var'][x]) in insert:
+                var.append(insert[str(data['var'][x])])
+            else:
+                var.append(0)
+        return eval(data['process'])
+    except:
+        return 0 
