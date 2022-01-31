@@ -2,7 +2,7 @@
 
 import sys
 from bson import ObjectId
-import json 
+import json
 from function import *
 import datetime
 from controller import deviceController
@@ -59,7 +59,9 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
     deviceData = deviceController.findOne(queryDevice)
     state = False
     if deviceData['status'] == True :
-        deviceProcess = deviceData['data']['field_process']
+        deviceProcess = False
+        if 'field_process' in deviceData['data']:
+            deviceProcess = deviceData['data']['field_process']
         deviceData = deviceData['data']['field']
         for fieldData in deviceData:
             if type(fieldData) is dict:
@@ -67,7 +69,7 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
             else:
                 fieldName = fieldData
             insertQuery[fieldName],state = extract_etl(fieldData,message,collection,device_code,state)
-        if state :
+        if state and deviceProcess:
             for fieldkey in deviceProcess:
                 fielditem = deviceProcess[fieldkey]
                 insertQuery[fieldkey] = preproces(insertQuery,fielditem)
