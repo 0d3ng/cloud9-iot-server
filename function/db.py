@@ -29,7 +29,7 @@ class dbmongo:
         return False
 
     def find(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
-        (sort1,sort2) = sort
+        (sort1,sort2) = sort        
         if not self.checkCollections(col):
             return []
         self.col = self.db[col] 
@@ -51,16 +51,19 @@ class dbmongo:
             response.append(document)
         return json.loads(dumps(response))
 
-    def findOne(self, col, filter = None, exclude = None):
+    def findOne(self, col, filter = None, exclude = None, sort=('$natural',1) ):
         if not self.checkCollections(col):
-            return False
+            return False        
         self.col = self.db[col]
         #return json.loads(json.dumps(list(self.col.find(filter,exclude)),default=json_util.default))
         response = []
-        res = self.col.find_one(filter,exclude)
-        if res:                        
-            res['id'] = str(res['_id'])        
-            del res['_id']
+        res = self.col.find_one(filter,exclude,sort=[sort]) 
+        if res:       
+            if('id' in res):
+                res['_id'] = str(res['_id'])
+            else:
+                res['id'] = str(res['_id'])
+                del res['_id']                
         return json.loads(dumps(res))
 
     def insertData(self,col,data):

@@ -261,6 +261,7 @@ class countSchemaData(RequestHandler):
                 del data['skip']
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
+                del data['sort']
             if 'date' in data:
                 date_time_str = str(data['date'])
                 datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
@@ -286,7 +287,7 @@ class countSchemaData(RequestHandler):
 
 class detailSchemaData(RequestHandler):
   def post(self,schema_code):    
-    data = json.loads(self.request.body)
+    data = json.loads(self.request.body)    
     if not schema_code:
         response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
         self.write(response)
@@ -295,20 +296,27 @@ class detailSchemaData(RequestHandler):
     schemaData = schemaController.findOne(query)
     if not schemaData['status']:
         response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}      
-        return         
+        self.write(response)
+        return             
+    if "_id" in data :
+        try:
+            data["_id"] = ObjectId(data["_id"])
+            del data["_id"]   
+        except:
+            del data["_id"]   
+    # elif "id" in query :
+    #     try:
+    #         query["_id"] = ObjectId(query["id"])
+    #         del query["id"]
+    #     except:
+    #         del query["id"]
+    sort = ('date_add_auto',-1)
+    exclude = None
+    if 'sort' in data:
+        sort = (data['sort']['field'],data['sort']['type'])            
+        del data['sort']
     query = data
-    if "_id" in query :
-        try:
-            query["_id"] = ObjectId(query["_id"])
-        except:
-            del query["_id"]   
-    elif "id" in query :
-        try:
-            query["_id"] = ObjectId(query["id"])
-            del query["id"]
-        except:
-            del query["id"]
-    result = schemaDataController.findOne(prefix_collection+schema_code,query)    
+    result = schemaDataController.findOne(prefix_collection+schema_code,query,exclude,sort)    
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -348,18 +356,17 @@ class updateSchemaData(RequestHandler):
         self.write(response)
         return
     
-    if 'id' not in data or '_id' not in data:
+    if '_id' not in data:
         response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
         self.write(response)
         return
     
     try:
-        if "_id" in data :
-            query = {"_id":ObjectId(data["_id"])}
-            del data["_id"]
-        elif "id" in data :
-            query = {"_id":ObjectId(data["id"])}
-            del data["id"]
+        query = {"_id":ObjectId(data["_id"])}
+        del data["_id"]
+        # elif "id" in data :
+        #     query = {"_id":ObjectId(data["id"])}
+        #     del data["id"]
     except:
         response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
         self.write(response) 
@@ -388,12 +395,12 @@ class deleteSchemaData(RequestHandler):
         response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
         self.write(response)
         return
-    if 'id' not in data:
+    if '_id' not in data:
         response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
         self.write(response)
         return
     try:
-        query = {"_id":ObjectId(data["id"])}
+        query = {"_id":ObjectId(data["_id"])}
     except:
         response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
         self.write(response) 

@@ -28,9 +28,9 @@ def find(collection,query, exclude = None, limit = None, skip = None, sort=('$na
         response = {'status':True, 'data':result}    
     return cloud9Lib.jsonObject(response)
 
-def findOne(collection,query, exclude = None):  
-    result = db.findOne(collection,query,exclude)
-    if result == []:
+def findOne(collection,query, exclude = None, sort=('$natural',1)):      
+    result = db.findOne(collection,query,exclude,sort)
+    if result == [] or result == False:
         response = {"status":False, "data":query}               
     else:
         response = {"status":True, 'message':'Success','data':result}
