@@ -97,12 +97,12 @@ def detection(testData,config):
                         room = []
                         print(id+" --> [ACCELERO > 150] : Process recent data with euclidean distance")
                         for j in fingerprint_data:
-                            lqi1 = testData['lq1'] - j["lq1"]
-                            lqi2 = testData['lq2'] - j["lq2"]
-                            lqi3 = testData['lq3'] - j["lq3"]
-                            lqi4 = testData['lq4'] - j["lq4"]
-                            lqi5 = testData['lq5'] - j["lq5"]
-                            lqi6 = testData['lq6'] - j["lq6"]
+                            lqi1 = round(testData['lq1'], 2) - j["lq1"]
+                            lqi2 = round(testData['lq2'], 2) - j["lq2"]
+                            lqi3 = round(testData['lq3'], 2) - j["lq3"]
+                            lqi4 = round(testData['lq4'], 2) - j["lq4"]
+                            lqi5 = round(testData['lq5'], 2) - j["lq5"]
+                            lqi6 = round(testData['lq6'], 2) - j["lq6"]
                             dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
                             pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
                             x_euc_dist = round(math.sqrt(dist), 2)
@@ -126,12 +126,12 @@ def detection(testData,config):
                 room = []
                 print(id+" --> [ACCELERO > 150] : Process recent data with euclidean distance")
                 for j in fingerprint_data:
-                    lqi1 = testData['lq1'] - j["lq1"]
-                    lqi2 = testData['lq2'] - j["lq2"]
-                    lqi3 = testData['lq3'] - j["lq3"]
-                    lqi4 = testData['lq4'] - j["lq4"]
-                    lqi5 = testData['lq5'] - j["lq5"]
-                    lqi6 = testData['lq6'] - j["lq6"]
+                    lqi1 = round(testData['lq1'], 2) - j["lq1"]
+                    lqi2 = round(testData['lq2'], 2) - j["lq2"]
+                    lqi3 = round(testData['lq3'], 2) - j["lq3"]
+                    lqi4 = round(testData['lq4'], 2) - j["lq4"]
+                    lqi5 = round(testData['lq5'], 2) - j["lq5"]
+                    lqi6 = round(testData['lq6'], 2) - j["lq6"]
                     dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
                     pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
                     x_euc_dist = round(math.sqrt(dist), 2)
@@ -146,12 +146,12 @@ def detection(testData,config):
             room = []
             print(id+" --> [ACCELERO > 150] : Process recent data with euclidean distance")
             for j in fingerprint_data:
-                lqi1 = testData['lq1'] - j["lq1"]
-                lqi2 = testData['lq2'] - j["lq2"]
-                lqi3 = testData['lq3'] - j["lq3"]
-                lqi4 = testData['lq4'] - j["lq4"]
-                lqi5 = testData['lq5'] - j["lq5"]
-                lqi6 = testData['lq6'] - j["lq6"]
+                lqi1 = round(testData['lq1'], 2) - j["lq1"]
+                lqi2 = round(testData['lq2'], 2) - j["lq2"]
+                lqi3 = round(testData['lq3'], 2) - j["lq3"]
+                lqi4 = round(testData['lq4'], 2) - j["lq4"]
+                lqi5 = round(testData['lq5'], 2) - j["lq5"]
+                lqi6 = round(testData['lq6'], 2) - j["lq6"]
                 dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
                 pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
                 x_euc_dist = round(math.sqrt(dist), 2)
@@ -164,12 +164,12 @@ def detection(testData,config):
         euc_dist = []
         room = []
         for j in fingerprint_data:
-            lqi1 = testData['lq1'] - j["lq1"]
-            lqi2 = testData['lq2'] - j["lq2"]
-            lqi3 = testData['lq3'] - j["lq3"]
-            lqi4 = testData['lq4'] - j["lq4"]
-            lqi5 = testData['lq5'] - j["lq5"]
-            lqi6 = testData['lq6'] - j["lq6"]
+            lqi1 = round(testData['lq1'], 2) - j["lq1"]
+            lqi2 = round(testData['lq2'], 2) - j["lq2"]
+            lqi3 = round(testData['lq3'], 2) - j["lq3"]
+            lqi4 = round(testData['lq4'], 2) - j["lq4"]
+            lqi5 = round(testData['lq5'], 2) - j["lq5"]
+            lqi6 = round(testData['lq6'], 2) - j["lq6"]
             dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
             pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
             x_euc_dist = round(math.sqrt(dist), 2)

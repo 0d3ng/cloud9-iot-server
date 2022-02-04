@@ -41,14 +41,17 @@ def readcsv(filename,client1):
     random_val = random.randint(minRandom,maxRandom) 
     for index, row in x.iterrows():
         # print(row['topic'], row['id'], row['lq'], row['x'], row['y'], row['z'])
-        topic = row['topic']
-        msg = {
-            "id":row['id'],
-            "lq":row['lq'],
-            "x":row['x'],
-            "y":row['y'],
-            "z":row['z']
-        }
+        try:
+            topic = row['topic']
+            msg = {
+                "id":str(int(row['id'])),
+                "lq":int(row['lq']),
+                "x":float(row['x']),
+                "y":float(row['y']),
+                "z":float(row['z'])
+            }
+        except:
+            topic = None
         if topic :
             payload = json.dumps(msg)
             client1.publish(topic,payload=payload)

@@ -10,7 +10,7 @@ import pandas as pd
 import time
 
 prefix_collection = "schema_data_"
-waiting_time_default = 30
+waiting_time_default = 10
 
 # config_fin = {
 #     "lqi_threshold":89,
