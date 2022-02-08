@@ -13,7 +13,7 @@ groups = []
 define_url = [
     ['add/','add'],
     ['','list'],
-    ['detail','detail'],
+    ['detail/','detail'],
     ['edit/','update'],
     ['delete/','delete']
 ]
@@ -57,8 +57,7 @@ class list(RequestHandler):
 class detail(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    query = {}
-    result = comChannelController.findOne(query)
+    result = comChannelController.findOne(data)
     # print(result)
     # print("------------------")
     # sys.stdout.flush()

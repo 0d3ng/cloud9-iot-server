@@ -38,6 +38,7 @@ class add(RequestHandler):
     #End Log Insert#
     queryGroup = {
         'token_access' : token_access,
+        'channel_type':"http-post",
         'active': True 
     }
     resultChannel = comChannelController.findOne(queryGroup)
@@ -71,7 +72,7 @@ class add(RequestHandler):
             infoHttp['date_add_sensor'] = data['date_add']
     else :
         infoHttp['date_add_sensor'] = None
-
+    
     if 'device_code' in data :
         insert = commETLController.etl(channelData['collection_name'],channelData['index_log'],infoHttp,data['device_code'],data)
     elif 'device_code' in channelData :

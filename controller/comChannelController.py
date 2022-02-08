@@ -178,6 +178,9 @@ def updateOther(query,data):
     if 'collection_name' in data: updateData['collection_name'] = data['collection_name']
     if 'active' in data: updateData['active'] = data['active']
     
+    print(queryUpdate)
+    print(updateData)
+    sys.stdout.flush()
     last = findOne(queryUpdate)['data']
     if updateData == {}:
         return {"status":False, "message":"UPDATE NONE"}        
@@ -194,9 +197,10 @@ def updateOther(query,data):
             if updateData['active'] == False and ( updateData['channel_type'] == 'mqtt'):
                 triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'nonactive')
 
-        if (last['server'] !=  updateData['server']) or (last['port'] !=  updateData['port']) or (last['topic'] !=  updateData['topic']):
-            triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'nonactive')
-            triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'active')
+        if "server" in last and 'server' in updateData:
+            if (last['server'] !=  updateData['server']) or (last['port'] !=  updateData['port']) or (last['topic'] !=  updateData['topic']):
+                triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'nonactive')
+                triggerOther(updateData['channel_type'],updateData['server'],updateData['port'],updateData['topic'],last['channel_code'],'active') 
 
     return cloud9Lib.jsonObject(response)
 
