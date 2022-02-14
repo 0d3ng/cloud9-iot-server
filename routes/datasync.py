@@ -5,7 +5,7 @@ from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
 from function import *
-from controller import combiController
+from controller import datasyncController
 from datetime import datetime,timedelta
 from pytz import timezone
 
@@ -30,7 +30,7 @@ class add(RequestHandler):
     if 'combi_code' not in data:
         data['combi_code'] = generateCode()
 
-    insert = combiController.add(data)    
+    insert = datasyncController.add(data)    
     if not insert['status']:
         response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
     else:
@@ -49,7 +49,7 @@ class list(RequestHandler):
         data['information.purpose'] = {"$regex": data['purpose']}
         del data['purpose']
     query = data    
-    result = combiController.find(query)
+    result = datasyncController.find(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -75,7 +75,7 @@ class count(RequestHandler):
         except:
             del query["id"]
     query = data
-    result = combiController.find(query)
+    result = datasyncController.find(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':0}               
     else:
@@ -92,7 +92,7 @@ class detail(RequestHandler):
             del query["id"]
         except:
             del query["id"]
-    result = combiController.findOne(query)    
+    result = datasyncController.findOne(query)    
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -120,11 +120,11 @@ class update(RequestHandler):
             self.write(response)
             return
 
-    result = combiController.findOne(query)
+    result = datasyncController.findOne(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
-        update = combiController.update(query,data)
+        update = datasyncController.update(query,data)
         if not update['status']:
             response = {"status":False, "message":"Failed to update","data":json.loads(self.request.body)}
         else:
@@ -146,11 +146,11 @@ class delete(RequestHandler):
         self.write(response) 
         return
     
-    result = combiController.findOne(query)
+    result = datasyncController.findOne(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}            
     else:
-        delete = combiController.delete(query)
+        delete = datasyncController.delete(query)
         if not delete['status']:
             response = {"status":False, "message":"Failed to delete","data":json.loads(self.request.body)}
         else:
@@ -161,7 +161,7 @@ class batch(RequestHandler):
   def post(self,combiCode):
     data = json.loads(self.request.body)
     query = {"combi_code":combiCode}
-    combiData = combiController.findOne(query)
+    combiData = datasyncController.findOne(query)
     if not combiData['status']:
         response = {"status":False, "message":"Combination Function Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -176,14 +176,14 @@ class batch(RequestHandler):
             return
         if 'batch_code' not in data:
             batch_code = generateCode("batch")
-        listTime = combiController.generateDate(data["date_start"],data["date_end"],combiData["time_loop"])
+        listTime = datasyncController.generateDate(data["date_start"],data["date_end"],combiData["time_loop"])
         insertCount = 0
         for x in range(len(listTime)-1):
             time_start = listTime[x]
             time_end = listTime[x+1]
             time_end = datetime.strptime(time_end,'%Y-%m-%d %H:%M') - timedelta(minutes=1)
             time_end = time_end.strftime('%Y-%m-%d %H:%M')
-            insertCount = insertCount + combiController.combiProcess(combiData["schema_code"],combiData["field"],time_start,time_end,batch_code)
+            insertCount = insertCount + datasyncController.combiProcess(combiData["schema_code"],combiData["field"],time_start,time_end,batch_code)
             
         response = {"status":True,"data":{"insert_count":insertCount}}
     self.write(response)        
@@ -196,7 +196,7 @@ def generateCode(code=""):
         code = code+"-"+cloud9Lib.randomStringLower(6)
     #check if exist
     query = {"combi_code":code}
-    result = combiController.findOne(query)
+    result = datasyncController.findOne(query)
     if result['status']:
         return generateCode(code)
     else:
@@ -205,10 +205,10 @@ def generateCode(code=""):
 def checkCombiCode(code,execpt=""):
     if execpt:
         query = {"combi_code":code,"_id":{ '$ne' : execpt } }
-        result = combiController.findOne(query)
+        result = datasyncController.findOne(query)
     else:
         query = {"combi_code":code}
-        result = combiController.findOne(query)
+        result = datasyncController.findOne(query)
     print(result)
     if result['status']:
         return True

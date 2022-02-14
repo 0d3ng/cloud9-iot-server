@@ -3,7 +3,7 @@ import sys, json, time
 import paho.mqtt.client as mqttClient #Must Install Req
 sys.path.append('../../')
 from function import cloud9Lib
-from controller import combiController
+from controller import datasyncController
 from datetime import datetime,timedelta
 from configparser import ConfigParser
 config = ConfigParser()
@@ -67,13 +67,13 @@ def worker(code, time_loop):
         curentTime = datetime.now().strftime('%Y-%m-%d %H:%M')
         if(next_time == curentTime):
             query = {"combi_code":code}
-            combiData = combiController.findOne(query)
+            combiData = datasyncController.findOne(query)
             if combiData['status']:    
                 combiData = combiData["data"]            
                 # print("Process for ",code," ",last_time," ",next_time)
                 next_time = datetime.strptime(next_time,'%Y-%m-%d %H:%M') - timedelta(minutes=1) #To get second data.
                 next_time = next_time.strftime('%Y-%m-%d %H:%M')
-                item = combiController.combiProcess(combiData["schema_code"],combiData["field"],last_time,next_time,"",True)
+                item = datasyncController.combiProcess(combiData["schema_code"],combiData["field"],last_time,next_time,"",True)
                 # print("Totall Insert ",code," : ",item)
                 # sys.stdout.flush()
                 #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
@@ -85,7 +85,7 @@ def stream_list():
     query = {
         "stream":True
     }
-    result = combiController.find(query)
+    result = datasyncController.find(query)
     if result['status']:        
         for val in result['data']:
             combi_code = val['combi_code']

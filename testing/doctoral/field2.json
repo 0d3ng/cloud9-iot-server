@@ -1,0 +1,215 @@
+{
+    "datasync_code": "2451jr",
+    "schema_code": "u834oe",
+    "name": "Fingerprint Testing",
+    "field": [
+        {
+            "id": "key"
+        },
+        {
+            "lq1": {
+                "data": [
+                    "nu63",
+                    "lq",
+                    "id"
+                ],
+                "option": "average",
+                "default": "5"
+            }
+        },
+        {
+            "lq2": {
+                "data": [
+                    "hl36",
+                    "lq",
+                    "id"
+                ],
+                "option": "average",
+                "default": "5"
+            }
+        },
+        {
+            "lq3": {
+                "data": [
+                    "aa83",
+                    "lq",
+                    "id"
+                ],
+                "option": "average",
+                "default": "5"
+            }
+        },
+        {
+            "lq4": {
+                "data": [
+                    "ty41",
+                    "lq",
+                    "id"
+                ],
+                "option": "average",
+                "default": "5"
+            }
+        },
+        {
+            "lq5": {
+                "data": [
+                    "vb26",
+                    "lq",
+                    "id"
+                ],
+                "option": "average",
+                "default": "5"
+            }
+        },
+        {
+            "lq6": {
+                "data": [
+                    "eu34",
+                    "lq",
+                    "id"
+                ],
+                "option": "average",
+                "default": "5"
+            }
+        },
+        {
+            "variance1": {
+                "data": [
+                    "nu63",
+                    "lq",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "5"
+            }
+        },
+        {
+            "variance2": {
+                "data": [
+                    "hl36",
+                    "lq",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "5"
+            }
+        },
+        {
+            "variance3": {
+                "data": [
+                    "aa83",
+                    "lq",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "5"
+            }
+        },
+        {
+            "variance4": {
+                "data": [
+                    "ty41",
+                    "lq",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "5"
+            }
+        },
+        {
+            "variance5": {
+                "data": [
+                    "vb26",
+                    "lq",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "5"
+            }
+        },
+        {
+            "variance6": {
+                "data": [
+                    "eu34",
+                    "lq",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "5"
+            }
+        },
+        {
+            "accelvariance1": {
+                "data": [
+                    "nu63",
+                    "accel",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "0"
+            }
+        },
+        {
+            "accelvariance2": {
+                "data": [
+                    "hl36",
+                    "accel",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "0"
+            }
+        },
+        {
+            "accelvariance3": {
+                "data": [
+                    "aa83",
+                    "accel",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "0"
+            }
+        },
+        {
+            "accelvariance4": {
+                "data": [
+                    "ty41",
+                    "accel",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "0"
+            }
+        },
+        {
+            "accelvariance5": {
+                "data": [
+                    "vb26",
+                    "accel",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "0"
+            }
+        },
+        {
+            "accelvariance6": {
+                "data": [
+                    "eu34",
+                    "accel",
+                    "id"
+                ],
+                "option": "variance",
+                "default": "0"
+            }
+        }
+    ],
+    "add_by": "618494667dc7ea09fd36bc46",
+    "stream": true,
+    "time_loop": 60,
+    "information": {
+        "detail": "-",
+        "purpose": "For fingerprint Testing"
+    }
+}

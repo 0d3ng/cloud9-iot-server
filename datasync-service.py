@@ -2,14 +2,14 @@ import multiprocessing
 import sys, json, time
 import paho.mqtt.client as mqttClient #Must Install Req
 from function import *
-from controller import combiController
+from controller import datasyncController
 from datetime import datetime,timedelta
 from configparser import ConfigParser
 config = ConfigParser()
 config.read("config.ini")
 #Config
-comm_list = {} 
-comm_subs = {}
+datasync_list = {} 
+datasync_subs = {}
 Connected = False
 broker_address= config["MQTT"]["broker"]
 port = int(config["MQTT"]["port"])
@@ -43,39 +43,39 @@ def on_message(client, userdata, message):
         print("-----------------")
       
 def on_message_subscribe(message):
-    combi_code = message['combi_code']
+    datasync_code = message['datasync_code']
     time_loop = message['time_loop']
-    if combi_code not in comm_subs:    
-        comm_subs[combi_code] = multiprocessing.Process(target=worker, args=(combi_code,time_loop))
-        comm_subs[combi_code].start()
+    if datasync_code not in datasync_subs:    
+        datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
+        datasync_subs[datasync_code].start()
 
 def on_message_unsubscribe(message):
-    combi_code = message['combi_code']
-    print("Stop Service : ",combi_code)
+    datasync_code = message['datasync_code']
+    print("Stop Service : ",datasync_code)
     sys.stdout.flush()
-    if combi_code in comm_subs:
-        comm_subs[combi_code].terminate()
-        comm_subs[combi_code].join()
-        del comm_subs[combi_code]
+    if datasync_code in datasync_subs:
+        datasync_subs[datasync_code].terminate()
+        datasync_subs[datasync_code].join()
+        del datasync_subs[datasync_code]
 
 def worker(code, time_loop):
-    last_time = datetime.now().strftime('%Y-%m-%d %H:%M')
-    next_time = datetime.now() + timedelta(minutes=int(time_loop))
-    next_time = next_time.strftime('%Y-%m-%d %H:%M')
+    last_time = datetime.now().strftime('%Y-%m-%d %H:%M:00')
+    next_time = datetime.now() + timedelta(seconds=int(time_loop))
+    next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
     print("Start Service : ",code)
     sys.stdout.flush()
     while True:
-        curentTime = datetime.now().strftime('%Y-%m-%d %H:%M')
+        curentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         if(next_time == curentTime):
-            query = {"combi_code":code}
-            combiData = combiController.findOne(query)
-            if combiData['status']:    
-                combiData = combiData["data"]            
+            query = {"datasync_code":code}
+            dataSyncData = datasyncController.findOne(query)
+            if dataSyncData['status']:    
+                dataSyncData = dataSyncData["data"]            
                 # print("Process for ",code," ",last_time," ",next_time)
-                next_time = datetime.strptime(next_time,'%Y-%m-%d %H:%M') - timedelta(minutes=1) #To get second data.
-                next_time = next_time.strftime('%Y-%m-%d %H:%M')
+                next_time = datetime.strptime(next_time,'%Y-%m-%d %H:%M:%S') #To get second data.
+                next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
                 try:
-                    item = combiController.combiProcess(combiData["schema_code"],combiData["field"],last_time,next_time,"",True)
+                    item = datasyncController.datasyncProcess(dataSyncData["schema_code"],dataSyncData["field"],last_time,next_time,"",True)
                 except:
                     print("------++++++------")
                     print(code)
@@ -85,9 +85,9 @@ def worker(code, time_loop):
                     sys.stdout.flush()
                 # print("Totall Insert ",code," : ",item)                
                 #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
-                time_loop = combiData["time_loop"]
-            next_time = datetime.now() + timedelta(minutes=int(time_loop))
-            next_time = next_time.strftime('%Y-%m-%d %H:%M')
+                time_loop = dataSyncData["time_loop"]
+            next_time = datetime.now() + timedelta(seconds=int(time_loop))
+            next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
             last_time = curentTime
             # print(code)
             # print(next_time)
@@ -97,17 +97,17 @@ def stream_list():
     query = {
         "stream":True
     }
-    result = combiController.find(query)
+    result = datasyncController.find(query)
     if result['status']:        
         for val in result['data']:
-            combi_code = val['combi_code']
+            datasync_code = val['datasync_code']
             time_loop = val['time_loop']
-            comm_subs[combi_code] = multiprocessing.Process(target=worker, args=(combi_code,time_loop))
-            comm_subs[combi_code].start()
+            datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
+            datasync_subs[datasync_code].start()
 
 
 if __name__ == "__main__":    
-    client = mqttClient.Client("Python3-Combi_"+cloud9Lib.randomOnlyString(4))               
+    client = mqttClient.Client("Python3-DataSync_"+cloud9Lib.randomOnlyString(4))               
     # client.username_pw_set(username=user, password=password)    #set username and password
     client.on_connect= on_connect                      
     client.on_message= on_message                      

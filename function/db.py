@@ -152,6 +152,20 @@ class dbmongo:
         
         return res 
 
+    def aggregate(self, col, pipeline = None):
+        if not self.checkCollections(col):
+            return []
+        self.col = self.db[col] 
+        res = self.col.aggregate(pipeline)   
+        response = []
+        for document in res:
+            if('id' in document):
+                document['_id'] = str(document['_id'])
+            else:
+                document['id'] = str(document['_id'])
+                del document['_id']
+            response.append(document)
+        return json.loads(dumps(response))
 
 if __name__ == "__main__":
     mongo = dbmongo()    
