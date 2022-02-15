@@ -1,20 +1,28 @@
-#!/usr/bin/python3
 
 import sys
 from bson import ObjectId
 import json 
-from function import *
 import datetime
 import pandas as pd
-from controller import schemaDataController
-from controller import sensorController
 from pytz import timezone
 import statistics
 import math
+import requests
+import time
 
 prefix_collection = "schema_data_"
+waiting_time_default = 10
 
-def detection(testData,config):
+config_fin = {
+    "lqi_threshold":89,
+    "schema_dataset":"r277qj",
+    "schema_goal":"u834oe",
+    "waiting_time":30,#detik
+    "limit_data":50, 
+    "rest_api":"http://localhost:3001/schema/data/"
+}
+
+def detection(testData,lastData,fingerprint_data,config):
     lqDroppedIdentifier = 0
     detectRoom = "-"
     LQI_threshold = config["lqi_threshold"]
@@ -28,10 +36,7 @@ def detection(testData,config):
     variance6 = testData['variance6']
     accelero_data = max(testData['accelvariance1'],testData['accelvariance2'],testData['accelvariance3'],testData['accelvariance4'],testData['accelvariance5'],testData['accelvariance6'])
     id = testData['id']
-    try:
-        _id = ObjectId(testData['_id'])
-    except:
-        _id = testData['_id']
+    _id = testData['_id']
 
 
     if(testData['lq1'] > LQI_threshold):
@@ -61,7 +66,7 @@ def detection(testData,config):
     else:
         query = {}
     
-    fingerprint_data = schemaDataController.find(fingerprint_collection,query)["data"]
+    # fingerprint_data = schemaDataController.find(fingerprint_collection,query)["data"]
 
     if variance1 > 80 or variance2 > 80 or variance3 > 80 or variance4 > 80 or variance5 > 80 or variance6 > 80:
         if lqDroppedIdentifier == 0:
@@ -83,11 +88,8 @@ def detection(testData,config):
             if accelero_data < 150:
                 if lqDroppedIdentifier != 0:
                     if testData['lq{}'.format(lqDroppedIdentifier)] == 5:
-                        ##Get Room Before
-                        query = { 'id' : id }
-                        Lastdata = schemaDataController.findOne(data_collection,query,None,('date_add_auto',-1))
-                        if(Lastdata['status']):
-                            LastRoom = Lastdata['data']['room']
+                        if( id in lastData):
+                            LastRoom = lastData[id]
                         else:
                             LastRoom = "-"
                         detectRoom = LastRoom
@@ -112,10 +114,8 @@ def detection(testData,config):
                         detectRoom = room[max_euc_dist]
                 else:
                     ##Get Room Before
-                    query = { 'id' : id }
-                    Lastdata = schemaDataController.findOne(data_collection,query,None,('date_add_auto',-1))
-                    if(Lastdata['status']):
-                        LastRoom = Lastdata['data']['room']
+                    if( id in lastData):
+                        LastRoom = lastData[id]
                     else:
                         LastRoom = "-"
                     detectRoom = LastRoom   
@@ -177,14 +177,72 @@ def detection(testData,config):
             room.append(j['room'])
         max_euc_dist = euc_dist.index(min(euc_dist))
         detectRoom = room[max_euc_dist]
-    
-    query = { "_id":_id }
-    updateData = {"room":detectRoom,"date_detection":datetime.datetime.now(timezone('Asia/Tokyo'))}
-    update = schemaDataController.update(data_collection,query,updateData)
+    msg = {
+        "_id":_id,
+        "room":detectRoom,
+        "date_detection":datetime.datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d %H:%M:%S")
+    }
+    update = HTTP_post(config["rest_api"]+config["schema_goal"]+"/edit",msg)
+    # print(update)
     if(update['status']):
         return 1
     else:
         return 0
 
+def HTTP_post(url,message):
+    payload = json.dumps(message)
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, data = payload)
+    return json.loads(response.text.encode('utf8'))
 
+def FingerMethod():
+    # try:
+        config = config_fin
+        dataSet = HTTP_post(config["rest_api"]+config["schema_dataset"],{})        
+        if dataSet["status"] : 
+            dataSet = dataSet["data"]
+            query = {
+                "groupby":"id",
+                "query":{
+                    "room":{"$exists": True}
+                },
+                "field":{
+                    "room":"room"
+                }
+            }
+            lastData = {}
+            getLastData = HTTP_post(config["rest_api"]+config["schema_dataset"]+"/group",query) 
+            if getLastData["status"] :
+                for item  in getLastData["data"]:
+                    lastData[item["id"]] = item["room"]
+            limit =  int(config["limit_data"])
+            query = {
+                "room":{"$exists": False},
+                "limit":limit
+            }
+            dataTest = HTTP_post(config["rest_api"]+config["schema_goal"],query)
+            if dataTest["status"]:
+                dataTest = dataTest["data"]
+                for document in dataTest:
+                    detection(document,lastData,dataSet,config)
+                FingerMethod()
+            else:
+                time.sleep(config["waiting_time"])
+                FingerMethod()
+        else:
+            dataSet = []
+            print("Dataset not found")        
+    # except Exception as e:
+    #     print("-------Error---------")
+    #     print(e)
+    #     time.sleep(waiting_time_default)
+    #     FingerMethod()
+    
 
+print("Start Fingerprint Method")
+sys.stdout.flush()
+FingerMethod()
+# dataSet = HTTP_post(config_fin["rest_api"]+config_fin["schema_dataset"],{}) 
+# print(dataSet["data"])

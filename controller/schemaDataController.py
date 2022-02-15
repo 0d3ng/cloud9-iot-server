@@ -83,6 +83,9 @@ def filter(schema_code,value):
                 elif fieldType == "time":
                     val = cloud9Lib.cv2time(value[fieldName])
                 data[fieldName] = val        
+        
+        if 'date_detection' in value:
+            data['date_detection'] = cloud9Lib.cv2datetime(value['date_detection'])
         response = {'status':True, 'data':data}
     else:
         response = {'status':False, 'message':"Add Failed"}
@@ -132,4 +135,10 @@ def filterAdd(schema_code,value):
     sys.stdout.flush()
     return cloud9Lib.jsonObject(response)
 
-
+def aggregate(collection,pipeline):  
+    result = db.aggregate(collection,pipeline)
+    if result == []:
+        response = {"status":False, "data":pipeline}               
+    else:
+        response = {'status':True, 'data':result}    
+    return cloud9Lib.jsonObject(response)

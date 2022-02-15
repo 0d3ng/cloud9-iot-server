@@ -1,4 +1,5 @@
 import sys
+from sklearn import pipeline
 sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
@@ -31,7 +32,15 @@ define_url = [
     ['data/([^/]+)/detail/','detailSchemaData'],
     ['data/([^/]+)/add/','addSchemaData'],
     ['data/([^/]+)/edit/','updateSchemaData'],
-    ['data/([^/]+)/delete/','deleteSchemaData']
+    ['data/([^/]+)/delete/','deleteSchemaData'],
+    ['data/([^/]+)/group/','groupSchemaData'],
+    ['data/([^/]+)','getSchemaData'],
+    ['data/([^/]+)/count','countSchemaData'],
+    ['data/([^/]+)/detail','detailSchemaData'],
+    ['data/([^/]+)/add','addSchemaData'],
+    ['data/([^/]+)/edit','updateSchemaData'],
+    ['data/([^/]+)/delete','deleteSchemaData'],
+    ['data/([^/]+)/group','groupSchemaData']
 ]
 
 class add(RequestHandler):
@@ -181,7 +190,7 @@ class getSchemaData(RequestHandler):
     query = {"schema_code":code}
     schemaData = schemaController.findOne(query)
     if not schemaData['status']:
-        response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Schema Not Found",'data':json.loads(self.request.body)}               
     else:
         schemaData = schemaData['data']
         if response == "":
@@ -240,7 +249,7 @@ class countSchemaData(RequestHandler):
     query = {"schema_code":code}
     schemaData = schemaController.findOne(query)
     if not schemaData['status']:
-        response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Schema Not Found",'data':json.loads(self.request.body)}               
     else:
         schemaData = schemaData['data']
         if response == "":
@@ -295,7 +304,7 @@ class detailSchemaData(RequestHandler):
     query = {"schema_code":schema_code}
     schemaData = schemaController.findOne(query)
     if not schemaData['status']:
-        response = {"status":False, "message":"Device Not Found",'data':json.loads(self.request.body)}      
+        response = {"status":False, "message":"Schema Not Found",'data':json.loads(self.request.body)}      
         self.write(response)
         return             
     if "_id" in data :
@@ -415,6 +424,67 @@ class deleteSchemaData(RequestHandler):
             response = {"status":False, "message":"Failed to delete","data":json.loads(self.request.body)}
         else:
             response = {"status":True, 'message':'Delete Success'}
+    self.write(response)
+
+class groupSchemaData(RequestHandler):
+  def post(self,code):    
+    if not code:
+        response = {"status":False, "message":"Schema Code not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    data = json.loads(self.request.body)
+    print(data)
+    response = ""
+    query = {"schema_code":code}
+    schemaData = schemaController.findOne(query)
+    if not schemaData['status']:
+        response = {"status":False, "message":"Schema Not Found",'data':json.loads(self.request.body)}               
+    else:
+        schemaData = schemaData['data']
+        if response == "":
+            query = {}
+            limit =  None
+            skip = None
+            groupby = "_id"
+            if 'groupby' in data:
+                groupby = data["groupby"]
+            if 'query' in data:
+                query = data['query']
+                if 'date' in query:
+                    date_time_str = str(data['date'])
+                    datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
+                    datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
+                    query['date_add_auto'] = {"$gte":datesrc_str, "$lt":datesrc_end }                
+                if 'date_start' in query and 'date_end' in query:
+                    date_time_str = str(data['date_start'])
+                    date_time_end = str(data['date_end'])
+                    datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
+                    datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
+                    query['date_add_auto'] = {"$gte":datesrc_str, "$lt":datesrc_end }
+                    del query['date_start']
+                    del query['date_end']
+            method = "last"
+            if "method" in data:
+                method = data["method"]
+            
+            if method == "last":
+                group = {
+                    "_id":"$"+groupby,
+                    "date":{"$last":"$date_add_auto"}
+                }
+                if 'field' in data:
+                    for item in data["field"]:
+                        group[item] = {"$last":"$"+data["field"][item]}    
+            pipeline = [
+                {"$match":query},
+                {"$group":group}
+            ]
+            print(pipeline)
+            result = schemaDataController.aggregate(prefix_collection+code,pipeline)
+            if not result['status']:
+                response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+            else:
+                response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
 
 def generateCode(code=""):

@@ -3,7 +3,7 @@ import sys
 from pymongo import collection
 sys.path.append('../../')
 from function import cloud9Lib
-from method import fingerprint
+from testing.Fingerprint import fingerprint
 import json 
 from function import *
 from controller import schemaDataController
