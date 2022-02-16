@@ -1,5 +1,4 @@
 import sys
-from sklearn import pipeline
 sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
