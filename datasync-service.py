@@ -35,9 +35,9 @@ def on_message(client, userdata, message):
         raw_object = json.loads(raw_msg)
     except:
         raw_object = {"failed":True}
-    if message.topic == config["MQTT"]["combi_stream_start"] :
+    if message.topic == config["MQTT"]["datasync_stream_start"] :
         on_message_subscribe(raw_object)
-    elif message.topic == config["MQTT"]["combi_stream_stop"] :
+    elif message.topic == config["MQTT"]["datasync_stream_start"] :
         on_message_unsubscribe(raw_object)
     else :
         print("-----------------")
@@ -117,8 +117,8 @@ if __name__ == "__main__":
     while Connected != True:    #Wait for connection
         time.sleep(0.1)
     
-    client.subscribe(config["MQTT"]["combi_stream_start"])
-    client.subscribe(config["MQTT"]["combi_stream_stop"])
+    client.subscribe(config["MQTT"]["datasync_stream_start"])
+    client.subscribe(config["MQTT"]["datasync_stream_start"])
 
     try:
         while True:
