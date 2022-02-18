@@ -12,7 +12,7 @@ import paho.mqtt.client as mqttClient #Must Install Req
 
 readPath = "dataset/"
 backupPath = "dataset-log/"
-broker="localhost"
+broker="103.106.72.188"
 port=1883
 TM_wait = 30 #second
 file_list = {}

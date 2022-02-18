@@ -309,9 +309,8 @@ class detailSchemaData(RequestHandler):
     if "_id" in data :
         try:
             data["_id"] = ObjectId(data["_id"])
-            del data["_id"]   
         except:
-            del data["_id"]   
+            data["_id"] = data["_id"]   
     # elif "id" in query :
     #     try:
     #         query["_id"] = ObjectId(query["id"])

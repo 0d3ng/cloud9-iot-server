@@ -67,21 +67,24 @@ def filter(schema_code,value):
             fieldName = list(fieldData.keys())[0]
             fieldType = fieldData[fieldName]
             if fieldName in value:
-                if fieldType == "int":
-                    # val = int(value[fieldName])
-                    val = round(float(value[fieldName]))
-                elif fieldType == "float":
-                    val = float(value[fieldName])
-                elif fieldType == "str":
-                    val = str(value[fieldName])
-                elif fieldType == "boolean":
-                    val = cloud9Lib.str2bool(value[fieldName])
-                elif fieldType == "datetime":
-                    val = cloud9Lib.cv2datetime(value[fieldName])
-                elif fieldType == "date":
-                    val = cloud9Lib.cv2date(value[fieldName])
-                elif fieldType == "time":
-                    val = cloud9Lib.cv2time(value[fieldName])
+                try:
+                    if fieldType == "int":
+                        # val = int(value[fieldName])
+                        val = round(float(value[fieldName]))
+                    elif fieldType == "float":
+                        val = float(value[fieldName])
+                    elif fieldType == "str":
+                        val = str(value[fieldName])
+                    elif fieldType == "boolean":
+                        val = cloud9Lib.str2bool(value[fieldName])
+                    elif fieldType == "datetime":
+                        val = cloud9Lib.cv2datetime(value[fieldName])
+                    elif fieldType == "date":
+                        val = cloud9Lib.cv2date(value[fieldName])
+                    elif fieldType == "time":
+                        val = cloud9Lib.cv2time(value[fieldName])
+                except:
+                    val = ''
                 data[fieldName] = val        
         
         if 'date_detection' in value:
