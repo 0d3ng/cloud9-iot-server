@@ -15,11 +15,11 @@ waiting_time_default = 10
 
 config_fin = {
     "lqi_threshold":89,
-    "schema_dataset":"r277qj",
-    "schema_goal":"u834oe",
-    "waiting_time":30,#detik
+    "schema_dataset":"r83y1y",
+    "schema_goal":"5y76py",
+    "waiting_time":30,#detikclea
     "limit_data":50, 
-    "rest_api":"http://localhost:3001/schema/data/"
+    "rest_api":"http://103.106.72.188:3001/schema/data/"
 }
 
 def detection(testData,lastData,fingerprint_data,config):

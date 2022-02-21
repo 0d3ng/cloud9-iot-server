@@ -35,7 +35,7 @@ def add(fillData):
         'date_add': datetime.datetime.utcnow(),
         'add_by':fillData.get('add_by', None),
         'stream':fillData.get('stream', False),
-        'time_loop':fillData.get('time_loop', None), #in minutes
+        'time_loop':fillData.get('time_loop', None), #in second
         'information':fillData.get('information', None), #array[detail, purpose]        
     }
     result = db.insertData(collection,insertQuery)

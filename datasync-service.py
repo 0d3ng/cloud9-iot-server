@@ -5,6 +5,8 @@ from function import *
 from controller import datasyncController
 from datetime import datetime,timedelta
 from configparser import ConfigParser
+from importlib import reload
+from pytz import timezone
 config = ConfigParser()
 config.read("config.ini")
 #Config
@@ -59,39 +61,44 @@ def on_message_unsubscribe(message):
         del datasync_subs[datasync_code]
 
 def worker(code, time_loop):
-    last_time = datetime.now().strftime('%Y-%m-%d %H:%M:00')
-    next_time = datetime.now() + timedelta(seconds=int(time_loop))
+    reload(db)
+    reload(datasyncController)
+    last_time = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:00')
+    next_time = datetime.now(timezone('Asia/Tokyo')) + timedelta(seconds=int(time_loop))
     next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
     print("Start Service : ",code)
     sys.stdout.flush()
     while True:
-        curentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        curentTime = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
         if(next_time == curentTime):
-            query = {"datasync_code":code}
-            dataSyncData = datasyncController.findOne(query)
-            if dataSyncData['status']:    
-                dataSyncData = dataSyncData["data"]            
-                # print("Process for ",code," ",last_time," ",next_time)
-                next_time = datetime.strptime(next_time,'%Y-%m-%d %H:%M:%S') #To get second data.
+            try:
+                query = {"datasync_code":code}
+                dataSyncData = datasyncController.findOne(query)
+                if dataSyncData['status']:    
+                    dataSyncData = dataSyncData["data"]            
+                    # print("Process for ",code," ",last_time," ",next_time)
+                    next_time = datetime.strptime(next_time,'%Y-%m-%d %H:%M:%S') #To get second data.
+                    next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
+                    try:
+                        item = datasyncController.datasyncProcess(dataSyncData["schema_code"],dataSyncData["field"],last_time,next_time,"",True)
+                    except:
+                        print("------++++++------")
+                        print(code)
+                        print(next_time)
+                        print("Error")
+                        print("------------------")
+                        sys.stdout.flush()
+                    # print("Total Insert ",code," : ",item," --> ",last_time," ",next_time)                
+                    #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
+                    time_loop = dataSyncData["time_loop"]
+                next_time = datetime.now(timezone('Asia/Tokyo')) + timedelta(seconds=int(time_loop))
                 next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
-                try:
-                    item = datasyncController.datasyncProcess(dataSyncData["schema_code"],dataSyncData["field"],last_time,next_time,"",True)
-                except:
-                    print("------++++++------")
-                    print(code)
-                    print(next_time)
-                    print("Error")
-                    print("------------------")
-                    sys.stdout.flush()
-                # print("Totall Insert ",code," : ",item)                
-                #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
-                time_loop = dataSyncData["time_loop"]
-            next_time = datetime.now() + timedelta(seconds=int(time_loop))
-            next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
-            last_time = curentTime
-            # print(code)
-            # print(next_time)
-            # sys.stdout.flush()
+                last_time = curentTime
+                # print(code)
+                # print(next_time)
+                # sys.stdout.flush()
+            except:
+                continue
 
 def stream_list():
     query = {
@@ -103,7 +110,7 @@ def stream_list():
             datasync_code = val['datasync_code']
             time_loop = val['time_loop']
             datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
-            datasync_subs[datasync_code].start()
+            datasync_subs[datasync_code].start() 
 
 
 if __name__ == "__main__":    
