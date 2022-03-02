@@ -9,6 +9,7 @@ from controller import deviceController
 from pytz import timezone
 import copy
 import base64
+import time
 import os
 
 
@@ -46,7 +47,7 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
     insertQuery['raw_message'] = message
     insertElastic = copy.copy(insertQuery)
     insertQuery['date_add_server'] = datetime.datetime.now(timezone('Asia/Tokyo')) #datetime.datetime.utcnow() #datetime.datetime.utcnow()
-    insertQuery['date_add_server_unix'] = round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000) #round(datetime.datetime.utcnow().timestamp() * 1000) #datetime.datetime.utcnow()
+    insertQuery['date_add_server_unix'] = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000) #round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000) #round(datetime.datetime.utcnow().timestamp() * 1000) #datetime.datetime.utcnow()
     insertQuery['device_code'] = device_code
     # print("------------------")
     # sys.stdout.flush()    

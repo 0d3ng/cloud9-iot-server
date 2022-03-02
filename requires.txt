@@ -12,3 +12,4 @@ kafka-python
 configparser
 numpy
 pandas
+ntplib

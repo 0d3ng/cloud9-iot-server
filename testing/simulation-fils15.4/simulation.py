@@ -1,4 +1,3 @@
-from msilib.schema import Error
 from multiprocessing.connection import wait
 import os, shutil
 import sys, json, time, datetime
@@ -8,7 +7,7 @@ from pymysql import Connect
 from scipy.fftpack import ss_diff
 import glob
 import pandas as pd
-import paho.mqtt.client as mqttClient #Must Install Req
+import paho.mqtt.client as mqttClient
 
 readPath = "dataset/"
 backupPath = "dataset-log/"
@@ -35,6 +34,7 @@ def readcsv(filename,client1):
     print("Read File "+filename+" Start")
     tstart = time.time()
     x = pd.read_csv(readPath+filename, low_memory=False)
+    x = x.dropna()
     move_name = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S %f")
     move_file(filename,"simulation-"+move_name) 
     iteration = 0
@@ -43,13 +43,17 @@ def readcsv(filename,client1):
         # print(row['topic'], row['id'], row['lq'], row['x'], row['y'], row['z'])
         try:
             topic = row['topic']
-            msg = {
-                "id":str(int(row['id'])),
-                "lq":int(row['lq']),
-                "x":float(row['x']),
-                "y":float(row['y']),
-                "z":float(row['z'])
-            }
+            msg = {}
+            if( row['id'] != "" ):
+                msg["id"] = str(int(row['id']))
+            if( row['id'] != "" ):
+                msg["lq"] = int(row['lq']) 
+            if( row['x'] != "" and row['x'] is not None ):
+                msg["x"] = float(row['x'])
+            if( row['y'] != "" and row['y'] is not None ):
+                msg["y"] = float(row['y'])
+            if( row['z'] != "" and row['z'] is not None ):
+                msg["z"] = float(row['z'])
         except:
             topic = None
         if topic :
