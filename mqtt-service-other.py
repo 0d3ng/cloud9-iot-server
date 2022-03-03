@@ -5,6 +5,7 @@ from controller import comChannelController
 from controller import commETLController
 from controller import commLogController
 from datetime import datetime
+from datetime import timezone as timezone2
 from pytz import timezone
 from configparser import ConfigParser
 config = ConfigParser()
@@ -45,6 +46,8 @@ class Comm:
             sys.stdout.flush()
     
     def on_message(self,client, userdata, message):
+        self.client.publish(self.topic+"/feedback",message)
+        receive_unix_time = round(datetime.now(timezone2.utc).timestamp()*1000)
         raw_msg = message.payload.decode("utf-8")
         # print(self.device_code)
         # print("--RAW MESSAGE---")
@@ -71,7 +74,7 @@ class Comm:
             hack = True        
         if hack == False:
             message_obj = raw_object
-            insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj)
+            insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj,receive_unix_time)
             if not insert['status']:
                 response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
             else:

@@ -72,10 +72,11 @@ while True:
     # datetime_now2 = datetime.now(pytz.timezone('Asia/Tokyo'))
     # # print(no," ",(time.mktime(datetime_now.timetuple())))
     # print(no," ",datetime_now, " - ",(time.mktime(datetime_now2.timetuple())))    
-    dt = datetime.now(timezone.utc).timestamp()
-    # ntptime = ntplib.system_to_ntp_time(dt)
-    # ts = ntplib.ntp_to_system_time(ntptime)
-    resp = client.request(server, version=3)
-    print(no," ",dt, " - ",resp.orig_time)    
-    no=no+1
-    time.sleep(5)
+    # dt = datetime.now(timezone.utc).timestamp()
+    # # ntptime = ntplib.system_to_ntp_time(dt)
+    # # ts = ntplib.ntp_to_system_time(ntptime)
+    # resp = client.request(server, version=3)
+    dt = round(datetime.now(timezone.utc).timestamp()*1000)
+    print(dt)    
+    # no=no+1
+    time.sleep(3)

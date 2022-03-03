@@ -42,12 +42,12 @@ def save_image(message,field,group,device_name):
     return res
 
 
-def etl(collection,elastic_index,info,device_code,message):  #info --> , channel_type,topic,token_access,ip_sender,date_add_sensor
+def etl(collection,elastic_index,info,device_code,message,receive_time = None):  #info --> , channel_type,topic,token_access,ip_sender,date_add_sensor
     insertQuery = info
     insertQuery['raw_message'] = message
     insertElastic = copy.copy(insertQuery)
     insertQuery['date_add_server'] = datetime.datetime.now(timezone('Asia/Tokyo')) #datetime.datetime.utcnow() #datetime.datetime.utcnow()
-    insertQuery['date_add_server_unix'] = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000) #round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000) #round(datetime.datetime.utcnow().timestamp() * 1000) #datetime.datetime.utcnow()
+    #round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000) #round(datetime.datetime.utcnow().timestamp() * 1000) #datetime.datetime.utcnow()
     insertQuery['device_code'] = device_code
     # print("------------------")
     # sys.stdout.flush()    
@@ -90,6 +90,8 @@ def etl(collection,elastic_index,info,device_code,message):  #info --> , channel
     if state == False:
         result = []
     else:
+        insertQuery['receive_unix_time'] = receive_time
+        insertQuery['save_unix_time'] = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000)
         result = db.insertData(collection,insertQuery)  
     ### END CODINGHACK #### 
     if result == []:
