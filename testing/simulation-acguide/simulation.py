@@ -3,8 +3,6 @@ import os, shutil
 import sys, json, time, datetime
 import random,string
 import multiprocessing
-from pymysql import Connect
-from scipy.fftpack import ss_diff
 import glob
 import pandas as pd
 from pytz import timezone
@@ -13,13 +11,14 @@ import paho.mqtt.client as mqttClient
 
 readPath = "dataset/"
 backupPath = "dataset-log/"
-broker= "103.106.72.188"#"localhost"#
+broker= "localhost"#"103.106.72.188"#
 topic="acguide/d207"
 port=1883
 TM_wait = 30 #second
 file_list = {}
 minRandom = 40
 maxRandom = 100
+list_file = []
 
 def randomString(stringLength=8):
     letters1 = string.ascii_lowercase
@@ -81,17 +80,34 @@ def readcsv(filename,client1):
 def on_publish(client,userdata,result): #create function for callback
     print("data published")
     pass
-
-def worker(filename,code):    
+    
+def on_message(client, userdata, message):
+    raw_msg = message.payload.decode("utf-8")
+    end_time = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000)
+    try:
+        raw_object = json.loads(raw_msg)
+        raw_object["endtime"] = end_time
+    except:
+        raw_object = {"endtime":end_time,"message":raw_msg}
+    print(raw_object)
+    
+def worker(filename,code):   
     client1= mqttClient.Client("simulation_"+code) #create client object
     # client1.on_publish = on_publish
+    # client1.on_connect= on_connect
+    client1.on_message= on_message
     client1.connect(broker,port) #establish connection
+    client1.loop_start() 
     print("Start Simulation : "+filename+" "+code)
+    client1.subscribe(topic+"/feedback")
     readcsv(filename,client1)     
 
 def readfile():
     for file_name in glob.glob(readPath+'*.csv'):
-        file_name = os.path.basename(file_name)   
+        if file_name in list_file:
+            continue
+        file_name = os.path.basename(file_name)
+        list_file.append(file_name)   
         code = randomString(3)  
         p = multiprocessing.Process(target=worker, args=(file_name,code))
         p.start()

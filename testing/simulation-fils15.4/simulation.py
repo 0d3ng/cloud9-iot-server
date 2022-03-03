@@ -3,7 +3,6 @@ import os, shutil
 import sys, json, time, datetime
 import random,string
 import multiprocessing
-from pymysql import Connect
 from scipy.fftpack import ss_diff
 import glob
 import pandas as pd
