@@ -12,7 +12,7 @@ import csv
 
 readPath = "dataset/"
 backupPath = "dataset-log/"
-broker= "103.106.72.188"#"103.106.72.188"#
+broker= "103.106.72.188"#"localhost"#
 topic="acguide/d207"
 port=1883
 TM_wait = 10 #second
