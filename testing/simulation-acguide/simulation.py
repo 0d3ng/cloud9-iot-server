@@ -91,12 +91,12 @@ def on_publish(client,userdata,result): #create function for callback
 def on_message(client, userdata, message):
     raw_msg = message.payload.decode("utf-8")
     end_time = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000)
-    print(raw_msg)
     try:
         raw_object = json.loads(raw_msg)
         raw_object["endtime"] = end_time
     except:
         raw_object = {"endtime":end_time,"message":raw_msg}
+    print(raw_object)
     topic_str = str(message.topic)
     topic_str = topic_str.replace("/", "_")
     writeCSV(topic_str,raw_object)
@@ -109,7 +109,8 @@ def worker(filename,code):
     client1.connect(broker,port) #establish connection
     client1.loop_start() 
     print("Start Simulation : "+filename+" "+code)
-    client1.subscribe(topic+"/feedback")
+    # client1.subscribe(topic+"/feedback")
+    client1.subscribe(topic)
     readcsv(filename,client1)     
 
 def readfile():
