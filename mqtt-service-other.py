@@ -46,9 +46,9 @@ class Comm:
             sys.stdout.flush()
     
     def on_message(self,client, userdata, message):
+        self.client.publish(self.topic+"/feedback",payload=raw_msg)
         receive_unix_time = round(datetime.now(timezone2.utc).timestamp()*1000)
         raw_msg = message.payload.decode("utf-8")
-        self.client.publish(self.topic+"/feedback",payload=raw_msg)
         # print(self.device_code)
         # print("--RAW MESSAGE---")
         # print(raw_msg)

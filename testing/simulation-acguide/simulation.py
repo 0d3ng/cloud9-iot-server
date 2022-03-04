@@ -8,17 +8,24 @@ import pandas as pd
 from pytz import timezone
 import time
 import paho.mqtt.client as mqttClient
+import csv
 
 readPath = "dataset/"
 backupPath = "dataset-log/"
-broker= "localhost"#"103.106.72.188"#
+broker= "103.106.72.188"#"103.106.72.188"#
 topic="acguide/d207"
 port=1883
-TM_wait = 30 #second
+TM_wait = 10 #second
 file_list = {}
 minRandom = 40
 maxRandom = 100
 list_file = []
+
+def writeCSV(file,value):
+    value = list(value.values())
+    with open("feedback/feedback_"+file+".csv",'a+', newline='') as f:
+        writer=csv.writer(f)
+        writer.writerow(value)
 
 def randomString(stringLength=8):
     letters1 = string.ascii_lowercase
@@ -42,7 +49,6 @@ def readcsv(filename,client1):
     iteration = 0
     random_val = random.randint(minRandom,maxRandom) 
     for index, row in x.iterrows():
-        print(row['co2_value'], row['window_state'], row['door_state'], row['person_num'], row['ventilate_state'], row['temperature_in'], row['humidity_in'], row['di_in'], row['ac_state']) 
         try:            
             msg = {}
             if( row['co2_value'] != "" ):
@@ -70,6 +76,7 @@ def readcsv(filename,client1):
             msg["date_add_sensor"] =  round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000) #round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000)
             payload = json.dumps(msg)
             client1.publish(topic,payload=payload)
+            print(row['co2_value'], row['window_state'], row['door_state'], row['person_num'], row['ventilate_state'], row['temperature_in'], row['humidity_in'], row['di_in'], row['ac_state']) 
             time.sleep(TM_wait)   
         else:
             time.sleep(5)  
@@ -84,12 +91,15 @@ def on_publish(client,userdata,result): #create function for callback
 def on_message(client, userdata, message):
     raw_msg = message.payload.decode("utf-8")
     end_time = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000)
+    print(raw_msg)
     try:
         raw_object = json.loads(raw_msg)
         raw_object["endtime"] = end_time
     except:
         raw_object = {"endtime":end_time,"message":raw_msg}
-    print(raw_object)
+    topic_str = str(message.topic)
+    topic_str = topic_str.replace("/", "_")
+    writeCSV(topic_str,raw_object)
     
 def worker(filename,code):   
     client1= mqttClient.Client("simulation_"+code) #create client object
