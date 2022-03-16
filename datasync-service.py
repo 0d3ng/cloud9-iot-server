@@ -40,7 +40,7 @@ def on_message(client, userdata, message):
         raw_object = {"failed":True}
     if message.topic == config["MQTT"]["datasync_stream_start"] :
         on_message_subscribe(raw_object)
-    elif message.topic == config["MQTT"]["datasync_stream_start"] :
+    elif message.topic == config["MQTT"]["datasync_stream_stop"] :
         on_message_unsubscribe(raw_object)
     else :
         print("-----------------")
