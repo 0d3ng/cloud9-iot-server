@@ -33,6 +33,7 @@ def on_connect(client, userdata, flags, rc):
  
 def on_message(client, userdata, message):
     raw_msg = message.payload.decode("utf-8")
+    print(raw_msg)
     try:
         raw_object = json.loads(raw_msg)
     except:
@@ -127,7 +128,7 @@ if __name__ == "__main__":
         time.sleep(0.1)
     
     client.subscribe(config["MQTT"]["datasync_stream_start"])
-    client.subscribe(config["MQTT"]["datasync_stream_start"])
+    client.subscribe(config["MQTT"]["datasync_stream_stop"])
 
     try:
         while True:
