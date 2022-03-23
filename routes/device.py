@@ -240,7 +240,8 @@ class getdata(RequestHandler):
                 skip = data['skip']
                 del data['skip']
             if 'sort' in data:
-                sort = (data['sort']['field'],data['sort']['type'])            
+                sort = (data['sort']['field'],data['sort']['type'])   
+                del data['sort']         
             if 'date' in data:
                 date_time_str = str(data['date'])
                 datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
@@ -306,6 +307,7 @@ class countdata(RequestHandler):
                 del data['skip']
             if 'sort' in data:
                 sort = (data['sort']['field'],data['sort']['type'])            
+                del data['sort']         
             if 'date' in data:
                 date_time_str = str(data['date'])
                 datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
