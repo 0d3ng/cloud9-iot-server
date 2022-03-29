@@ -220,8 +220,14 @@ class getSchemaData(RequestHandler):
             if 'date_start' in data and 'date_end' in data:
                 date_time_str = str(data['date_start'])
                 date_time_end = str(data['date_end'])
-                datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
-                datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
+                if 'time_start'in data and 'time_end' in data:
+                    datesrc_str = datetime.strptime(date_time_str+" "+str(data['time_start']),'%Y-%m-%d %H:%M:%S') - td
+                    datesrc_end = datetime.strptime(date_time_end+" "+str(data['time_end']),'%Y-%m-%d %H:%M:%S') - td
+                    del data['time_start']
+                    del data['time_end']
+                else:
+                    datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
+                    datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
                 data['date_add_auto'] = {"$gte":datesrc_str, "$lt":datesrc_end }
                 del data['date_start']
                 del data['date_end']
@@ -280,8 +286,14 @@ class countSchemaData(RequestHandler):
             if 'date_start' in data and 'date_end' in data:
                 date_time_str = str(data['date_start'])
                 date_time_end = str(data['date_end'])
-                datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
-                datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
+                if 'time_start'in data and 'time_end' in data:
+                    datesrc_str = datetime.strptime(date_time_str+" "+str(data['time_start']),'%Y-%m-%d %H:%M:%S') - td
+                    datesrc_end = datetime.strptime(date_time_end+" "+str(data['time_end']),'%Y-%m-%d %H:%M:%S') - td
+                    del data['time_start']
+                    del data['time_end']
+                else:
+                    datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
+                    datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
                 data['date_add_auto'] = {"$gte":datesrc_str, "$lt":datesrc_end }
                 del data['date_start']
                 del data['date_end']
