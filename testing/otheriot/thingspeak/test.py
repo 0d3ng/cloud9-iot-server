@@ -58,25 +58,63 @@
 # # publish.single(topic, payload, hostname=server, transport=t_transport, port=t_port, client_id=clientId, auth={'username':username,'password':password})
 
 
-from datetime import datetime, timezone
-import pytz
+# from datetime import datetime, timezone
+# import pytz
+# import time
+# import ntplib
+# no = 1
+
+# client = ntplib.NTPClient()
+# server = 'jp.pool.ntp.org'
+
+# while True:
+#     # datetime_now = round(datetime.now(pytz.timezone('Asia/Tokyo')).timestamp() * 1000)
+#     # datetime_now2 = datetime.now(pytz.timezone('Asia/Tokyo'))
+#     # # print(no," ",(time.mktime(datetime_now.timetuple())))
+#     # print(no," ",datetime_now, " - ",(time.mktime(datetime_now2.timetuple())))    
+#     # dt = datetime.now(timezone.utc).timestamp()
+#     # # ntptime = ntplib.system_to_ntp_time(dt)
+#     # # ts = ntplib.ntp_to_system_time(ntptime)
+#     # resp = client.request(server, version=3)
+#     dt = round(datetime.now(timezone.utc).timestamp()*1000)
+#     print(dt)    
+#     # no=no+1
+#     time.sleep(3)
+
+
 import time
 import ntplib
-no = 1
-
-client = ntplib.NTPClient()
-server = 'jp.pool.ntp.org'
-
+from datetime import datetime, timezone
+c = ntplib.NTPClient()
+# Provide the respective ntp server ip in below function
 while True:
-    # datetime_now = round(datetime.now(pytz.timezone('Asia/Tokyo')).timestamp() * 1000)
-    # datetime_now2 = datetime.now(pytz.timezone('Asia/Tokyo'))
-    # # print(no," ",(time.mktime(datetime_now.timetuple())))
-    # print(no," ",datetime_now, " - ",(time.mktime(datetime_now2.timetuple())))    
-    # dt = datetime.now(timezone.utc).timestamp()
-    # # ntptime = ntplib.system_to_ntp_time(dt)
-    # # ts = ntplib.ntp_to_system_time(ntptime)
-    # resp = client.request(server, version=3)
-    dt = round(datetime.now(timezone.utc).timestamp()*1000)
-    print(dt)    
-    # no=no+1
-    time.sleep(3)
+    response = c.request('103.106.72.188', version=3)
+    response.offset
+    # dt = datetime.fromtimestamp(response.tx_time)
+    # dt2 = datetime.now()
+    # dt3 = dt2 - dt
+    # print (dt.isoformat()," - ",dt2.isoformat()," ",dt3)
+    # print (dt.strftime('%Y-%m-%d %H:%M:%S.%Z'))
+    dt = datetime.now() - datetime.fromtimestamp(response.tx_time)
+    print(dt)
+    time.sleep(1)
+# print (datetime.fromtimestamp(response.tx_time, timezone.utc))
+# while True:
+#     c = ntplib.NTPClient()
+#     response = c.request('103.106.72.188', version=3)
+#     response.offset
+#     dt = datetime.fromtimestamp(response.tx_time)
+#     if(dt.strftime('%S') == "30" or dt.strftime('%S') == "00"):
+#         print (dt.strftime('%H:%M:%S'))
+# from datetime import datetime, timedelta
+# import time
+# from pytz import timezone
+
+# current = datetime.now() + timedelta(seconds=int(1))
+# next_time = current.strftime('%Y-%m-%d %H:%M:%S')
+# while True:
+#     dt = datetime.now()
+#     if(dt.strftime('%Y-%m-%d %H:%M:%S') == next_time):
+#         print (dt.isoformat())
+#         current = dt + timedelta(seconds=int(1))
+#         next_time = current.strftime('%Y-%m-%d %H:%M:%S')

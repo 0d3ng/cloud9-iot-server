@@ -73,6 +73,7 @@ class Comm:
         if ('ts' in raw_object) and (len(raw_object) == 1) :
             hack = True        
         if hack == False:
+            
             message_obj = raw_object
             insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj,receive_unix_time)
             if not insert['status']:

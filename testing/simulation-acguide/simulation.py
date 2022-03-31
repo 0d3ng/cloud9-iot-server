@@ -15,7 +15,7 @@ backupPath = "dataset-log/"
 broker= "103.106.72.188"#"localhost"#
 topic="acguide/d207"
 port=1883
-TM_wait = 10 #second
+TM_wait = 1 #second
 file_list = {}
 minRandom = 40
 maxRandom = 100
@@ -49,8 +49,10 @@ def readcsv(filename,client1):
     iteration = 0
     random_val = random.randint(minRandom,maxRandom) 
     for index, row in x.iterrows():
+        iteration = iteration + 1
         try:            
             msg = {}
+            msg["id"] = iteration
             if( row['co2_value'] != "" ):
                 msg["co2_value"] = int(row['co2_value'])
             if( row['window_state'] != "" ):

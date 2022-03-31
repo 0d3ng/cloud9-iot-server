@@ -12,10 +12,12 @@ readPath = "dataset/"
 backupPath = "dataset-log/"
 broker="103.106.72.188"
 port=1883
-TM_wait = 30 #second
+TM_wait = 0.5 #second
 file_list = {}
 minRandom = 40
 maxRandom = 100
+senddata = 10
+simulation = "SIM15"
 
 def randomString(stringLength=8):
     letters1 = string.ascii_lowercase
@@ -37,7 +39,7 @@ def readcsv(filename,client1):
     move_name = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S %f")
     move_file(filename,"simulation-"+move_name) 
     iteration = 0
-    random_val = random.randint(minRandom,maxRandom) 
+    random_val = senddata #random.randint(minRandom,maxRandom) 
     for index, row in x.iterrows():
         # print(row['topic'], row['id'], row['lq'], row['x'], row['y'], row['z'])
         try:
@@ -53,10 +55,13 @@ def readcsv(filename,client1):
                 msg["y"] = float(row['y'])
             if( row['z'] != "" and row['z'] is not None ):
                 msg["z"] = float(row['z'])
+            msg["simulation"] = simulation
+            msg["key"] = simulation+"-"+str(index)            
         except:
             topic = None
         if topic :
             payload = json.dumps(msg)
+            
             client1.publish(topic,payload=payload)
                         
         iteration+=1
