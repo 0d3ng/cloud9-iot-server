@@ -11,6 +11,9 @@ controller/__pycache__/
 function/__pycache__/
 mqtt-log/
 testing/simulation-fils15.4/dataset-log/
+testing/simulation-fils15.4/dataset-backup/
+testing/simulation-acguide/dataset-log/
+testing/simulation-acguide/log/
 
 config.ini
 # Learn more about .gitignore:
