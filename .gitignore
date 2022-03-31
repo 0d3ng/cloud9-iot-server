@@ -9,7 +9,7 @@
 routes/__pycache__/
 controller/__pycache__/
 function/__pycache__/
-mqtt-log/
+log/
 testing/simulation-fils15.4/__pycache__/
 testing/simulation-fils15.4/dataset-log/
 testing/simulation-fils15.4/dataset-backup/
