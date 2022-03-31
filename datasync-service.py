@@ -64,7 +64,7 @@ def on_message_unsubscribe(message):
 def worker(code, time_loop):
     reload(db)
     reload(datasyncController)
-    last_time = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:00')
+    last_time = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
     next_time = datetime.strptime(last_time,'%Y-%m-%d %H:%M:%S') + timedelta(seconds=int(time_loop))
     next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
     print("Start Service : ",code)
