@@ -15,6 +15,8 @@ testing/simulation-fils15.4/dataset-log/
 testing/simulation-fils15.4/dataset-backup/
 testing/simulation-acguide/dataset-log/
 testing/simulation-acguide/log/
+testing/simulation-fils15.4/feedback/
+
 
 config.ini
 # Learn more about .gitignore:

@@ -8,6 +8,7 @@ from datetime import datetime
 from datetime import timezone as timezone2
 from pytz import timezone
 from configparser import ConfigParser
+import csv
 config = ConfigParser()
 config.read("config.ini")
 #Config
@@ -46,8 +47,13 @@ class Comm:
             sys.stdout.flush()
     
     def on_message(self,client, userdata, message):
+        hack = False
+        receive_unix_time2 = round(datetime.now(timezone('Asia/Tokyo')).timestamp()*1000)
         receive_unix_time = round(datetime.now(timezone2.utc).timestamp()*1000)
         raw_msg = message.payload.decode("utf-8")
+        if "ts" not in raw_msg and "::t" not in raw_msg:
+            cDate = datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d")
+            writeLog(self.broker+"_"+self.device_code+"_"+cDate,str(receive_unix_time2)+","+raw_msg)
         # self.client.publish(self.topic+"/feedback",payload=raw_msg)
         # print(self.device_code)
         # print("--RAW MESSAGE---")
@@ -68,12 +74,10 @@ class Comm:
         # print("--RAW OBJECT---")
         # print(raw_object)
         # print("-------------------------------------------")
-        # sys.stdout.flush()
-        hack = False
+        # sys.stdout.flush()        
         if ('ts' in raw_object) and (len(raw_object) == 1) :
             hack = True        
-        if hack == False:
-            
+        if hack == False:            
             message_obj = raw_object
             insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj,receive_unix_time)
             if not insert['status']:
@@ -102,6 +106,10 @@ class Comm:
         print("Diconnecting from:"+self.topic+"@"+self.broker+":"+str(self.port))
         print("-------------------------------------------")
         sys.stdout.flush()
+
+def writeLog(file,value):
+    with open("log/log_"+file+".log",'a+',newline='') as f:
+        f.write(value+'\n')
 
 def subscribe_list():
     query = {
@@ -153,6 +161,7 @@ def on_message(client, userdata, message):
         print("undefined messages")
       
 def on_message_subscribe(message):
+    print(message)
     channel_code = message['channel_code']
     if(channel_code):
         query = {
@@ -162,10 +171,17 @@ def on_message_subscribe(message):
         if result['status']: 
             val = result['data']
             print("New Subscribe to: "+val['topic']+"@"+val['server']+":"+str(val['port']))
+            if(val['channel_code'] in comm_subs):
+                try:
+                    comm_subs[val['channel_code']].disconnect()
+                    del comm_subs[val['channel_code']]
+                except KeyError:
+                    pass
             comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
             comm_subs[val['channel_code']].connect()
 
 def on_message_unsubscribe(message):
+    print(message)
     channel_code = message['channel_code']
     try:
         comm_subs[channel_code].disconnect()
