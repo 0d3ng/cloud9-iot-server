@@ -162,6 +162,7 @@ def on_message(client, userdata, message):
         print("undefined messages")
       
 def on_message_subscribe(message):
+    print("subscribe")
     print(message)
     channel_code = message['channel_code']
     if(channel_code):
@@ -177,17 +178,20 @@ def on_message_subscribe(message):
                     comm_subs[val['channel_code']].disconnect()
                     del comm_subs[val['channel_code']]
                 except KeyError:
+                    print(KeyError)
                     pass
             comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
             comm_subs[val['channel_code']].connect()
 
 def on_message_unsubscribe(message):
+    print("unsubscribe")
     print(message)
     channel_code = message['channel_code']
     try:
         comm_subs[channel_code].disconnect()
         del comm_subs[channel_code]
     except KeyError:
+        print(KeyError)
         pass
 
 client = mqttClient.Client("Python3-Other_"+cloud9Lib.randomOnlyString(4))               
