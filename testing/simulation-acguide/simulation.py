@@ -13,7 +13,7 @@ import csv
 readPath = "dataset/"
 backupPath = "dataset-log/"
 broker= "103.106.72.188"#"localhost"#
-topic="acguide/d207"
+topic="acguide/d207/1"
 port=1883
 TM_wait = 1 #second
 file_list = {}
@@ -72,8 +72,9 @@ def readcsv(filename,client1):
             if( row['ac_state'] != "" ):
                 msg["ac_state"] = str(row['ac_state']) 
             send = True
-        except:
+        except Exception as e:
             send = False
+            print(e)
         if send :
             msg["date_add_sensor"] =  round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000) #round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000)
             payload = json.dumps(msg)
@@ -105,7 +106,7 @@ def on_message(client, userdata, message):
     
 def worker(filename,code):   
     client1= mqttClient.Client("simulation_"+code) #create client object
-    # client1.on_publish = on_publish
+    client1.on_publish = on_publish
     # client1.on_connect= on_connect
     client1.on_message= on_message
     client1.connect(broker,port) #establish connection

@@ -1,4 +1,5 @@
 import multiprocessing
+import threading
 import sys, json, time
 import paho.mqtt.client as mqttClient #Must Install Req
 from function import *
@@ -11,6 +12,7 @@ config = ConfigParser()
 config.read("config.ini")
 #Config
 datasync_list = {} 
+datasync_state = {} 
 datasync_subs = {}
 Connected = False
 broker_address= config["MQTT"]["broker"]
@@ -23,9 +25,12 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to broker")
         print("------------------------------------")
-        sys.stdout.flush()
-        global Connected                
-        Connected = True   
+        client.subscribe(config["MQTT"]["datasync_stream_start"])
+        client.subscribe(config["MQTT"]["datasync_stream_stop"])
+        print(config["MQTT"]["datasync_stream_start"]," - ",config["MQTT"]["datasync_stream_stop"])
+        # sys.stdout.flush()
+        # global Connected                
+        # Connected = True   
         stream_list()             
     else:
         print("Connection failed")
@@ -46,24 +51,31 @@ def on_message(client, userdata, message):
         print("-----------------")
       
 def on_message_subscribe(message):
+    print("Start Service : ",message)
     datasync_code = message['datasync_code']
     time_loop = message['time_loop']
     if datasync_code not in datasync_subs:    
-        datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
+        # datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
+        datasync_subs[datasync_code] = threading.Thread(target=worker, args=(datasync_code,time_loop))
+        datasync_state[datasync_code] = True
         datasync_subs[datasync_code].start()
+        print("--------++++-----------")
 
 def on_message_unsubscribe(message):
     datasync_code = message['datasync_code']
     print("Stop Service : ",datasync_code)
     sys.stdout.flush()
     if datasync_code in datasync_subs:
-        datasync_subs[datasync_code].terminate()
+        # datasync_subs[datasync_code].terminate()
+        datasync_state[datasync_code] = False
         datasync_subs[datasync_code].join()
         del datasync_subs[datasync_code]
+        print("--------++++-----------")
 
 def worker(code, time_loop):
     reload(db)
     reload(datasyncController)
+    global datasync_state
     last_time = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
     next_time = datetime.strptime(last_time,'%Y-%m-%d %H:%M:%S') + timedelta(seconds=int(time_loop))
     next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -90,7 +102,7 @@ def worker(code, time_loop):
                         print(next_time)
                         print("Error")
                         print("------------------")
-                        sys.stdout.flush()
+                        
                     # print("Total Insert ",code," : ",item," --> ",last_time," ",next_time)                
                     #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
                     time_loop = dataSyncData["time_loop"]
@@ -102,6 +114,8 @@ def worker(code, time_loop):
                 # sys.stdout.flush()
             except:
                 continue
+        if(datasync_state[code] == False):
+            break
 
 def stream_list():
     query = {
@@ -112,7 +126,9 @@ def stream_list():
         for val in result['data']:
             datasync_code = val['datasync_code']
             time_loop = val['time_loop']
-            datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
+            # datasync_subs[datasync_code] = multiprocessing.Process(target=worker, args=(datasync_code,time_loop))
+            datasync_subs[datasync_code] = threading.Thread(target=worker, args=(datasync_code,time_loop))
+            datasync_state[datasync_code] = True
             datasync_subs[datasync_code].start() 
 
 
@@ -124,15 +140,18 @@ if __name__ == "__main__":
     client.connect(broker_address, port=port)          
     client.loop_start()        
     
-    while Connected != True:    #Wait for connection
-        time.sleep(0.1)
+    # while Connected != True:    #Wait for connection
+    #     print(".")
+    #     time.sleep(0.1)
     
-    client.subscribe(config["MQTT"]["datasync_stream_start"])
-    client.subscribe(config["MQTT"]["datasync_stream_stop"])
-
+    # client.subscribe(config["MQTT"]["datasync_stream_start"])
+    # client.subscribe(config["MQTT"]["datasync_stream_stop"])
+    # print(config["MQTT"]["datasync_stream_start"]," - ",config["MQTT"]["datasync_stream_stop"])
     try:
+        # client.loop_forever() 
         while True:
             time.sleep(1)
+            # client.loop()
     
     except KeyboardInterrupt:
         print("exiting")

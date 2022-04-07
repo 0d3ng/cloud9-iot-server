@@ -15,7 +15,7 @@ waiting_time_default = 10
 
 config_fin = {
     "lqi_threshold":89,
-    "schema_dataset":"r83y1y",
+    "schema_dataset":"xp10lj",
     "schema_goal":"5y76py",
     "waiting_time":30,#detikclea
     "limit_data":50, 
@@ -99,12 +99,12 @@ def detection(testData,lastData,fingerprint_data,config):
                         room = []
                         print(id+" --> [ACCELERO > 150] : Process recent data with euclidean distance")
                         for j in fingerprint_data:
-                            lqi1 = round(testData['lq1'], 2) - j["lq1"]
-                            lqi2 = round(testData['lq2'], 2) - j["lq2"]
-                            lqi3 = round(testData['lq3'], 2) - j["lq3"]
-                            lqi4 = round(testData['lq4'], 2) - j["lq4"]
-                            lqi5 = round(testData['lq5'], 2) - j["lq5"]
-                            lqi6 = round(testData['lq6'], 2) - j["lq6"]
+                            lqi1 = round(testData['lq1'], 2) - float(j["lq1"])
+                            lqi2 = round(testData['lq2'], 2) - float(j["lq2"])
+                            lqi3 = round(testData['lq3'], 2) - float(j["lq3"])
+                            lqi4 = round(testData['lq4'], 2) - float(j["lq4"])
+                            lqi5 = round(testData['lq5'], 2) - float(j["lq5"])
+                            lqi6 = round(testData['lq6'], 2) - float(j["lq6"])
                             dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
                             pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
                             x_euc_dist = round(math.sqrt(dist), 2)
@@ -126,12 +126,12 @@ def detection(testData,lastData,fingerprint_data,config):
                 room = []
                 print(id+" --> [ACCELERO > 150] : Process recent data with euclidean distance")
                 for j in fingerprint_data:
-                    lqi1 = round(testData['lq1'], 2) - j["lq1"]
-                    lqi2 = round(testData['lq2'], 2) - j["lq2"]
-                    lqi3 = round(testData['lq3'], 2) - j["lq3"]
-                    lqi4 = round(testData['lq4'], 2) - j["lq4"]
-                    lqi5 = round(testData['lq5'], 2) - j["lq5"]
-                    lqi6 = round(testData['lq6'], 2) - j["lq6"]
+                    lqi1 = round(testData['lq1'], 2) - float(j["lq1"])
+                    lqi2 = round(testData['lq2'], 2) - float(j["lq2"])
+                    lqi3 = round(testData['lq3'], 2) - float(j["lq3"])
+                    lqi4 = round(testData['lq4'], 2) - float(j["lq4"])
+                    lqi5 = round(testData['lq5'], 2) - float(j["lq5"])
+                    lqi6 = round(testData['lq6'], 2) - float(j["lq6"])
                     dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
                     pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
                     x_euc_dist = round(math.sqrt(dist), 2)
@@ -146,12 +146,12 @@ def detection(testData,lastData,fingerprint_data,config):
             room = []
             print(id+" --> [ACCELERO > 150] : Process recent data with euclidean distance")
             for j in fingerprint_data:
-                lqi1 = round(testData['lq1'], 2) - j["lq1"]
-                lqi2 = round(testData['lq2'], 2) - j["lq2"]
-                lqi3 = round(testData['lq3'], 2) - j["lq3"]
-                lqi4 = round(testData['lq4'], 2) - j["lq4"]
-                lqi5 = round(testData['lq5'], 2) - j["lq5"]
-                lqi6 = round(testData['lq6'], 2) - j["lq6"]
+                lqi1 = round(testData['lq1'], 2) - float(j["lq1"])
+                lqi2 = round(testData['lq2'], 2) - float(j["lq2"])
+                lqi3 = round(testData['lq3'], 2) - float(j["lq3"])
+                lqi4 = round(testData['lq4'], 2) - float(j["lq4"])
+                lqi5 = round(testData['lq5'], 2) - float(j["lq5"])
+                lqi6 = round(testData['lq6'], 2) - float(j["lq6"])
                 dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
                 pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
                 x_euc_dist = round(math.sqrt(dist), 2)
@@ -164,12 +164,12 @@ def detection(testData,lastData,fingerprint_data,config):
         euc_dist = []
         room = []
         for j in fingerprint_data:
-            lqi1 = round(testData['lq1'], 2) - j["lq1"]
-            lqi2 = round(testData['lq2'], 2) - j["lq2"]
-            lqi3 = round(testData['lq3'], 2) - j["lq3"]
-            lqi4 = round(testData['lq4'], 2) - j["lq4"]
-            lqi5 = round(testData['lq5'], 2) - j["lq5"]
-            lqi6 = round(testData['lq6'], 2) - j["lq6"]
+            lqi1 = round(testData['lq1'], 2) - float(j["lq1"])
+            lqi2 = round(testData['lq2'], 2) - float(j["lq2"])
+            lqi3 = round(testData['lq3'], 2) - float(j["lq3"])
+            lqi4 = round(testData['lq4'], 2) - float(j["lq4"])
+            lqi5 = round(testData['lq5'], 2) - float(j["lq5"])
+            lqi6 = round(testData['lq6'], 2) - float(j["lq6"])
             dist = (pow(lqi1, 2)+pow(lqi2, 2)+pow(lqi3, 2)+
             pow(lqi4, 2)+pow(lqi5, 2)+pow(lqi6, 2))
             x_euc_dist = round(math.sqrt(dist), 2)

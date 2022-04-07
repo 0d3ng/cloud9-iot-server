@@ -116,10 +116,14 @@ def triggerService(datasync_code,time_loop,status):
         "datasync_code":datasync_code,
         "time_loop":time_loop
     }
+    print("----------------------")
+    print(send)
     if status :
+        print(config["MQTT"]["datasync_stream_start"])
         mqttcom.publish(config["MQTT"]["datasync_stream_start"],send)
         return
     else:
+        print(config["MQTT"]["datasync_stream_stop"])
         mqttcom.publish(config["MQTT"]["datasync_stream_stop"],send)
         return
 
