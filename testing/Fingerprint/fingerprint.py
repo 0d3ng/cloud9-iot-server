@@ -17,8 +17,8 @@ config_fin = {
     "lqi_threshold":89,
     "schema_dataset":"xp10lj",
     "schema_goal":"5y76py",
-    "waiting_time":30,#detikclea
-    "limit_data":50, 
+    "waiting_time":30,#detik
+    "limit_data":20, 
     "rest_api":"http://103.106.72.188:3001/schema/data/"
 }
 
@@ -182,11 +182,17 @@ def detection(testData,lastData,fingerprint_data,config):
         "room":detectRoom,
         "date_detection":datetime.datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d %H:%M:%S")
     }
-    update = HTTP_post(config["rest_api"]+config["schema_goal"]+"/edit",msg)
-    # print(update)
-    if(update['status']):
-        return 1
-    else:
+    try:
+        update = HTTP_post(config["rest_api"]+config["schema_goal"]+"/edit/",msg)
+        time.sleep(3)
+        print(msg)
+        print(update)
+        if(update['status']):
+            return 1
+        else:
+            return 0
+    except Exception as e:
+        print(e)
         return 0
 
 def HTTP_post(url,message):
@@ -206,20 +212,34 @@ def FingerMethod():
             query = {
                 "groupby":"id",
                 "query":{
-                    "room":{"$exists": True}
+                    "$and":[
+                        {"room":{"$exists": True}},
+                        {"room":{"$nin": ["","-",None]}}
+                    ]
+                    
                 },
                 "field":{
                     "room":"room"
                 }
             }
             lastData = {}
-            getLastData = HTTP_post(config["rest_api"]+config["schema_dataset"]+"/group",query) 
+            getLastData = HTTP_post(config["rest_api"]+config["schema_goal"]+"/group",query)
+            print(getLastData)
             if getLastData["status"] :
                 for item  in getLastData["data"]:
                     lastData[item["id"]] = item["room"]
             limit =  int(config["limit_data"])
             query = {
-                "room":{"$exists": False},
+                "$or":[
+                    {"room":{"$exists": False}},
+                    {"room":""},
+                    {"room":"-"},
+                    {"room":None}
+                ],
+                # "sort":{
+                #     "field":"date_add_auto",
+                #     "type":1
+                # },
                 "limit":limit
             }
             dataTest = HTTP_post(config["rest_api"]+config["schema_goal"],query)
