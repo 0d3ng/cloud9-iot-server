@@ -13,6 +13,7 @@ import time
 prefix_collection = "schema_data_"
 waiting_time_default = 10
 
+
 config_fin = {
     "lqi_threshold":89,
     "schema_dataset":"xp10lj",
