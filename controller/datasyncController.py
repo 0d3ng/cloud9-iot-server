@@ -271,10 +271,10 @@ def datasyncProcess(schema_code,field,time_start,time_end,batch_code = None,send
         filter = schemaDataController.filter(schema_code,insertQuery)
         if filter['status']:
             insertQuery = filter['data']
-            if batch_code is not None :
-                insertQuery["batch_code"] = batch_code
-            if send_result is None:
-                insertQuery["date_add_batch"] = datetime.datetime.now(timezone('Asia/Tokyo'))
+            # if batch_code is not None :
+            #     insertQuery["batch_code"] = batch_code
+            # if send_result is None:
+            #     insertQuery["date_add_batch"] = datetime.datetime.now(timezone('Asia/Tokyo'))
             insertQuery["date_add_auto"] = datetime.datetime.strptime(time_end,'%Y-%m-%d %H:%M:%S') - td            
             try:
                 insert = schemaDataController.add(prefix_collection_schema+schema_code,insertQuery)
