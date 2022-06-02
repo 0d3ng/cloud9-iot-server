@@ -90,26 +90,24 @@ def worker(code, time_loop):
         return str(h)+":"+str(m)+":"+str(i)
 
     global datasync_state
-    last_time = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
-    next_time = datetime.strptime(last_time,'%Y-%m-%d %H:%M:%S') + timedelta(seconds=int(time_loop))
-    next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
+    last_time = datetime.now(timezone('Asia/Tokyo'))
+    next_time = last_time + timedelta(seconds=int(time_loop))
     print("Start Service : ",code)
+    print(time_loop)
     sys.stdout.flush()
     while True:
-        curentTime = datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
-        if(next_time == curentTime):
+        curentTime = datetime.now(timezone('Asia/Tokyo'))
+        if(datetime.timestamp(next_time) <= datetime.timestamp(curentTime)):
             try:
-                next_time = datetime.now(timezone('Asia/Tokyo')) + timedelta(seconds=int(time_loop))
-                next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')                
+                curentTime = next_time
+                next_time = next_time + timedelta(seconds=int(time_loop))
                 query = {"datasync_code":code}
                 dataSyncData = datasyncController.findOne(query)
                 if dataSyncData['status']:    
-                    dataSyncData = dataSyncData["data"]            
-                    # print("Process for ",code," + ",last_time," + ",curentTime," + ",next_time)                    
-                    startTime = datetime.strptime(curentTime,'%Y-%m-%d %H:%M:%S') #To get second data.
-                    startTime = startTime.strftime('%Y-%m-%d %H:%M:%S')
+                    dataSyncData = dataSyncData["data"]   
+                    last_time = last_time.strftime('%Y-%m-%d %H:%M:%S')                             
+                    startTime = curentTime.strftime('%Y-%m-%d %H:%M:%S')
                     try:
-                        # item = datasyncController.datasyncProcess(dataSyncData["schema_code"],dataSyncData["field"],last_time,startTime,"",True)
                         item = threading.Thread(target=worker2, args=(dataSyncData["schema_code"],dataSyncData["field"],last_time,startTime,"",True))
                         item.start()
                     except:
@@ -117,12 +115,9 @@ def worker(code, time_loop):
                         print(code)
                         print(next_time)
                         print("Error")
-                        print("------------------")                        
-                    # print("Total Insert ",code," : ",item," --> ",last_time," ",next_time)                
+                        print("------------------")                                                          
                     #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
                     time_loop = dataSyncData["time_loop"]
-                # next_time = datetime.now(timezone('Asia/Tokyo')) + timedelta(seconds=int(time_loop))
-                # next_time = next_time.strftime('%Y-%m-%d %H:%M:%S')
                 # print(next_time," ",last_time," ",startTime)
                 last_time = curentTime
                 # print(code)
