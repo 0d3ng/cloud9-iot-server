@@ -108,8 +108,9 @@ def worker(code, time_loop):
                     last_time = last_time.strftime('%Y-%m-%d %H:%M:%S')                             
                     startTime = curentTime.strftime('%Y-%m-%d %H:%M:%S')
                     try:
-                        item = threading.Thread(target=worker2, args=(dataSyncData["schema_code"],dataSyncData["field"],last_time,startTime,"",True))
-                        item.start()
+                        # item = threading.Thread(target=worker2, args=(dataSyncData["schema_code"],dataSyncData["field"],last_time,startTime,"",True))
+                        # item.start()
+                        print("xxx")
                     except:
                         print("------++++++------")
                         print(code)
