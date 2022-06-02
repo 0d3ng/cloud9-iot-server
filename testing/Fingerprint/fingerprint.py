@@ -17,7 +17,7 @@ waiting_time_default = 10
 config_fin = {
     "lqi_threshold":89,
     "schema_dataset":"xp10lj",
-    "schema_goal":"5y76py",
+    "schema_goal":"0kw38j",#"hdp0uc",
     "waiting_time":30,#detik
     "limit_data":20, 
     "rest_api":"http://103.106.72.188:3001/schema/data/"
@@ -29,13 +29,24 @@ def detection(testData,lastData,fingerprint_data,config):
     LQI_threshold = config["lqi_threshold"]
     fingerprint_collection = prefix_collection+config["schema_dataset"]
     data_collection = prefix_collection+config["schema_goal"]
-    variance1 = testData['variance1']
-    variance2 = testData['variance2']
-    variance3 = testData['variance3']
-    variance4 = testData['variance4']
-    variance5 = testData['variance5']
-    variance6 = testData['variance6']
-    accelero_data = max(testData['accelvariance1'],testData['accelvariance2'],testData['accelvariance3'],testData['accelvariance4'],testData['accelvariance5'],testData['accelvariance6'])
+    try:
+
+        variance1 = testData['variance1']
+        variance2 = testData['variance2']
+        variance3 = testData['variance3']
+        variance4 = testData['variance4']
+        variance5 = testData['variance5']
+        variance6 = testData['variance6']
+        accelero_data = max(testData['accelvariance1'],testData['accelvariance2'],testData['accelvariance3'],testData['accelvariance4'],testData['accelvariance5'],testData['accelvariance6'])
+    except:
+        variance1 = 0
+        variance2 = 0
+        variance3 = 0
+        variance4 = 0
+        variance5 = 0
+        variance6 = 0
+        accelero_data = 0
+
     id = testData['id']
     _id = testData['_id']
 

@@ -12,7 +12,7 @@ port=1883
 # topic= 'message/sensor/l0v2p5'
 
 broker="103.106.72.188"
-topic="/Project_IPS/client1" #"raspitest"
+topic="raspitest" #"/Project_IPS/client1" #
 
 def on_publish(client,userdata,result): #create function for callback
     print("data published")
@@ -26,14 +26,9 @@ client1.connect(broker,port) #establish connection
 for x in range(1000):
     today = datetime.today() #current-datetime
     msg = {
-        # "device_code":"l0v2p5-co62",
-        # "temperature":12,
-        # "di":12,
-        # "date_add":round(datetime.today().timestamp() * 1000)-700, #today.strftime("%Y-%m-%d %H:%M:%S"),
-        # "layanan_kependudukan":random.randint(2,100),
-        # "layanan_catatan_cipil":random.randint(2,100),
-        "id":11,
-        "lqi":89
+        "temperature":random.randint(2,100),
+        "di":random.randint(2,100),
+        "humidty":random.randint(2,100)
     }
     payload = json.dumps(msg)
     print(msg)

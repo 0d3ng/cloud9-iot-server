@@ -184,17 +184,43 @@ def variancedata(datalist,defaultval):
     except:
         return defaultval
 
-def firstdata(datalist,defaultval):
+def maxdata(datalist,defaultval):
     try:
-        return datalist[0]
+        df = pd.DataFrame(datalist)
+        datalist = df[df[0].apply(lambda x: is_float(x))]
+        return min(datalist[0])
     except:
+        print(datalist)
+        print("ERROR Max")
         return defaultval
 
-def lastdata(datalist,defaultval):
+def mindata(datalist,defaultval):
+    try:
+        df = pd.DataFrame(datalist)
+        datalist = df[df[0].apply(lambda x: is_float(x))]
+        return min(datalist[0])
+    except:
+        print(datalist)
+        print("ERROR Min")
+        return defaultval
+
+def currentdata(datalist,defaultval):
     try:
         return datalist[len(datalist)]
     except:
         return defaultval
+
+# def firstdata(datalist,defaultval):
+#     try:
+#         return datalist[0]
+#     except:
+#         return defaultval
+
+# def lastdata(datalist,defaultval):
+#     try:
+#         return datalist[len(datalist)]
+#     except:
+#         return defaultval
 
 def is_float(x):
     try:
@@ -259,10 +285,12 @@ def datasyncProcess(schema_code,field,time_start,time_end,batch_code = None,send
                         insertQuery[fieldName] = averagedata(item_ds,fieldValue["default"])
                     elif method == 'variance':
                         insertQuery[fieldName] = variancedata(item_ds,fieldValue["default"])
-                    elif method == 'lastvalue':
-                        insertQuery[fieldName] = lastdata(item_ds,fieldValue["default"])
-                    elif method == 'fisrtvalue':
-                        insertQuery[fieldName] = firstdata(item_ds,fieldValue["default"])
+                    elif method == 'current':
+                        insertQuery[fieldName] = currentdata(item_ds,fieldValue["default"])
+                    elif method == 'max':
+                        insertQuery[fieldName] = maxdata(item_ds,fieldValue["default"])
+                    elif method == 'min':
+                        insertQuery[fieldName] = mindata(item_ds,fieldValue["default"])
                     else:
                         insertQuery[fieldName] = fieldValue["default"]
                 else:
