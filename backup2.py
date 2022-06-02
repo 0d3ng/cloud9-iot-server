@@ -110,7 +110,7 @@ def worker(code, time_loop):
                     try:
                         # item = threading.Thread(target=worker2, args=(dataSyncData["schema_code"],dataSyncData["field"],last_time,startTime,"",True))
                         # item.start()
-                        print("xxx")
+                        print(code)
                     except:
                         print("------++++++------")
                         print(code)
@@ -119,9 +119,9 @@ def worker(code, time_loop):
                         print("------------------")                                                          
                     #Tambahkan Funsgi untuk mengirimkan hasil kombinasi ke sebagai MQTT Message.
                     time_loop = dataSyncData["time_loop"]
-                # print(next_time," ",last_time," ",startTime)
+                print(next_time," ",last_time," ",startTime)
                 last_time = curentTime
-                print(code)
+                # print(code)
                 sys.stdout.flush()
             except:
                 continue
