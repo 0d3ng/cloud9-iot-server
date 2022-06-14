@@ -90,4 +90,5 @@ for name in list:
                 if key in item:
                     itemData.append(item[key])
             writeCSV(code+" - "+name,itemData)
+        print("Progress: "+str(x+1)+"/"+str(page))
     

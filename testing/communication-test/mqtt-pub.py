@@ -6,7 +6,7 @@ import random
 
 broker="103.106.72.188"#"localhost" #"161.117.58.227"
 port=1883
-topic= 'trydevice'#'Project_IPS/client1'#'message/sensor/xzhu2l'
+topic= '/Project_IPS/client1'#'message/sensor/xzhu2l''trydevice'#
 topic2= 'trydevice2'#'Project_IPS/client1'#'message/sensor/xzhu2l'
 
 def on_publish(client,userdata,result): #create function for callback
@@ -35,7 +35,7 @@ msg = {
 	"z":random.randint(4000,10000) / 100
 }
 payload = json.dumps(msg)
-payload = "::rc=80000000:lq=59\u0000:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=1:y=1 :z=1::ts=9774"
+# payload = "::rc=80000000:lq=59\u0000:ct=A8A6:ed=810D731C:id=3:ba=2540:a1=1314:a2=0665:x=1:y=1 :z=1::ts=9774"
 # payload = "::rc=8000\u00000000:lq=\u0000"
 ret= client1.publish(topic,payload=payload) #publish
-ret= client1.publish(topic2,payload=payload) #publish
+# ret= client1.publish(topic2,payload=payload) #publish
