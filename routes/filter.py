@@ -103,21 +103,26 @@ class simulation(RequestHandler):
                     ctime = item["date_add_server"]["$date"] / 1000
                     value = item[field]
                     if not filterController.is_float(value) :
-                        value = 0   
+                        value = 0 
+                        item[str(field)] = 0  
+                    
                     last_data.append(value)     
                     if(len(last_data)>2):
-                        print(str(ctime-last_time))
                         filter_data = value
                         if method == "lowpass":
                             filter_data = filterController.scipy_low(params["cutoff"], ctime-last_time,
-                                        value, last_data[0], last_data[1],
-                                        last_filter_data[0], last_filter_data[1])
+                                        value, last_data[1], last_data[0],
+                                        last_filter_data[1], last_filter_data[0])
+                        if method == "highpass":
+                            filter_data = filterController.scipy_high(params["cutoff"], ctime-last_time,
+                                        value, last_data[1], last_data[0],
+                                        last_filter_data[1], last_filter_data[0])
                         last_filter_data.append(filter_data)
                         item["filter_"+str(field)] = filter_data                    
                         del last_data[0]
                         del last_filter_data[0]
                     else:
-                        last_filter_data.append(0)
+                        last_filter_data.append(value)
                         item["filter_"+str(field)] = value
                     
                     last_time = ctime  
