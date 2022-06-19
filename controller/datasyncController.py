@@ -188,7 +188,7 @@ def maxdata(datalist,defaultval):
     try:
         df = pd.DataFrame(datalist)
         datalist = df[df[0].apply(lambda x: is_float(x))]
-        return min(datalist[0])
+        return max(datalist[0])
     except:
         print(datalist)
         print("ERROR Max")

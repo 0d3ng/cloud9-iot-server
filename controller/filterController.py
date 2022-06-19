@@ -26,11 +26,27 @@ collection = "filter"
 prefix_collection_sensor = "sensor_data_"
 prefix_collection_schema = "schema_data_"
 
-def variancedata(datalist,defaultval):
+def variancedata(datalist, defaultval=0):
     try:
         df = pd.DataFrame(datalist)
         datalist = df[df[0].apply(lambda x: is_float(x))]
         return statistics.variance(datalist[0])
+    except:
+        return defaultval
+
+def maxdata(datalist, defaultval=0):
+    try:
+        df = pd.DataFrame(datalist)
+        datalist = df[df[0].apply(lambda x: is_float(x))]
+        return max(datalist[0])
+    except:
+        return defaultval
+
+def mindata(datalist, defaultval=0):
+    try:
+        df = pd.DataFrame(datalist)
+        datalist = df[df[0].apply(lambda x: is_float(x))]
+        return min(datalist[0])
     except:
         return defaultval
 
