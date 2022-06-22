@@ -100,6 +100,9 @@ class simulation(RequestHandler):
                 last_time = 0
                 last_data = []
                 last_filter_data = []
+                maxparams = 2
+                if method == "bandpass":
+                    maxparams = 4
                 #-----------------------
                 list_sample_time = []
                 list_unfiltered = []
@@ -115,18 +118,23 @@ class simulation(RequestHandler):
                         list_unfiltered.append(value)
                         
                     last_data.append(value)  
-                    if(len(last_data)>2):
+                    if(len(last_data)>maxparams):
                         filter_data = value                         
                         if method == "lowpass":
                             filter_data = filterController.scipy_low(params["cutoff"], ctime-last_time,
                                         value, last_data[1], last_data[0],
                                         last_filter_data[1], last_filter_data[0])
-                        if method == "highpass":
+                        elif method == "highpass":
                             filter_data = filterController.scipy_high(params["cutoff"], ctime-last_time,
                                         value, last_data[1], last_data[0],
                                         last_filter_data[1], last_filter_data[0])
+                        elif method == "bandpass":
+                            filter_data = filterController.scipy_band(params["low_cutoff"], params["high_cutoff"], ctime-last_time,
+                                        value, last_data[3], last_data[2], last_data[1], last_data[0],
+                                        last_filter_data[3], last_filter_data[2], last_filter_data[1], last_filter_data[0])
+                        filter_data = float("{:.2f}".format(filter_data))   
                         last_filter_data.append(filter_data)
-                        item["filter_"+str(field)] = float("{:.2f}".format(filter_data))       
+                        item["filter_"+str(field)] = filter_data #float("{:.2f}".format(filter_data))       
                         list_filtered.append(item["filter_"+str(field)])             
                         del last_data[0]
                         del last_filter_data[0]
@@ -310,8 +318,11 @@ class simulationOld(RequestHandler):
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
             else:
                 last_time = 0
+                maxparams = 2
                 last_data = []
                 last_filter_data = []
+                if method == "bandpass":
+                    maxparams = 4
                 for item in result["data"]:
                     ctime = item["date_add_server"]["$date"] / 1000
                     value = item[field]
@@ -320,16 +331,20 @@ class simulationOld(RequestHandler):
                         item[str(field)] = 0  
                     
                     last_data.append(value)     
-                    if(len(last_data)>2):
+                    if(len(last_data)>maxparams):
                         filter_data = value
                         if method == "lowpass":
                             filter_data = filterController.scipy_low(params["cutoff"], ctime-last_time,
                                         value, last_data[1], last_data[0],
                                         last_filter_data[1], last_filter_data[0])
-                        if method == "highpass":
+                        elif method == "highpass":
                             filter_data = filterController.scipy_high(params["cutoff"], ctime-last_time,
                                         value, last_data[1], last_data[0],
                                         last_filter_data[1], last_filter_data[0])
+                        elif method == "bandpass":
+                            filter_data = filterController.scipy_high(params["low_cutoff"], params["high_cutoff"], ctime-last_time,
+                                        value, last_data[3], last_data[2], last_data[1], last_data[0],
+                                        last_filter_data[3], last_filter_data[2], last_filter_data[1], last_filter_data[0])
                         last_filter_data.append(filter_data)
                         item["filter_"+str(field)] = float("{:.2f}".format(filter_data))                    
                         del last_data[0]

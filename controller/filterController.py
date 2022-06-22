@@ -78,3 +78,11 @@ def scipy_high(cutoff_freq, sample_time, x0, x1, x2, y1, y2):
     Wn = cutoff_freq / nyquist_freq
     b, a = butter(2, Wn, btype='highpass')
     return -a[1] * y1 - a[2] * y2 + b[0] * x0 + b[1] * x1 + b[2] * x2
+
+def scipy_band(cutoff_freq_low,cutoff_freq_high, sample_time, x0, x1, x2, x3, x4, y1, y2, y3, y4):
+    sample_rate = 1.0 / sample_time
+    nyquist_freq = 0.5 * sample_rate
+    high = cutoff_freq_high / nyquist_freq
+    low = cutoff_freq_low / nyquist_freq
+    b, a = butter(2, [low,high], btype='bandstop',analog=False)
+    return  -a[1] * y1 - a[2] * y2 -a[3] * y3 - a[4] * y4 +  b[0] * x0 + b[1] * x1 + b[2] * x2 + b[3] * x3 + b[4] * x4
