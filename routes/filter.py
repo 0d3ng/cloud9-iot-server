@@ -103,6 +103,13 @@ class simulation(RequestHandler):
                 maxparams = 2
                 if method == "bandpass":
                     maxparams = 4
+                if method == "kalmanbasic":
+                    maxparams = 1
+                    P = 0 #Error covariance
+                    K = 0 #Kalman Gain
+                    H = 1 #measurement map scalar
+                    if("H" in params):
+                        H = params["H"]
                 #-----------------------
                 list_sample_time = []
                 list_unfiltered = []
@@ -132,6 +139,9 @@ class simulation(RequestHandler):
                             filter_data = filterController.scipy_band(params["low_cutoff"], params["high_cutoff"], ctime-last_time,
                                         value, last_data[3], last_data[2], last_data[1], last_data[0],
                                         last_filter_data[3], last_filter_data[2], last_filter_data[1], last_filter_data[0])
+                        elif method == "kalmanbasic":
+                            filter_data,K,P = filterController.basic_kalman(value,params["R"],H,K,params["Q"],P,last_data[0])
+
                         filter_data = float("{:.2f}".format(filter_data))   
                         last_filter_data.append(filter_data)
                         item["filter_"+str(field)] = filter_data #float("{:.2f}".format(filter_data))       
