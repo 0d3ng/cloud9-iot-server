@@ -136,7 +136,7 @@ class simulation(RequestHandler):
                                         value, last_data[1], last_data[0],
                                         last_filter_data[1], last_filter_data[0])
                         elif method == "bandpass":
-                            filter_data = filterController.scipy_band(params["low_cutoff"], params["high_cutoff"], ctime-last_time,
+                            filter_data = filterController.scipy_band_lfilter(params["low_cutoff"], params["high_cutoff"], ctime-last_time,
                                         value, last_data[3], last_data[2], last_data[1], last_data[0],
                                         last_filter_data[3], last_filter_data[2], last_filter_data[1], last_filter_data[0])
                         elif method == "kalmanbasic":
