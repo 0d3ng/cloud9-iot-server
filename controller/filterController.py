@@ -167,8 +167,11 @@ def update(query,data):
         response = {"status":False, "message":"UPDATE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
-        triggerService(last["filter_code"],True)
-        
+        if last['stream'] !=  updateData['stream']:
+            if updateData['stream'] == True:
+                triggerService(last["filter_code"],True)
+            if updateData['stream'] == False:
+                triggerService(last["filter_code"],False)
     return cloud9Lib.jsonObject(response)
 
 def delete(query): 

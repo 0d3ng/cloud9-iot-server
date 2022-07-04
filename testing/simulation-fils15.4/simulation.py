@@ -10,12 +10,12 @@ import paho.mqtt.client as mqttClient
 
 readPath = "dataset/"
 backupPath = "dataset-log/"
-broker="103.106.72.188"#"localhost"#
+broker="localhost"#"103.106.72.188"#
 port=1883
 TM_wait = 0.5 #second
 file_list = {}
-minRandom = 40
-maxRandom = 100
+minRandom = 1 #40
+maxRandom = 3 #100
 senddata = 10
 simulation = "SIM15"
 
