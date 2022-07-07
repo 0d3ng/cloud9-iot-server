@@ -8,6 +8,7 @@ from controller import filterController,deviceController
 from datetime import datetime,timedelta
 from configparser import ConfigParser
 from importlib import reload
+from bson import ObjectId
 from pytz import timezone
 
 config = ConfigParser()
@@ -30,7 +31,60 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe(config["MQTT"]["filter_start"])
         client.subscribe(config["MQTT"]["filter_remove"])
         print(config["MQTT"]["filter_start"]," - ",config["MQTT"]["filter_remove"])
-        filter_list()             
+        filter_list()           
+        # topic = "mqtt/output/device-vy00"
+
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015523429, "device_code": "vy00", "id": "3", "lq": 39, "x": -15.0, "y": 9.0, "z": 91.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)    
+        # on_process(topic,inputs)       
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015523429, "device_code": "vy00", "id": "2", "lq": 39, "x": -15.0, "y": 9.0, "z": 92.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)   
+        # on_process(topic,inputs)        
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015523429, "device_code": "vy00", "id": "1", "lq": 39, "x": -15.0, "y": 9.0, "z": 93.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015525429, "device_code": "vy00", "id": "3", "lq": 39, "x": -25.0, "y": 91.0, "z": 77.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015525429, "device_code": "vy00", "id": "2", "lq": 39, "x": -85.0, "y": 91.0, "z": 57.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015525429, "device_code": "vy00", "id": "1", "lq": 39, "x": -55.0, "y": 91.0, "z": 67.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015527429, "device_code": "vy00", "id": "3", "lq": 39, "x": 5.0, "y": 3.0, "z": 92.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015527429, "device_code": "vy00", "id": "2", "lq": 39, "x": 5.0, "y": 3.0, "z": 91.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015527429, "device_code": "vy00", "id": "1", "lq": 39, "x": 5.0, "y": 3.0, "z": 92.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015529429, "device_code": "vy00", "id": "3", "lq": 39, "x": 31.0, "y": -9.0, "z": 12.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015529429, "device_code": "vy00", "id": "2", "lq": 39, "x": 25.0, "y": -9.0, "z": 14.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015529429, "device_code": "vy00", "id": "1", "lq": 39, "x": 16.0, "y": -9.0, "z": 15.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+
+        
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015531429, "device_code": "vy00", "id": "3", "lq": 39, "x": -5.0, "y": 15.0, "z": 44.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015531429, "device_code": "vy00", "id": "2", "lq": 39, "x": -5.0, "y": 11.0, "z": 43.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+        # inputs = '{"topic": "/Project_IPS/client1", "channel_type": "mqtt", "date_add_server": 1657015531429, "device_code": "vy00", "id": "1", "lq": 39, "x": -5.0, "y": 12.0, "z": 23.0, "accel": 97.54486147409304, "receive_unix_time": 1657015523410, "save_unix_time": 1657015523437, "_id": "62c40ce31cd75442ec3b8e1a"}'
+        # inputs = json.loads(inputs)
+        # on_process(topic,inputs)
+
     else:
         print("Connection failed")
         sys.stdout.flush()
@@ -85,12 +139,41 @@ def on_process(topic,message):
     for code in topic_list[topic]:
         filecon = get_config(code)
         config = filecon["config"]
-        method = config["method"]
         data = filecon["data"]
-        #------------- METHOD --------------
+        method = config["method"]
+        groupby = config["group"]
+        waiting_time = config["waiting_time"]
+        device = config["device"]
+        params = config["params"]
+        #-------- GET PREV DATA -----------
+        for field in groupby:            
+            if field in message:
+                key = message[field]
+            else:
+                key = "-"
+            if key in data:
+                print(data[key])
+                data = data[key]
+            else:
+                data = {}
+
+        if len(data) == 0 :
+            data = {
+                "prev_time":0,
+                "prev_data":[],
+                "prev_filter":[]
+            }
         last_time = data["prev_time"]
         last_data = data["prev_data"]
         last_filter_data = data["prev_filter"]
+        #-----------------------------------
+        ctime = message["date_add_server"] / 1000
+        if(ctime-last_time > waiting_time):
+            last_time = 0
+            last_data = []
+            last_filter_data = []
+        
+        #------------- METHOD --------------
         maxparams = 2
         if method == "bandpass":
             maxparams = 4
@@ -101,8 +184,81 @@ def on_process(topic,message):
             H = 1 #measurement map scalar
             if("H" in params):
                 H = params["H"]
-
         
+        value = 0
+        field = config["field"]
+        if(field in message):
+            value = float(message[field])
+            if not filterController.is_float(value) :
+                value = 0 
+        print(value, message[field], field)
+        
+        last_data.append(float(value))  
+        if(len(last_data)>maxparams):
+            filter_data = value                         
+            try:
+                if method == "lowpass":
+                    print("-----------------------------------")
+                    filter_data = filterController.scipy_low(params["cutoff"], ctime-last_time,
+                                value, last_data[1], last_data[0],
+                                last_filter_data[1], last_filter_data[0])
+
+                elif method == "highpass":
+                    filter_data = filterController.scipy_high(params["cutoff"], ctime-last_time,
+                                value, last_data[1], last_data[0],
+                                last_filter_data[1], last_filter_data[0])
+                elif method == "bandpass":
+                    filter_data = filterController.scipy_band_lfilter(params["low_cutoff"], params["high_cutoff"], ctime-last_time,
+                                value, last_data[3], last_data[2], last_data[1], last_data[0],
+                                last_filter_data[3], last_filter_data[2], last_filter_data[1], last_filter_data[0])
+                elif method == "kalmanbasic":
+                    filter_data,K,P = filterController.basic_kalman(value,params["R"],H,K,params["Q"],P,last_data[0])
+            except:
+
+                filter_data = value 
+
+            filter_data = float("{:.2f}".format(filter_data))   
+            print(filter_data)
+            last_filter_data.append(float(filter_data))                
+            del last_data[0]
+            del last_filter_data[0]            
+        else:
+            last_filter_data.append(float(value))
+            filter_data = float(value)
+        last_time = ctime
+        #-------- SAVE DATA --------------
+        collection = "sensor_data_"+device
+        queryUpdate = {
+            "_id":ObjectId(message["_id"])
+        }
+        updateData = {
+            field+"_filter":filter_data
+        }
+        deviceController.updateSensorData(collection,queryUpdate,updateData)
+        data = {
+            "prev_time":last_time,
+            "prev_data":last_data,
+            "prev_filter":last_filter_data
+        }
+        group = groupby[:]
+        filecon["data"] = data_rec(group,message,filecon["data"],data)
+        update_config(code,filecon)
+        #-------- SAVE CONFIG ------------
+
+def data_rec(group,message,current,new):
+    field = group[0]
+    del group[0]
+    if field in message:
+        key = message[field]
+    else:
+        key = "-"
+    if key not in current:
+        current[key] = {}
+    if(len(group)>0):
+        current[key] = data_rec(group,message,current,new)
+    else:
+        current[key] = new
+    return current
 
 
 def run_filter_service(item):
@@ -120,11 +276,7 @@ def run_filter_service(item):
     if(data == False):
         data = {
             "config":{},
-            "data":{
-                "prev_time":0,
-                "prev_data":[],
-                "prev_filter":[]
-            }
+            "data":{}
         }
         stat = "Add"
     
@@ -184,6 +336,10 @@ if __name__ == "__main__":
         print("exiting")
         client.disconnect()
         client.loop_stop()
+
+    
+
+
 
 
 

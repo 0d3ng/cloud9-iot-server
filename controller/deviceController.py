@@ -253,3 +253,12 @@ def communication_update(fillData):
     #             updateKafka['topic'] = commdata['topic']
     #             comChannelController.update(query,updateKafka)
 
+def updateSensorData(collection,queryUpdate,updateData):            
+    if updateData == []:
+        return {"status":False, "message":"UPDATE NONE"}        
+    result = db.updateData(collection,queryUpdate,updateData)
+    if not result :
+        response = {"status":False, "message":"UPDATE FAILED"}               
+    else:
+        response = {'status':True,'message':'Success','data':result}
+    return cloud9Lib.jsonObject(response)

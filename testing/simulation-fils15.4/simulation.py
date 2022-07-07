@@ -16,7 +16,7 @@ TM_wait = 0.5 #second
 file_list = {}
 minRandom = 1 #40
 maxRandom = 3 #100
-senddata = 10
+senddata = 1
 simulation = "SIM15"
 
 def randomString(stringLength=8):

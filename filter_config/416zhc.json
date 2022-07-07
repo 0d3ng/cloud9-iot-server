@@ -1,1 +1,0 @@
-{"config": {"stream": true, "device": "dn56", "field": "x", "waiting_time": 60, "method": "lowpass", "params": {"cutoff": "0.09"}, "group": ["id"]}, "data": {"prev_time": 0, "prev_data": [], "prev_filter": []}}

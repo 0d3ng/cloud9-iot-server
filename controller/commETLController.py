@@ -99,11 +99,10 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
     else:        
         response = {'status':True,'message':'Success','data':result}   
         del insertQuery['raw_message']
+        insertQuery["date_add_server"] = round(insertQuery["date_add_server"].timestamp()*1000)
+        insertQuery["_id"] = str(insertQuery["_id"])
         mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)    
-        # elastic.insertOne(elastic_index,insertElastic) 
-        # mqttcom.publish("message/ouput/"+elastic_index,insertElastic)    
-    # print(response)
-    # sys.stdout.flush()
+        
     return cloud9Lib.jsonObject(response)
 
 def extract_etl(field,data,collection,device_code,state=False):
@@ -144,6 +143,8 @@ def nonetl(collection,elastic_index,info,message):  #info --> device_code, chann
     else:        
         response = {'status':True,'message':'Success','data':result} 
         # elastic.insertOne(elastic_index,insertElastic)
+        insertQuery["date_add_server"] = round(insertQuery["date_add_server"].timestamp()*1000)
+        insertQuery["_id"] = str(insertQuery["_id"])
         mqttcom.publish("mqtt/output/"+elastic_index,insertElastic)    
     return cloud9Lib.jsonObject(response)
 

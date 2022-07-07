@@ -66,6 +66,17 @@ def scipy_low(cutoff_freq, sample_time, x0, x1, x2, y1, y2):
     #cutoff can't offer thatn 0.125
     Wn = cutoff_freq / nyquist_freq
     b, a = butter(2, Wn, btype='lowpass')
+    # print("a[1] ",type(a[1]))
+    # print("a[2] ",type(a[2]))
+    # print("b[0] ",type(b[0]))
+    # print("b[1] ",type(b[1]))
+    # print("b[2] ",type(b[2]))
+    # print("y1 ",type(y1))
+    # print("y2 ",type(y2))
+    # print("x0 ",type(x0))
+    # print("x1 ",type(x1))
+    # print("x2 ",type(x2))
+
     return -a[1] * y1 - a[2] * y2 + b[0] * x0 + b[1] * x1 + b[2] * x2
 
 def scipy_high(cutoff_freq, sample_time, x0, x1, x2, y1, y2):
