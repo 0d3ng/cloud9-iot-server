@@ -5,8 +5,8 @@ import time
 import sys
 import random
 
-token = "92h95vj7v81ij80l"
-url = "http://localhost:3001/comdata/sensor/"+token+"/" #"http://103.106.72.188:3001/comdata/sensor/"+token+"/"
+token = "132k58zbu6bhqpsx" #"92h95vj7v81ij80l"
+url = "http://103.106.72.188:3001/comdata/sensor/"+token+"/" #"http://localhost:3001/comdata/sensor/"+token+"/" #
 for x in range(1000):
     # today = datetime.today()
     # msg = {
@@ -42,7 +42,11 @@ for x in range(1000):
     headers = {
         'Content-Type': 'application/json'
     }
+    tstart = time.time()
     response = requests.request("POST", url, headers=headers, data = payload)
     print(response.text.encode('utf8'))
+    tend = time.time()
+    difference = tend - tstart
+    print(difference)
     sys.stdout.flush()
     time.sleep(1)

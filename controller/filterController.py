@@ -120,6 +120,7 @@ def add(fillData):
         'filter_code':fillData.get('filter_code', None),        
         'device':fillData.get('device', None),
         'field':fillData.get('field', None), #field name only
+        'save_to':fillData.get('save_to', None), #field for saving filtered value
         'date_add': datetime.datetime.utcnow(),
         'add_by':fillData.get('add_by', None),
         'stream':fillData.get('stream', False),
@@ -162,6 +163,7 @@ def update(query,data):
     if 'filter_code' in data: updateData['filter_code'] = data['filter_code']
     if 'device' in data: updateData['device'] = data['device']
     if 'field' in data: updateData['field'] = data['field']
+    if 'save_to' in data: updateData['save_to'] = data['save_to']
     if 'stream' in data: updateData['stream'] = data['stream']
     if 'waiting_time' in data: updateData['waiting_time'] = data['waiting_time']
     if 'method' in data: updateData['method'] = data['method']

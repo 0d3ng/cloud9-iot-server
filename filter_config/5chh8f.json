@@ -1,0 +1,1 @@
+{"config": {"stream": true, "device": "vy00", "field": "y", "save_to": "y_filter_kalman", "waiting_time": 60, "method": "kalmanbasic", "params": {"R": 10, "Q": 5}, "group": ["id"]}, "data": {}}

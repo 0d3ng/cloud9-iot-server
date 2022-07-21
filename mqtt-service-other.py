@@ -50,7 +50,8 @@ class Comm:
         hack = False
         receive_unix_time2 = round(datetime.now(timezone('Asia/Tokyo')).timestamp()*1000)
         receive_unix_time = round(datetime.now(timezone2.utc).timestamp()*1000)
-        raw_msg = message.payload.decode("utf-8")
+        raw_msg = message.payload.decode("utf-8")        
+        raw_msg2 = message.payload.decode("utf-8")        
         if "ts" not in raw_msg and "::t" not in raw_msg:
             cDate = datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d")
             cTime = datetime.now(timezone('Asia/Tokyo')).strftime("%H:%M:%S")
@@ -81,6 +82,7 @@ class Comm:
         if hack == False:            
             message_obj = raw_object
             insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj,receive_unix_time)
+            self.client.publish(self.topic+"/response",payload=raw_msg2)            
             if not insert['status']:
                 response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
             else:
@@ -88,10 +90,16 @@ class Comm:
             insertLog['response'] = response
             commLogController.add(insertLog)   
 
+    def on_publish(self,client,userdata,result):  
+        dc = self.device_code           
+        print(dc,"data published \n")
+        pass
+
     def connect(self):
         self.client = mqttClient.Client(self.code+cloud9Lib.randomOnlyString(4))
         self.client.on_connect=self.on_connect
         self.client.on_message=self.on_message
+        # self.client.on_publish = self.on_publish 
         try:
             self.client.connect(self.broker,self.port) #connect to broker
             self.client.loop_start()

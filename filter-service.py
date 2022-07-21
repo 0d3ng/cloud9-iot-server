@@ -187,6 +187,7 @@ def on_process(topic,message):
         
         value = 0
         field = config["field"]
+        saveto = config["save_to"]
         if(field in message):
             value = float(message[field])
             if not filterController.is_float(value) :
@@ -232,7 +233,7 @@ def on_process(topic,message):
             "_id":ObjectId(message["_id"])
         }
         updateData = {
-            field+"_filter":filter_data
+            saveto:filter_data
         }
         deviceController.updateSensorData(collection,queryUpdate,updateData)
         data = {
@@ -284,6 +285,7 @@ def run_filter_service(item):
         "stream":item["stream"],
         "device":item["device"],
         "field":item["field"],
+        "save_to":item["save_to"],
         "waiting_time":item["waiting_time"],
         "method":item["method"]["name"],
         "params":item["method"]["parameter"],

@@ -70,10 +70,11 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
             else:
                 fieldName = fieldData
             insertQuery[fieldName],state = extract_etl(fieldData,message,collection,device_code,state)
-        if state and deviceProcess:
-            for fieldkey in deviceProcess:
-                fielditem = deviceProcess[fieldkey]
-                insertQuery[fieldkey] = preproces(insertQuery,fielditem)
+        
+        # if state and deviceProcess:
+        #     for fieldkey in deviceProcess:
+        #         fielditem = deviceProcess[fieldkey]
+        #         insertQuery[fieldkey] = preproces(insertQuery,fielditem)
 
     # print("------------------")
     # print(collection)
@@ -101,7 +102,8 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
         del insertQuery['raw_message']
         insertQuery["date_add_server"] = round(insertQuery["date_add_server"].timestamp()*1000)
         insertQuery["_id"] = str(insertQuery["_id"])
-        mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)    
+        # Tutup sementara
+        # mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)    
         
     return cloud9Lib.jsonObject(response)
 
