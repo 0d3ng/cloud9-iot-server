@@ -71,10 +71,10 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
                 fieldName = fieldData
             insertQuery[fieldName],state = extract_etl(fieldData,message,collection,device_code,state)
         
-        # if state and deviceProcess:
-        #     for fieldkey in deviceProcess:
-        #         fielditem = deviceProcess[fieldkey]
-        #         insertQuery[fieldkey] = preproces(insertQuery,fielditem)
+        if state and deviceProcess:
+            for fieldkey in deviceProcess:
+                fielditem = deviceProcess[fieldkey]
+                insertQuery[fieldkey] = preproces(insertQuery,fielditem)
 
     # print("------------------")
     # print(collection)
