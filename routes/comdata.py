@@ -37,7 +37,7 @@ class add(RequestHandler):
     writeLog("HTTP_"+token_access+"_"+cDate,cDate+","+cTime+","+str(receive_unix_time)+","+str(self.request.body))
 
     if not token_access:
-        response = {"status":False, "message":"Token Acces not found",'data':json.loads(data)}               
+        response = {"status":False, "message":"Token Acces not found",'data':data}               
         self.write(response)
         return
     #Log Insert#

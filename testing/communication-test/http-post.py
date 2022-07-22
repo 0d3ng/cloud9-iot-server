@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 
 token = "535k0wfur67i3t8g"#"l8et0xzhu2lb48ah6"
-url = "http://localhost:3001/comdata/sensor/"+token+"/" #"http://161.117.58.227:3001/comdata/sensor/"+token+"/" #
+url = "http://103.106.72.188:3001/comdata/sensor/"+token+"/" #"http://localhost:3001/comdata/sensor/"+token+"/" #
 # today = datetime.today()
 # msg = {
 #     "device_code":"xzhu2l-rc01",
