@@ -8,6 +8,7 @@ from controller import comChannelController
 from controller import commETLController
 from controller import commLogController
 from datetime import datetime 
+from datetime import timezone as timezone2
 from pytz import timezone
 
 groups = []
@@ -18,11 +19,25 @@ define_url = [
     ['sensor/([^/]+)/','add']
 ]
 
+def writeLog(file,value):
+    with open("log/log_"+file+".log",'a+',newline='') as f:
+        f.write(value+'\n')
+
 class add(RequestHandler):
-  def post(self,token_access):    
-    data = json.loads(self.request.body)
+  def post(self,token_access):        
+    try:
+        data = json.loads(self.request.body)
+    except:
+        raw_msg = str(self.request.body).replace('\u0000', '')
+        data = cloud9Lib.delimeterExtract(raw_msg)    
+
+    receive_unix_time = round(datetime.now(timezone('Asia/Tokyo')).timestamp()*1000)
+    cDate = datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d")
+    cTime = datetime.now(timezone('Asia/Tokyo')).strftime("%H:%M:%S")
+    writeLog("HTTP_"+token_access+"_"+cDate,cDate+","+cTime+","+str(receive_unix_time)+","+str(self.request.body))
+
     if not token_access:
-        response = {"status":False, "message":"Token Acces not found",'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Token Acces not found",'data':json.loads(data)}               
         self.write(response)
         return
     #Log Insert#
@@ -50,12 +65,16 @@ class add(RequestHandler):
         return              
     else:
         channelData = resultChannel['data']
-
+        ###WriteLog                
+    
     infoHttp = {
         'token_access' : token_access,
         'ip_sender':remote_ip,
         'channel_type':'http-post',
     }
+    
+    
+    
     if 'date_add' in data :
         try:
             if(isinstance(data['date_add'],int)):
@@ -72,6 +91,7 @@ class add(RequestHandler):
             infoHttp['date_add_sensor'] = data['date_add']
     else :
         infoHttp['date_add_sensor'] = None
+    
     
     if 'device_code' in data :
         insert = commETLController.etl(channelData['collection_name'],channelData['index_log'],infoHttp,data['device_code'],data)

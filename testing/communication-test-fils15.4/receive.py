@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import json
 from datetime import datetime
 
-broker = 'localhost'
+broker = '103.106.72.188' #'localhost'
 topic = "/simulationIPS/client2/response"
 idc = "client1"
 
