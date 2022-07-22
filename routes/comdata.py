@@ -58,7 +58,7 @@ class add(RequestHandler):
     }
     resultChannel = comChannelController.findOne(queryGroup)
     if not resultChannel['status']:
-        response = {"status":False, "message":"Token Access not match",'data':json.loads(self.request.body)} 
+        response = {"status":False, "message":"Token Access not match",'data':data} 
         insertLog['response'] = response
         commLogController.add(insertLog)
         self.write(response)
@@ -101,7 +101,7 @@ class add(RequestHandler):
         insert = commETLController.nonetl(channelData['collection_name'],channelData['index_log'],infoHttp,data)
     
     if not insert['status']:
-        response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Failed to add", 'data':data}               
     else:
         response = {'message':'Success','status':True}    
     insertLog['response'] = response
