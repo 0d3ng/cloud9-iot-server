@@ -6,7 +6,7 @@ from pytz import timezone
 
 broker = 'localhost'
 topic = "/simulationIPS/client2/response"
-device_code = "hl36"
+device_code = "nu63"
 
 def writeLog(file,value):
     with open("log/log_"+file+".log",'a+',newline='') as f:
