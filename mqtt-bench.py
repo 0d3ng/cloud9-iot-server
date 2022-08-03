@@ -25,7 +25,7 @@ if(dc):
     device_num = int(dc)
 
 try:
-    max_device = sys.argv[2]
+    max_device = int(sys.argv[2])
 except:
     max_device = 100
 
