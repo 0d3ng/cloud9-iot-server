@@ -24,7 +24,12 @@ dc = sys.argv[1]
 if(dc):
     device_num = int(dc)
 
+try:
+    max_device = sys.argv[2]
+except:
+    max_device = 100
 
+print(max_device)
 
 class Comm:
     def __init__(self, code, broker, port, topic, device_code, collection, index_log):
@@ -71,7 +76,7 @@ class Comm:
         raw_object = json.loads(raw_msg)                    
         message_obj = raw_object
         insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj,receive_unix_time)
-        self.client.publish(message.topic+"/response",payload=raw_msg2)            
+        self.client.publish(message.topic+"/response",payload=raw_msg2)                    
         if not insert['status']:
             response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
         else:
