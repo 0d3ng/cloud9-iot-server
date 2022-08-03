@@ -18,10 +18,12 @@ Connected = False
 broker_address= config["MQTT"]["broker"]
 port = int(config["MQTT"]["port"])
 device_num = 5
+max_device = 100
 
 dc = sys.argv[1]
 if(dc):
     device_num = int(dc)
+
 
 
 class Comm:
@@ -40,11 +42,12 @@ class Comm:
         print("rc: "+str(rc))
         sys.stdout.flush()
         if rc == 0:
-            print("Connected to broker:"+self.broker+":"+str(self.port))
+            print("["+str(self.code)+"]Connected to broker:"+self.broker+":"+str(self.port))
             sys.stdout.flush()
             self.Conected=True  
-            self.client.subscribe(self.topic)
-            print("Connected to topic:"+self.topic)
+            for topic in self.topic:
+                self.client.subscribe(topic)
+                print("["+str(self.code)+"]Connected to topic:"+topic)
             print("-------------------------------")
             sys.stdout.flush()
         else:
@@ -68,7 +71,7 @@ class Comm:
         raw_object = json.loads(raw_msg)                    
         message_obj = raw_object
         insert = commETLController.etl(self.collection,self.index_log,infoMqtt,self.device_code,message_obj,receive_unix_time)
-        self.client.publish(self.topic+"/response",payload=raw_msg2)            
+        self.client.publish(message.topic+"/response",payload=raw_msg2)            
         if not insert['status']:
             response = {"status":False, "message":"Failed to add", 'data':raw_msg}               
         else:
@@ -88,7 +91,7 @@ class Comm:
         try:
             self.client.connect(self.broker,self.port) #connect to broker
             self.client.loop_start()
-            print("Connecting to broker:"+self.broker+":"+str(self.port))
+            print("["+str(self.code)+"]Connecting to broker:"+self.broker+":"+str(self.port))
             sys.stdout.flush()
         except:
             print(self.broker+": connection failed")
@@ -106,12 +109,23 @@ def writeLog(file,value):
         f.write(value+'\n')
 
 def subscribe_list():
-    for val in range(device_num):
+    topic_l = {}
+    n = 0
+    for i in range(device_num):
+        if(n not in topic_l):
+            topic_l[n] = []
+        topic_l[n].append("/simulationIPS/client-test-"+str(i+1))
+        n+=1
+        if n > max_device-1 :
+            n=0
+    
+    for val in topic_l:
+        topic = topic_l[val]
         device_id = val+1
         comm_list[device_id] = {
             'server':"103.106.72.188",
             'port':1883,
-            'topic':"/simulationIPS/client-test-"+str(device_id),
+            'topic':topic,
             'collection_name':"sensor_benchmark",
             'device_code':"pu92"
         }
@@ -119,7 +133,7 @@ def subscribe_list():
             'channel_code':str(device_id),
             'server':"localhost",#"103.106.72.188",
             'port':1883,
-            'topic':"/simulationIPS/client-test-"+str(device_id),
+            'topic':topic,
             'device_code':"pu92",
             'collection_name':"sensor_benchmark",
             'index_log':"sensor_benchmark"
