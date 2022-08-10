@@ -30,8 +30,8 @@ class dbmongo:
 
     def find(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
         (sort1,sort2) = sort        
-        if not self.checkCollections(col):
-            return []
+        # if not self.checkCollections(col):
+        #     return []
         self.col = self.db[col] 
         if (limit is None) and (skip is None):
             res = self.col.find(filter,exclude).sort(sort1,sort2)            
@@ -52,8 +52,8 @@ class dbmongo:
         return json.loads(dumps(response))
 
     def findOne(self, col, filter = None, exclude = None, sort=('$natural',1) ):
-        if not self.checkCollections(col):
-            return False        
+        # if not self.checkCollections(col):
+        #     return False        
         self.col = self.db[col]
         #return json.loads(json.dumps(list(self.col.find(filter,exclude)),default=json_util.default))
         response = []
@@ -74,8 +74,8 @@ class dbmongo:
         return x.inserted_id
 
     def deleteData(self,col,filter):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.delete_one(filter)
         if x.deleted_count > 0:
@@ -83,8 +83,8 @@ class dbmongo:
         return False
 
     def deleteDataMany(self,col,filter):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.delete_many(filter)
         if x.deleted_count > 0:
@@ -92,8 +92,8 @@ class dbmongo:
         return False
 
     def updateData(self,col,filter,values):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.update(filter,{ "$set": values })        
         if(x['nModified'] > 0):
@@ -101,8 +101,8 @@ class dbmongo:
         return False
 
     def updateDataOne(self,col,filter,values):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.update_one(filter,{ "$set": values })
         if(x['nModified'] > 0):
@@ -110,8 +110,8 @@ class dbmongo:
         return False
 
     def updatePush(self,col,filter,values):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.update(filter,{ "$push": values })        
         if(x['nModified'] > 0):
@@ -119,8 +119,8 @@ class dbmongo:
         return False
 
     def updatePull(self,col,filter,values):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.update(filter,{ "$pull": values })        
         if(x['nModified'] > 0):
@@ -128,8 +128,8 @@ class dbmongo:
         return False
         
     def renameField(self,col,filter,values):
-        if not self.checkCollections(col):
-            return False
+        # if not self.checkCollections(col):
+        #     return False
         self.col = self.db[col]
         x = self.col.update_one(filter,{ "$rename": values })
         if(x['nModified'] > 0):
@@ -138,8 +138,8 @@ class dbmongo:
 
     def count(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
         (sort1,sort2) = sort
-        if not self.checkCollections(col):
-            return []
+        # if not self.checkCollections(col):
+        #     return []
         self.col = self.db[col] 
         if (limit is None) and (skip is None):
             res = self.col.find(filter,exclude).sort(sort1,sort2).count()            
@@ -153,8 +153,8 @@ class dbmongo:
         return res 
 
     def aggregate(self, col, pipeline = None):
-        if not self.checkCollections(col):
-            return []
+        # if not self.checkCollections(col):
+        #     return []
         self.col = self.db[col] 
         res = self.col.aggregate(pipeline)   
         response = []
