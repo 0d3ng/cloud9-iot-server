@@ -148,7 +148,6 @@ def _handle_sigterm(self, sig, frame):
     self.stop()
 
 if __name__ == "__main__":    
-    signal.signal(signal.SIGTERM, self._handle_sigterm)
     client = mqttClient.Client("Python3-DataSync_"+cloud9Lib.randomOnlyString(4))               
     # client.username_pw_set(username=user, password=password)    #set username and password
     client.on_connect= on_connect                      
