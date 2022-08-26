@@ -15,7 +15,7 @@ import os
 
 sensors = []
 db = db.dbmongo()
-elastic = elastic.elastic()
+# elastic = elastic.elastic()
 main_folder = "data"
 
 def add_dir(new_dir):
@@ -103,7 +103,7 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
         insertQuery["date_add_server"] = round(insertQuery["date_add_server"].timestamp()*1000)
         insertQuery["_id"] = str(insertQuery["_id"])
         # Tutup sementara
-        # mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)    
+        mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)    
         
     return cloud9Lib.jsonObject(response)
 
