@@ -4,8 +4,9 @@ import sys
 from bson import ObjectId
 import json 
 from function import *
-import datetime
+from datetime import datetime,timedelta
 from controller import comChannelController
+from pytz import timezone
 
 sensors = []
 db = db.dbmongo()
@@ -14,14 +15,15 @@ collection = "edgeconfig"
 
 def add(fillData):  
     insertQuery = {
-        'edge_config_code':fillData.get('edge_config_code', None),
+        'edgeconfig_code':fillData.get('edgeconfig_code', None),
         'device_code':fillData.get('device_code', None),
         'method':fillData.get('method', None),
         'string_sample':fillData.get('string_sample', None),
         'delimeter':fillData.get('delimeter', None), #arraylist [dem1,dem2]
         'string_pattern':fillData.get('string_pattern', None),
-        'object_used':fillData.get('string_pattern', None),        
-        'date_add': datetime.datetime.utcnow(),
+        'object_used':fillData.get('string_pattern', None),
+        'active':fillData.get('active', False),                        
+        'date_add': datetime.utcnow(),
         'add_by':fillData.get('add_by', None)             
     }
     result = db.insertData(collection,insertQuery)
@@ -50,7 +52,7 @@ def findOne(query):
 def update(query,data):            
     updateData = {}
     queryUpdate = {}
-    if 'edge_config_code' in query: queryUpdate['edge_config_code'] = query['edge_config_code']
+    if 'edgeconfig_code' in query: queryUpdate['edgeconfig_code'] = query['edgeconfig_code']
     if '_id' in query: queryUpdate['_id'] = query['_id']
     
     if 'device_code' in data: updateData['device_code'] = data['device_code']
@@ -59,7 +61,13 @@ def update(query,data):
     if 'delimeter' in data: updateData['delimeter'] = data['delimeter']
     if 'string_pattern' in data: updateData['string_pattern'] = data['string_pattern']
     if 'object_used' in data: updateData['object_used'] = data['object_used']
+    if 'active' in data: updateData['active'] = data['active']
     if 'updated_by' in data: updateData['updated_by'] = data['updated_by']
+    if 'date_download' in data: 
+        try:
+            updateData['date_download'] = cloud9Lib.cv2datetime(data['date_download'])
+        except:
+            updateData['date_download'] = datetime.now(timezone('Asia/Tokyo'))
 
     if updateData == []:
         return {"status":False, "message":"UPDATE NONE"}        

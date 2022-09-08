@@ -1,4 +1,6 @@
 import sys
+from turtle import st
+from unittest import result
 sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
@@ -38,7 +40,7 @@ define_url = [
     ['edge/detail/','detail_edge'],
     ['edge/edit/','update_edge'],
     ['edge/delete/','delete_edge'],
-    ['edge/config/','config_edge']
+    ['edge/config/process','config_edge']
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -467,6 +469,19 @@ def generateCode(code=""):
     else:
         return code
 
+def generateEdgeCode(code=""):
+    if code == "":
+        code = cloud9Lib.randomOnlyString(2)+cloud9Lib.randomNumber(2)
+    else:
+        code = code+"-"+cloud9Lib.randomOnlyString(2)+cloud9Lib.randomNumber(2)
+    #check if exist
+    query = {"edgeconfig_code":code}
+    result = edgeController.findOne(query)
+    if result['status']:
+        return generateCode(code)
+    else:
+        return code
+
 def generateAccess():
     code = cloud9Lib.randomStringLower(16)
     print(code)
@@ -484,35 +499,23 @@ def generateAccess():
 #--------------------------------
 class add_edge(RequestHandler):
   def post(self):    
-    data = json.loads(self.request.body)
-    print(data)
-    sys.stdout.flush()
-    if 'group_code_name' not in data:
-        response = {"status":False, "message":"Parameter group_code_name not exists",'data':json.loads(self.request.body)}               
+    data = json.loads(self.request.body)        
+    if 'device_code' not in data:
+        response = {"status":False, "message":"Parameter device_code not exists",'data':json.loads(self.request.body)}               
         self.write(response)
         return
     #check if exist
-    query = {"code_name":data['group_code_name']}
-    result = groupSensorController.findOne(query)
+    query = {"device_code":data['device_code']}
+    result = deviceController.findOne(query)
     if not result['status']:
-        response = {"status":False, "message":"Group not found",'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Device not found",'data':json.loads(self.request.body)}               
         self.write(response)
         return
 
+    if 'edgeconfig_code' not in data:
+        data['edgeconfig_code'] = generateCode()
 
-    if 'key_access' not in data:
-        data['key_access'] = generateAccess();
-    else:
-        if checkKeyAccess(data['key_access']):
-            response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
-            self.write(response)
-            return
-
-
-    if 'device_code' not in data:
-        data['device_code'] = generateCode(data['group_code_name'])
-
-    insert = deviceController.add(data)    
+    insert = edgeController.add(data)    
     if not insert['status']:
         response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
     else:
@@ -525,7 +528,7 @@ class list_edge(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)    
     query = data    
-    result = deviceController.find(query)
+    result = edgeController.find(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -543,7 +546,7 @@ class count_edge(RequestHandler):
         except:
             del query["id"]
     query = data
-    result = deviceController.find(query)
+    result = edgeController.find(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':0}               
     else:
@@ -560,7 +563,7 @@ class detail_edge(RequestHandler):
             del query["id"]
         except:
             del query["id"]
-    result = deviceController.findOne(query)       
+    result = edgeController.findOne(query)       
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -580,20 +583,13 @@ class update_edge(RequestHandler):
     except:
         response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
         self.write(response) 
-        return
+        return    
 
-    if 'key_access' in data:
-        if checkKeyAccess(data['key_access'],query['_id']):
-            response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
-            self.write(response)
-            return
-
-
-    result = deviceController.findOne(query)
+    result = edgeController.findOne(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
-        update = deviceController.update(query,data)
+        update = edgeController.update(query,data)
         if not update['status']:
             response = {"status":False, "message":"Failed to update","data":json.loads(self.request.body)}
         else:
@@ -615,11 +611,11 @@ class delete_edge(RequestHandler):
         self.write(response) 
         return
     
-    result = deviceController.findOne(query)
+    result = edgeController.findOne(query)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}            
     else:
-        delete = deviceController.delete(query)
+        delete = edgeController.delete(query)
         if not delete['status']:
             response = {"status":False, "message":"Failed to delete","data":json.loads(self.request.body)}
         else:
@@ -628,18 +624,61 @@ class delete_edge(RequestHandler):
 
 
 class config_edge(RequestHandler):
-  def post(self):    
+  def post(self):  
+    result = {}  
     data = json.loads(self.request.body)
-    query = data    
-    if "id" in query :
-        try:
-            query["_id"] = ObjectId(query["id"])
-            del query["id"]
-        except:
-            del query["id"]
-    result = deviceController.findOne(query)       
+    if 'method' not in data:
+        response = {"status":False, "message":"Method Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return  
+    if 'string_sample' not in data:
+        response = {"status":False, "message":"String Sample Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return    
+    delimeter = [None,None]
+    method = data["method"]
+    string_sample = data["string_sample"]
+    if 'delimeter' in data:
+        delimeter = data["delimeter"]
+    result['data'] = data.copy()
+    if method == "array_list" :
+        res_list,delim1 = edgeController.covert_to_list(string_sample,delimeter[0])
+        if res_list == False :
+            result['status'] = False
+        else:
+            result['status'] = True            
+            result['data']['delimeter'] = [delim1]
+            result['data']['list'] = res_list
+            string_pattern = ""
+            i = 0
+            for item in res_list:
+                string_pattern+="item["+str(i)+"]"                                
+                i+=1
+                if(len(res_list)>i):
+                    string_pattern+=str(delim1)
+
+            result['data']["string_pattern"] = string_pattern
+    elif method == "json_object" :
+        res_object,delim1,delim2 = edgeController.convert_to_json(string_sample,delimeter[0],delimeter[1])
+        if res_object == False :
+            result['status'] = False
+        else:
+            result['status'] = True  
+            result['data']['delimeter'] = [delim1,delim2]
+            result['data']['object'] = res_object        
+            string_pattern = ""   
+            i = 0         
+            for item in res_object:
+                string_pattern+=item+delim2+"["+str(item)+"-value]"    
+                i+=1                                            
+                if(len(res_object)>i):
+                    string_pattern+=str(delim1)
+            result['data']["string_pattern"] = string_pattern
+    else:
+        result['status'] = False
+
     if not result['status']:
-        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+        response = {"status":False, "message":"Process Failed",'data':json.loads(self.request.body)}               
     else:
         response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
