@@ -36,11 +36,11 @@ def writeCSV(file,value):
         writer.writerow(value)
 
 # date_start = "2022-06-02"
-date_start = "2022-06-02"
-date_end = "2022-06-04"
+date_start = "2022-08-10"
+date_end = "2022-08-11"
 # time_start = "16:31:08"
-time_start = "16:31:08"
-time_end = "21:55:38"
+time_start = "00:00:00"
+time_end = "23:59:59"
 limit = 1000
 sort = {
     "field":"date_add_auto",
@@ -57,25 +57,34 @@ query = {
 
 #list
 list = {
-    # "5s data":"0kw38j"#,
-    "10s data":"m8iy5a"
+    "10s data":"m8iy5a",
+    "20s data":"5hvb28",
+    "30s data":"o66tbs"
 }
 
 #field
-field_format = ["id","lq1","lq2","lq3","lq4","lq5","lq6"]
+field_format = ["id","lq1","lq2","lq3","lq4","lq5","lq6","accelvariance1","accelvariance2","accelvariance3","accelvariance4","accelvariance5","accelvariance6"]
 
 filen = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
+def isfloat(num):
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
+
 for name in list:
     code = list[name]
-    print(name," ",code)
+    print(name," ",code) 
     total = count(code,query)["data"]
+    query2 = query.copy()
     page = math.ceil(total/limit)
     print(page)
     for x in range(page) :
-        query["limit"] = limit
-        query["skip"] = x * limit
-        data = get(code,query)
+        query2["limit"] = limit
+        query2["skip"] = x * limit
+        data = get(code,query2)
         for item in data["data"]:
             itemData = []
             ts = datetime.datetime.fromtimestamp(int(item['date_add_auto']['$date'])/1000)
@@ -85,7 +94,12 @@ for name in list:
             itemData.append(times)
             for key in field_format: 
                 if key in item:
-                    itemData.append(item[key])
+                    vl = item[key]
+                    if(key == "id"):
+                        itemData.append(vl)
+                    elif(isfloat(item[key])):
+                        vl = round(float(vl), 2)
+                        itemData.append(vl)
             writeCSV(code+" - "+name,itemData)
         print("Progress: "+str(x+1)+"/"+str(page))
     

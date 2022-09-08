@@ -11,16 +11,15 @@ import pandas as pd
 import paho.mqtt.client as mqttClient
 import threading
 
-broker="localhost"#"103.106.72.188"#
+broker="103.106.72.188"#"localhost"#
 port=1883
 TM_wait = 1 #second
 file_list = {}
 topic_l = []
-device_num = 5
+device_num = 40
 for i in range(device_num):
     topic_l.append("/simulationIPS/client-test-"+str(i+1))
 
-device_code = "pu92"
 max_rep = 500
 file_goal = str(device_num)+"_"+str(datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 comm_pubs = {}

@@ -10,7 +10,7 @@ from controller import comChannelController
 
 sensors = []
 db = db.dbmongo()
-elastic = elastic.elastic()
+# elastic = elastic.elastic()
 prefix_topic = "message/sensor/"
 prefix_topic2 = "message-sensor-"
 prefix_collection = "sensor_data_"

@@ -85,25 +85,28 @@ def extracting2(folder,input):
     file1.close()
     return DS
 
-data = ["1","5","10","20","30","40","50","75","100","250","500"]
+data = ["1","5","10","20","30","40","50","75","100","125","150"] #"250","500"
+data = ["150"] #"250","500"
 for i in data:
     if( not path.exists(i) ):
         continue        
     error = 0
     avr = 0
+    deltatime = 0
+    filldata = 0
     for n in range(1,int(i)+1):
         device = extracting1(i,str(n))
         server = extracting2(i,str(n)) 
-        deltatime = 0
-        filldata = 0
+        
         for d in device:
             if d in server:
-                deltatime = server[d] - device[d]
+                deltatime += server[d] - device[d]
                 filldata+=1
             else:
                 error+=1
-        avr +=  (deltatime/filldata)
-    avr = avr / int(i)
+        # avr +=  (deltatime/filldata)
+    # avr = avr / int(i)
+    avr = (deltatime/filldata)
     res = ["device",i, "reponse",avr, "loss",error]
     writeCSV("result",res)
         

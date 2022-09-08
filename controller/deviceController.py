@@ -165,14 +165,14 @@ def communication_add(fillData):
     }
     
     if 'http-post' in fillData :
-        insertHttp = insertcomm;
+        insertHttp = insertcomm
         insertHttp['channel_code'] = 'http-post-'+fillData['token_access']
         insertHttp['channel_type'] = 'http-post'
         insertHttp['active'] = fillData['http-post']
         comChannelController.addOther(insertHttp)
 
     if 'mqtt' in fillData :
-        insertMqtt = insertcomm;
+        insertMqtt = insertcomm
         insertMqtt['channel_code'] = 'mqtt-'+fillData['token_access']
         insertMqtt['channel_type'] = 'mqtt'
         insertMqtt['server'] = fillData['server']
@@ -262,3 +262,5 @@ def updateSensorData(collection,queryUpdate,updateData):
     else:
         response = {'status':True,'message':'Success','data':result}
     return cloud9Lib.jsonObject(response)
+
+#==============================================================

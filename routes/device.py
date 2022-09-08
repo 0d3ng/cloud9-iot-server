@@ -7,6 +7,7 @@ from function import *
 from controller import deviceController
 from controller import groupSensorController
 from controller import sensorController
+from controller import edgeController
 from datetime import datetime
 
 from configparser import ConfigParser
@@ -31,6 +32,13 @@ define_url = [
     ['add/other/','addOther'],
     ['edit/other/','updateOther'],
     ['delete/other/','deleteOther'],
+    ['edge/add/','add_edge'],
+    ['edge/list/','list_edge'],
+    ['edge/count/','count_edge'],
+    ['edge/detail/','detail_edge'],
+    ['edge/edit/','update_edge'],
+    ['edge/delete/','delete_edge'],
+    ['edge/config/','config_edge']
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -472,3 +480,166 @@ def generateAccess():
         return generateAccess()
     else:
         return code
+
+#--------------------------------
+class add_edge(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)
+    print(data)
+    sys.stdout.flush()
+    if 'group_code_name' not in data:
+        response = {"status":False, "message":"Parameter group_code_name not exists",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    #check if exist
+    query = {"code_name":data['group_code_name']}
+    result = groupSensorController.findOne(query)
+    if not result['status']:
+        response = {"status":False, "message":"Group not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+
+    if 'key_access' not in data:
+        data['key_access'] = generateAccess();
+    else:
+        if checkKeyAccess(data['key_access']):
+            response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
+            self.write(response)
+            return
+
+
+    if 'device_code' not in data:
+        data['device_code'] = generateCode(data['group_code_name'])
+
+    insert = deviceController.add(data)    
+    if not insert['status']:
+        response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
+    else:
+        response = {'message':'Success','status':True}    
+    self.write(response)
+
+
+
+class list_edge(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)    
+    query = data    
+    result = deviceController.find(query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        response = {"status":True, 'message':'Success','data':result['data']}
+    self.write(response)
+
+class count_edge(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)    
+    query = data
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
+    query = data
+    result = deviceController.find(query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':0}               
+    else:
+        response = {"status":True, 'message':'Success','data':len(result['data'])}
+    self.write(response)
+
+class detail_edge(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)
+    query = data    
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
+    result = deviceController.findOne(query)       
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        response = {"status":True, 'message':'Success','data':result['data']}
+    self.write(response)
+
+class update_edge(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    if 'id' not in data:
+        response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    try:
+        query = {"_id":ObjectId(data["id"])}
+    except:
+        response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
+        self.write(response) 
+        return
+
+    if 'key_access' in data:
+        if checkKeyAccess(data['key_access'],query['_id']):
+            response = {"status":False, "message":"Key access is exits",'data':json.loads(self.request.body)} 
+            self.write(response)
+            return
+
+
+    result = deviceController.findOne(query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        update = deviceController.update(query,data)
+        if not update['status']:
+            response = {"status":False, "message":"Failed to update","data":json.loads(self.request.body)}
+        else:
+            response = {"status":True, 'message':'Update Success'}
+    self.write(response)
+
+class delete_edge(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    if 'id' not in data:
+        response = {"status":False, "message":"Id Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    try:
+        query = {"_id":ObjectId(data["id"])}
+    except:
+        response = {"status":False, "message":"Wrong id",'data':json.loads(self.request.body)}               
+        self.write(response) 
+        return
+    
+    result = deviceController.findOne(query)
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}            
+    else:
+        delete = deviceController.delete(query)
+        if not delete['status']:
+            response = {"status":False, "message":"Failed to delete","data":json.loads(self.request.body)}
+        else:
+            response = {"status":True, 'message':'Delete Success'}
+    self.write(response)
+
+
+class config_edge(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)
+    query = data    
+    if "id" in query :
+        try:
+            query["_id"] = ObjectId(query["id"])
+            del query["id"]
+        except:
+            del query["id"]
+    result = deviceController.findOne(query)       
+    if not result['status']:
+        response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
+    else:
+        response = {"status":True, 'message':'Success','data':result['data']}
+    self.write(response)
