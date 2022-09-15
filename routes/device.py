@@ -40,7 +40,7 @@ define_url = [
     ['edge/detail/','detail_edge'],
     ['edge/edit/','update_edge'],
     ['edge/delete/','delete_edge'],
-    ['edge/config/process','config_edge']
+    ['edge/config/process/','config_edge']
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]

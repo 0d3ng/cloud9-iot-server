@@ -18,10 +18,11 @@ def add(fillData):
         'edgeconfig_code':fillData.get('edgeconfig_code', None),
         'device_code':fillData.get('device_code', None),
         'method':fillData.get('method', None),
+        'interface':fillData.get('interface', None),
         'string_sample':fillData.get('string_sample', None),
         'delimeter':fillData.get('delimeter', None), #arraylist [dem1,dem2]
         'string_pattern':fillData.get('string_pattern', None),
-        'object_used':fillData.get('string_pattern', None),
+        'object_used':fillData.get('object_used', None),
         'active':fillData.get('active', False),                        
         'date_add': datetime.utcnow(),
         'add_by':fillData.get('add_by', None)             
@@ -56,6 +57,7 @@ def update(query,data):
     if '_id' in query: queryUpdate['_id'] = query['_id']
     
     if 'device_code' in data: updateData['device_code'] = data['device_code']
+    if 'interface' in data: updateData['interface'] = data['interface']
     if 'method' in data: updateData['method'] = data['method']
     if 'string_sample' in data: updateData['string_sample'] = data['string_sample']
     if 'delimeter' in data: updateData['delimeter'] = data['delimeter']
