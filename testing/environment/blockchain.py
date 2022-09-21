@@ -11,20 +11,15 @@ import sys
 
 port=1883 #MQTT PORT
 broker="103.106.72.188" #MQTT Broker URL (SEMAR Server)
-client1= paho.Client("sensor_node2") #create client object
+client1= paho.Client("sensor_node_blockchain") #create client object
 client1.connect(broker,port) #establish connection
 
 for i in range(1000):
-    topic="sensor/node6"#MQTT topic registered on the server
+    topic="blockchain/temperature1"#MQTT topic registered on the server
     sensor = {
         "temperature":random.randint(28,35), #32,          
-        "humidity":random.randint(75,80), #78, 
-        "no2":random.randint(75,80), #78,
-        "gps":{
-            "lat":random.randint(107,144), #78,
-            "lng":random.randint(-10,11), #78,
-        },
-        "id":1
+        "humidity":random.randint(75,80)#, #78, 
+        # "id":1
     }
     client1.publish(topic,payload=json.dumps(sensor)) #publish        
     time.sleep(5)

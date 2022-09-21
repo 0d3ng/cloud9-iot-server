@@ -20,6 +20,7 @@ for i in range(1000):
         sensor = {
             "temperature":random.randint(28,35),
             "humidity":random.randint(7500,8000)/100,
+            "co2":random.randint(28,35),
             "id":1
         }
         client1.publish(topic,payload=json.dumps(sensor)) #publish        

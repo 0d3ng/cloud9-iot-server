@@ -35,6 +35,7 @@ def add(fillData):
 
 def find(query):  
     result = db.find(collection,query)
+    print(result)
     if result == []:
         response = {"status":False, "data":query}               
     else:
