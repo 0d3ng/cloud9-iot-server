@@ -15,7 +15,7 @@ client1= paho.Client("sensor_node2") #create client object
 client1.connect(broker,port) #establish connection
 
 for i in range(1000):
-    topic="sensor/node6"#MQTT topic registered on the server
+    topic="sensor\/node3"#MQTT topic registered on the server
     sensor = {
         "temperature":random.randint(28,35), #32,          
         "humidity":random.randint(75,80), #78, 

@@ -1,5 +1,5 @@
 paho-mqtt
-pymongo
+pymongo==3.12.1
 cryptography
 nats-python
 setuptools_rust
