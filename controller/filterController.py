@@ -9,7 +9,6 @@ from controller import sensorController
 from pytz import timezone
 import statistics
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.signal import buttap, lp2hp_zpk, bilinear_zpk, zpk2tf, butter, lfilter
 
 from configparser import ConfigParser
