@@ -1,6 +1,4 @@
 import sys
-from turtle import st
-from unittest import result
 sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
