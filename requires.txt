@@ -14,4 +14,4 @@ numpy
 pandas
 ntplib
 detect_delimiter
-matplotlib
+scipy

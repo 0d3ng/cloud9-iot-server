@@ -167,6 +167,29 @@ class dbmongo:
             response.append(document)
         return json.loads(dumps(response))
 
+    # def find_aggre(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
+    #     (sort1,sort2) = sort        
+    #     self.col = self.db[col] 
+    #     project = {"_id": { "$toString": "$_id" }}
+    #     match = 
+    #     if (limit is None) and (skip is None):
+    #         res = self.col.find(filter,exclude).sort(sort1,sort2)            
+    #     elif not ( (limit is None) or (skip is None) ):
+    #         res = self.col.find(filter,exclude).limit(limit).skip(skip).sort(sort1,sort2)
+    #     elif not (limit is None):
+    #         res = self.col.find(filter,exclude).limit(limit).sort(sort1,sort2)
+    #     elif not (skip is None):
+    #         res = self.col.find(filter,exclude).skip(skip).sort(sort1,sort2)     
+    #     response = []
+    #     # for document in res:
+    #     #     if('id' in document):
+    #     #         document['_id'] = str(document['_id'])
+    #     #     else:
+    #     #         document['id'] = str(document['_id'])
+    #     #         del document['_id']
+    #     #     response.append(document)
+    #     return json.loads(dumps(response))
+
 if __name__ == "__main__":
     mongo = dbmongo()    
 
