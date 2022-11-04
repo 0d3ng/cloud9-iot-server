@@ -12,28 +12,44 @@ port=1883
 # topic= 'message/sensor/l0v2p5'
 
 broker="103.106.72.181"
-topic="/Project_IPS/client1" #"raspitest" #
+topic="sensor/logger2"
 
 def on_publish(client,userdata,result): #create function for callback
     print("data published")
     pass
 
 client1= paho.Client("iot") #create client object
-client1.on_publish = on_publish  #assign function to callback
-# client1.username_pw_set(username="OGRhNTI5MzE1YjY0ZWRlN2EwNjI2Mzg1",password="hdMFWDGTnfbhfoxoW7YXU8IwyAhFbD") #userpass
+# client1.on_publish = on_publish  #assign function to callback
 client1.connect(broker,port) #establish connection
 
+cekpoint = 100
+cekpoint_state = False
+
+value = 25.5
+
+msg = {
+    "experiment_code":"B1"
+}
+payload = json.dumps(msg)
+print(payload)
+client1.publish("logger/start2",payload=payload) #publish
+
 for x in range(1000):
-    today = datetime.today() #current-datetime
+    add = random.randint(1,5000) / 100
+    if(not cekpoint_state):
+        value += add
+        if(value>cekpoint):
+            cekpoint_state = True
+    
+    if(cekpoint_state):
+        value = cekpoint + random.randint(1,500) / 100
+
     msg = {
-        "temperature":random.randint(2,100),
-        "di":random.randint(2,100),
-        "humidty":random.randint(2,100)
+        "ch_1":value
     }
     payload = json.dumps(msg)
-    print(msg)
-    sys.stdout.flush()
+    print(payload)
     client1.publish(topic,payload=payload) #publish
-    time.sleep(1)
+    time.sleep(2)
 
 client1.close()
