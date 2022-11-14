@@ -25,7 +25,7 @@ current_data = {}
 alert_service = {}
 
 client = mqttClient.Client("data_logger_receiver")  # Create instance of client with client ID “digi_mqtt_test”
-topic = "sensor/logger"
+topic = "sensor/logger2"
 topic_start="logger/start"
 broker="103.106.72.181"#"localhost"#
 port=1883
@@ -268,6 +268,7 @@ def sensor_message(data, client):
             current_experiment["finish"]=now.strftime("%H:%M:%S")
             total_time=(datetime.strptime(current_experiment['finish'],'%H:%M:%S') - datetime.strptime(current_experiment['start'],'%H:%M:%S'))
             current_experiment['time_total'] = str(total_time).zfill(8)
+            current_experiment['state'] = True
             update_experiment(current_experiment["id"],current_experiment)
             alert_service.join()
 
