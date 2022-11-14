@@ -25,7 +25,7 @@ current_data = {}
 alert_service = {}
 
 client = mqttClient.Client("data_logger_receiver")  # Create instance of client with client ID “digi_mqtt_test”
-topic = "sensor/logger2"
+topic = "sensor/logger"
 topic_start="logger/start"
 broker="103.106.72.181"#"localhost"#
 port=1883
