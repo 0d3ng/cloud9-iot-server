@@ -31,11 +31,11 @@ msg = {
     "experiment_code":"B1"
 }
 payload = json.dumps(msg)
-print(payload)
-client1.publish("logger/start2",payload=payload) #publish
+# print(payload)
+# client1.publish("logger/start2",payload=payload) #publish
 
 for x in range(1000):
-    add = random.randint(1,5000) / 100
+    add = random.randint(1,100) / 100
     if(not cekpoint_state):
         value += add
         if(value>cekpoint):

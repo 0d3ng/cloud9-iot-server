@@ -12,13 +12,18 @@ from configparser import ConfigParser
 import requests
 import threading
 import time
+import pandas as pd
+import statistics
 
 restapi = "http://103.106.72.181:3001/schema/data/"
+restapi_sensor = "http://103.106.72.181:3001/device/data/"
 sender_email = "iotserver@deltadigitalid.com"
 password_email = "iotserver123"
 
 experiment_schema = "n2mjlr"
 experiment_data_schema = "8zl2vf"
+experiment_sensor = "xs46" #"nt57" #
+data_field="ch_1"
 
 current_experiment = {}
 current_data = {}
@@ -85,9 +90,10 @@ def add_data(data):
     else:
         return 0
 
-def update_data(id,step,code,data):
+def update_data(id,data):
     insertQuery = {}
     now = datetime.now()
+    insertQuery['_id'] = id
     if 'experiment_code' in data: insertQuery['name'] = code
     if 'date' in data:insertQuery['date'] = data['date']    
     if 'start' in data: insertQuery['start'] = data['start'] 
@@ -102,6 +108,9 @@ def update_data(id,step,code,data):
     if 'temperature_max' in data: insertQuery['temperature_max'] = data['temperature_max'] 
     if 'temperature_min' in data: insertQuery['temperature_min'] = data['temperature_min']
     if 'step' in data: insertQuery['step'] = data['step'] 
+    if 'average' in data: insertQuery['average'] = data['average'] 
+    if 'average_rise_per_min' in data: insertQuery['average_rise_per_min'] = data['average_rise_per_min'] 
+
     add = HTTP_post(restapi+experiment_data_schema+"/edit/",insertQuery)
     if(add['status']):
         return 1
@@ -133,13 +142,132 @@ def get_current_data():
     else:
         return []
 
-def get_data(query):    
+def get_experiment(query):    
     get = HTTP_post(restapi+experiment_schema+"/",query)
     if(get['status']):
         current_experiment = get["data"]
         return current_experiment[0]
     else:
         return []
+
+def get_experiment_data(query):    
+    get = HTTP_post(restapi+experiment_data_schema+"/",query)
+    if(get['status']):
+        experiment_data = get["data"]
+        return experiment_data
+    else:
+        return []
+
+#----------------- Analytical Function
+
+def get_sensor_data(query):    
+    get = HTTP_post(restapi_sensor+experiment_sensor+"/",query)
+    if(get['status']):
+        current_sensor = get["data"]
+        return current_sensor
+    else:
+        return []
+
+def is_float(x):
+    try:
+        float(x)
+    except ValueError:
+        return False
+    return True
+
+def averagedata(df,defaultval):
+    try:
+        datalist = df[df.apply(lambda x: is_float(x))]
+        return statistics.mean(datalist.to_numpy())
+    except:
+        print(df)
+        print("ERROR Average")
+        return defaultval
+
+def variancedata(df,defaultval):
+    try:
+        datalist = df[df.apply(lambda x: is_float(x))]
+        return statistics.variance(datalist.to_numpy())
+    except:
+        return defaultval
+
+def maxdata(df,defaultval):
+    try:
+        datalist = df[df.apply(lambda x: is_float(x))]
+        return max(datalist.to_numpy())
+    except:
+        print(datalist)
+        print("ERROR Max")
+        return defaultval
+
+def mindata(df,defaultval):
+    try:
+        datalist = df[df.apply(lambda x: is_float(x))]
+        return min(datalist.to_numpy())
+    except:
+        print(datalist)
+        print("ERROR Min")
+        return defaultval
+
+def analytical_method_1(code):
+    query = {
+        "experiment_code":code
+    }
+    experiment_data = get_experiment_data(query)
+    for exp_data in experiment_data:
+        # print(exp_data)
+        _id =  exp_data["id"]
+        query = {
+            "date_start":exp_data["date"],
+            "date_end":exp_data["date"],
+            "time_start":exp_data["start"],
+            "time_end":exp_data["finish"],
+            "sort":{
+                "field" : "receive_unix_time",
+                "type" : 1
+            }
+        }
+        sensor_data = get_sensor_data(query)
+        # print(len(sensor_data))
+        df = pd.DataFrame(sensor_data)  
+        
+        if(exp_data["step"] == 2):        
+            average = round(averagedata(df[data_field],0),2)
+            min_value = round(mindata(df[data_field],0),2)
+            max_value = round(maxdata(df[data_field],0),2)
+            variance_value = round(variancedata(df[data_field],0),2)
+            # print("Average: "+str(average))
+            # print("Min: "+str(min_value)+" "+str(exp_data["temperature_min"]))
+            # print("Max: "+str(max_value)+" "+str(exp_data["temperature_max"]))
+            # print("Variance: "+str(variance_value))        
+            update = update_data(_id,{"average":average})
+            
+            
+        elif (exp_data["step"] == 1):
+            df = df[ ["receive_unix_time",data_field] ]
+            df["receive_unix_time"] = pd.to_datetime(df['receive_unix_time']/1000,unit='s')
+            # print(df)
+            # df.to_csv("raw.csv")
+            def2 = df.groupby(pd.Grouper(key='receive_unix_time', freq='1min')).first()
+            # def2.to_csv("group.csv")
+            temp_data = def2[data_field].to_numpy()
+            rate_temp = []
+            for i in range(1,len(temp_data)-2):
+                rate_temp.append( round(temp_data[i+1] - temp_data[i],2) )
+
+            # print(rate_temp)
+            try:
+                average_rate_temp =  statistics.mean(rate_temp)
+            except:
+                if(len(temp_data) > 1):
+                    average_rate_temp = temp_data[1] - temp_data[0]
+                else:
+                    average_rate_temp =  0
+            # print("Average Temperature Rise Per Min : ",round(average_rate_temp,2))
+            # print("Temperature per Min")        
+            update = update_data(_id,{"average_rise_per_min":average_rate_temp})
+
+#----------------- Analytical Funtion ---------
 
 def on_connect(client, userdata, flags, rc):
     print("rc: "+str(rc))
@@ -230,7 +358,6 @@ def worker(experiment,start):
             experiment_state = 2
             break
 
-
 def sensor_message(data, client):
     global experiment_state
     global current_experiment
@@ -264,12 +391,14 @@ def sensor_message(data, client):
             experiment_state = 3
             now = datetime.now()            
             experiment_data = current_data.copy() 
+            experiment_data2 = current_data.copy() 
             end_exp_data(experiment_data,now,value)
             current_experiment["finish"]=now.strftime("%H:%M:%S")
             total_time=(datetime.strptime(current_experiment['finish'],'%H:%M:%S') - datetime.strptime(current_experiment['start'],'%H:%M:%S'))
             current_experiment['time_total'] = str(total_time).zfill(8)
             current_experiment['state'] = True
             update_experiment(current_experiment["id"],current_experiment)
+            analytical_method_1(experiment_data2["experiment_code"])
             alert_service.join()
 
         if(value>current_data["temperature_max"]):
@@ -296,20 +425,21 @@ def on_message(client, userdata, message):
         query = {
             "experiment_code": code,    
         }
-        current_experiment = get_data(query)
+        current_experiment = get_experiment(query)
         print(current_experiment)
         current_data["experiment_code"] = code
     elif message.topic == topic:
         sensor_message(data,client)
         
 
-# get_current_data()
-client.on_connect = on_connect  # Define callback function for successful connection
-client.on_message = on_message  # Define callback function for receipt of a message
-# client.connect("m2m.eclipse.org", 1883, 60)  # Connect to (broker, port, keepalive-time)
-client.connect(broker, port)
-client.loop_forever()  # Start networking daemon
+# # get_current_data()
+# client.on_connect = on_connect  # Define callback function for successful connection
+# client.on_message = on_message  # Define callback function for receipt of a message
+# # client.connect("m2m.eclipse.org", 1883, 60)  # Connect to (broker, port, keepalive-time)
+# client.connect(broker, port)
+# client.loop_forever()  # Start networking daemon
 
     
 
 
+analytical_method_1("INZKUT")
