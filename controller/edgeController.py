@@ -14,19 +14,33 @@ db = db.dbmongo()
 collection = "edgeconfig"
 
 def add(fillData):  
+    # insertQuery = {
+    #     'edgeconfig_code':fillData.get('edgeconfig_code', None),
+    #     'device_code':fillData.get('device_code', None),
+    #     'method':fillData.get('method', None),
+    #     'interface':fillData.get('interface', None),
+    #     'string_sample':fillData.get('string_sample', None),
+    #     'delimeter':fillData.get('delimeter', None), #arraylist [dem1,dem2]
+    #     'string_pattern':fillData.get('string_pattern', None),
+    #     'object_used':fillData.get('object_used', None),
+    #     'active':fillData.get('active', False),                        
+    #     'date_add': datetime.utcnow(),
+    #     'add_by':fillData.get('add_by', None)             
+    # }
+
     insertQuery = {
         'edgeconfig_code':fillData.get('edgeconfig_code', None),
         'device_code':fillData.get('device_code', None),
-        'method':fillData.get('method', None),
+        'resource':fillData.get('resource', None),
         'interface':fillData.get('interface', None),
-        'string_sample':fillData.get('string_sample', None),
-        'delimeter':fillData.get('delimeter', None), #arraylist [dem1,dem2]
-        'string_pattern':fillData.get('string_pattern', None),
-        'object_used':fillData.get('object_used', None),
-        'active':fillData.get('active', False),                        
-        'date_add': datetime.utcnow(),
-        'add_by':fillData.get('add_by', None)             
-    }
+        'data_transmitted':fillData.get('data_transmitted', None),
+        'time_interval':fillData.get('time_interval', None),
+        'comm_service':fillData.get('comm_service', None),
+        'active':fillData.get('active', False), 
+        'date_add': datetime.utcnow(), 
+        'add_by':fillData.get('add_by', None)       
+    } 
+
     result = db.insertData(collection,insertQuery)
     if result == []:
         response = {'status':False, 'message':"Add Failed"}               
@@ -57,12 +71,18 @@ def update(query,data):
     if '_id' in query: queryUpdate['_id'] = query['_id']
     
     if 'device_code' in data: updateData['device_code'] = data['device_code']
+    if 'resource' in data: updateData['resource'] = data['resource']
     if 'interface' in data: updateData['interface'] = data['interface']
-    if 'method' in data: updateData['method'] = data['method']
-    if 'string_sample' in data: updateData['string_sample'] = data['string_sample']
-    if 'delimeter' in data: updateData['delimeter'] = data['delimeter']
-    if 'string_pattern' in data: updateData['string_pattern'] = data['string_pattern']
-    if 'object_used' in data: updateData['object_used'] = data['object_used']
+    if 'data_transmitted' in data: updateData['data_transmitted'] = data['data_transmitted']
+    if 'time_interval' in data: updateData['time_interval'] = data['time_interval']
+    if 'comm_service' in data: updateData['comm_service'] = data['comm_service']    
+    
+    # if 'method' in data: updateData['method'] = data['method']
+    # if 'string_sample' in data: updateData['string_sample'] = data['string_sample']
+    # if 'delimeter' in data: updateData['delimeter'] = data['delimeter']
+    # if 'string_pattern' in data: updateData['string_pattern'] = data['string_pattern']
+    # if 'object_used' in data: updateData['object_used'] = data['object_used']
+    
     if 'active' in data: updateData['active'] = data['active']
     if 'updated_by' in data: updateData['updated_by'] = data['updated_by']
     if 'date_download' in data: 
@@ -91,7 +111,7 @@ def delete(query):
 
 #====================================================================
 
-
+#FOR SERIAL COMM Network Interface
 from detect_delimiter import detect
 
 def detect_delimeter(raw):

@@ -517,9 +517,8 @@ class add_edge(RequestHandler):
     if not insert['status']:
         response = {"status":False, "message":"Failed to add", 'data':json.loads(self.request.body)}               
     else:
-        response = {'message':'Success','status':True}    
+        response = {'message':'Success','status':True, 'data':{"id":insert['data']}}    
     self.write(response)
-
 
 
 class list_edge(RequestHandler):
