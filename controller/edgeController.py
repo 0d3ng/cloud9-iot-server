@@ -6,6 +6,7 @@ import json
 from function import *
 from datetime import datetime,timedelta
 from controller import comChannelController
+from controller import deviceController
 from pytz import timezone
 
 sensors = []
@@ -90,6 +91,8 @@ def update(query,data):
             updateData['date_download'] = cloud9Lib.cv2datetime(data['date_download'])
         except:
             updateData['date_download'] = datetime.now(timezone('Asia/Tokyo'))
+    
+    if 'edge_device_id' in data: updateData['edge_device_id'] = data['edge_device_id']
 
     if updateData == []:
         return {"status":False, "message":"UPDATE NONE"}        
@@ -106,6 +109,58 @@ def delete(query):
         response = {"status":False, "message":"DELETE FAILED"}               
     else:
         response = {'status':True,'message':'Success','data':result}
+    return cloud9Lib.jsonObject(response)
+
+
+def config_file(id,config):
+    query = {
+        'edgeconfig_code':id
+    }
+    edge_data = findOne(query)
+    if edge_data['status'] == False:
+        return {"status":False, "message":"No Configuration Data"}
+    edge_data= edge_data["data"]
+    query = {
+        'device_code':edge_data["device_code"]
+    }
+    device_data = deviceController.findOne(query)
+    if device_data['status'] == False:
+        return {"status":False, "message":"No Device Data"}
+    device_data = device_data["data"]
+
+    #communication service
+    if( edge_data["comm_service"] == "mqtt" and device_data["communication"]["mqtt"] == True):
+        mqtt_server = device_data["communication"]["server"]
+        if(mqtt_server == "localhost"):
+            mqtt_server = config["MQTT"]["broker"]
+        comm_service = {
+            "mqtt":{
+                "server": mqtt_server,
+			    "port": device_data["communication"]["port"],
+			    "topic": device_data["communication"]["topic"]
+            }
+        }
+    elif( edge_data["comm_service"] == "http_post" and device_data["communication"]["http-post"] == True ):
+        api_server = config["SERVER"]["ip"]
+        port = config["SERVER"]["port"]
+        comm_service = {
+            "http_post":api_server+":"+port+"/comdata/sensor/"+device_data["key_access"]
+        }
+    
+    edge_config = {
+        "device_code": device_data["device_code"],
+        "configuration_code":edge_data["edgeconfig_code"],
+        "device_info": {
+            "name": device_data["name"],
+            "field": device_data["field"]
+        },
+        "resource":edge_data["resource"],
+        "interface": edge_data["interface"],
+        "data_transmitted":edge_data["data_transmitted"],
+        "time_interval":edge_data["time_interval"],
+        "communication_protocol": comm_service
+    }
+    response = {'status':True,'message':'Success','data':edge_config}
     return cloud9Lib.jsonObject(response)
 
 

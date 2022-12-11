@@ -64,6 +64,7 @@ def update(query,data):
     if 'updated_by' in data: updateData['updated_by'] = data['updated_by']
     if 'token_access' in data: updateData['token_access'] = data['token_access']
     if 'field_process' in data: updateData['field_process'] = data['field_process']
+    if 'connected_device' in data: updateData['connected_device'] = data['connected_device']
 
     if updateData == []:
         return {"status":False, "message":"UPDATE NONE"}        

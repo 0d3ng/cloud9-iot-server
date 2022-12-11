@@ -432,14 +432,14 @@ def on_message(client, userdata, message):
         sensor_message(data,client)
         
 
-# # get_current_data()
-# client.on_connect = on_connect  # Define callback function for successful connection
-# client.on_message = on_message  # Define callback function for receipt of a message
-# # client.connect("m2m.eclipse.org", 1883, 60)  # Connect to (broker, port, keepalive-time)
-# client.connect(broker, port)
-# client.loop_forever()  # Start networking daemon
+# get_current_data()
+client.on_connect = on_connect  # Define callback function for successful connection
+client.on_message = on_message  # Define callback function for receipt of a message
+# client.connect("m2m.eclipse.org", 1883, 60)  # Connect to (broker, port, keepalive-time)
+client.connect(broker, port)
+client.loop_forever()  # Start networking daemon
 
     
 
 
-analytical_method_1("INZKUT")
+# analytical_method_1("INZKUT")

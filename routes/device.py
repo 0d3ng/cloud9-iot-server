@@ -8,7 +8,10 @@ from controller import deviceController
 from controller import groupSensorController
 from controller import sensorController
 from controller import edgeController
+from controller import userController
 from datetime import datetime
+from pytz import timezone
+
 
 from configparser import ConfigParser
 config = ConfigParser()
@@ -16,6 +19,7 @@ config.read("config.ini")
 
 from datetime import timedelta
 td = timedelta(hours=int(config["SERVER"]["timediff"]))
+mqtt_device = "edge/update/"
 
 groups = []
 
@@ -32,13 +36,16 @@ define_url = [
     ['add/other/','addOther'],
     ['edit/other/','updateOther'],
     ['delete/other/','deleteOther'],
-    ['edge/add/','add_edge'],
-    ['edge/list/','list_edge'],
-    ['edge/count/','count_edge'],
-    ['edge/detail/','detail_edge'],
-    ['edge/edit/','update_edge'],
-    ['edge/delete/','delete_edge'],
-    ['edge/config/process/','config_edge']
+    ['edge/add/','addEdge'],
+    ['edge/list/','listEdge'],
+    ['edge/count/','countEdge'],
+    ['edge/detail/','detailEdge'],
+    ['edge/edit/','updateEdge'],
+    ['edge/delete/','deleteEdge'],
+    ['edge/config/process/','configEdge'],
+    ['edge/device/init','deviceInitEdge'],
+    ['edge/device/config/','deviceGetEdgeConfig'],
+    ['edge/device/update/','deviceUpdateEdge']
     # ['data/([^/]+)/update/','updatedata'],
     # ['data/([^/]+)/delete/','deletedata'],
 ]
@@ -495,7 +502,7 @@ def generateAccess():
         return code
 
 #--------------------------------
-class add_edge(RequestHandler):
+class addEdge(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)        
     if 'device_code' not in data:
@@ -521,7 +528,7 @@ class add_edge(RequestHandler):
     self.write(response)
 
 
-class list_edge(RequestHandler):
+class listEdge(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)    
     query = data    
@@ -532,7 +539,7 @@ class list_edge(RequestHandler):
         response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
 
-class count_edge(RequestHandler):
+class countEdge(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)    
     query = data
@@ -550,7 +557,7 @@ class count_edge(RequestHandler):
         response = {"status":True, 'message':'Success','data':len(result['data'])}
     self.write(response)
 
-class detail_edge(RequestHandler):
+class detailEdge(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
     query = data    
@@ -567,7 +574,7 @@ class detail_edge(RequestHandler):
         response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
 
-class update_edge(RequestHandler):
+class updateEdge(RequestHandler):
   def post(self):        
     data = json.loads(self.request.body)
     if 'id' not in data:
@@ -593,7 +600,7 @@ class update_edge(RequestHandler):
             response = {"status":True, 'message':'Update Success'}
     self.write(response)
 
-class delete_edge(RequestHandler):
+class deleteEdge(RequestHandler):
   def post(self):        
     data = json.loads(self.request.body)
     if 'id' not in data:
@@ -620,7 +627,7 @@ class delete_edge(RequestHandler):
     self.write(response)
 
 
-class config_edge(RequestHandler):
+class configEdge(RequestHandler):
   def post(self):  
     result = {}  
     data = json.loads(self.request.body)
@@ -679,3 +686,167 @@ class config_edge(RequestHandler):
     else:
         response = {"status":True, 'message':'Success','data':result['data']}
     self.write(response)
+
+
+class deviceInitEdge(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    ##CEK username, pass, device id, edge_device_id
+    if 'email' not in data:
+        response = {"status":False, "message":"Email Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    if 'password' not in data:
+        response = {"status":False, "message":"Password Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    if 'device_code' not in data:
+        response = {"status":False, "message":"Device Code Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    
+    if 'edge_device_id' not in data:
+        response = {"status":False, "message":"Edge Device ID Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    
+    if 'device_info' not in data: 
+        device_info = {}
+    else:
+        device_info = data["device_info"]
+
+
+    query = {'email':data['email']}
+    result = userController.findOne(query)
+    if not result['status']:
+        account = False               
+    else:
+        password_db = cloud9Lib.decrypt(result['data']['password'])
+        password = data['password']
+        if password == password_db:
+            if result['data']['active'] == False:
+                account = False
+            else :
+                account = True
+        else:
+            account = False
+    
+    if account == False:
+        response = {"status":False, "message":"Account not Active",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    
+    query = {
+        'device_code':data["device_code"],
+        'active' : True
+    }
+    edge_data = edgeController.findOne(query)
+    if edge_data["status"] == False:
+        response = {"status":False, "message":"Edge Configuration not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    edge_data = edge_data["data"]
+    edge_config = edgeController.config_file(edge_data["edgeconfig_code"],config)
+    response = {"status":True, 'message':'Success','data':edge_config['data']}
+    query = {
+        "edgeconfig_code" : edge_data["edgeconfig_code"]
+    }
+    updatedata = {
+        "date_download" : datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
+    }
+    update = edgeController.update(query,updatedata)
+    query = {
+        "device_code" : data["device_code"]
+    }
+    updatedata = {
+        "connected_device" : {
+            "id": data["edge_device_id"],
+            "device_info":device_info
+        }
+    }
+    update = deviceController.update(query,updatedata)
+
+    self.write(response)
+    
+
+class deviceUpdateEdge(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    if 'edgeconfig_code' not in data:
+        response = {"status":False, "message":"Edge Device Code Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    query = {
+        'edgeconfig_code':data["edgeconfig_code"],
+        'active' : True
+    }
+    edge_data = edgeController.findOne(query)
+    if edge_data["status"] == False:
+        response = {"status":False, "message":"Edge Configuration not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return        
+    edge_data = edge_data['data']
+    query = {"device_code":edge_data['device_code']}
+    device_data = deviceController.findOne(query)
+    if not device_data['status']:
+        response = {"status":False, "message":"Device not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    device_data = device_data["data"]
+    if("connected_device" in device_data):
+        if("id" in device_data["connected_device"]):
+            edge_config = edgeController.config_file(data["edgeconfig_code"],config)
+            edge_config = edge_config['data']
+            mqttcom.publish(mqtt_device+device_data["connected_device"]["id"],edge_config)
+            query = {
+                "edgeconfig_code" : edge_data["edgeconfig_code"]
+            }
+            updatedata = {
+                "date_download" : datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d %H:%M:%S')
+            }
+            update = edgeController.update(query,updatedata)  
+            response = {"status":True, 'message':'Success'}
+        else:
+           response = {"status":False, "message":"Device not found",'data':json.loads(self.request.body)}  
+    else:
+        response = {"status":False, "message":"Device not found",'data':json.loads(self.request.body)}  
+
+    self.write(response)
+    return
+    
+
+class deviceGetEdgeConfig(RequestHandler):
+  def post(self):        
+    data = json.loads(self.request.body)
+    if 'edgeconfig_code' not in data:
+        response = {"status":False, "message":"Edge Device Code Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    query = {
+        'edgeconfig_code':data["edgeconfig_code"],
+        'active' : True
+    }
+    edge_data = edgeController.findOne(query)
+    if edge_data["status"] == False:
+        response = {"status":False, "message":"Edge Configuration not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return        
+    edge_data = edge_data['data']
+    query = {"device_code":edge_data['device_code']}
+    device_data = deviceController.findOne(query)
+    if not device_data['status']:
+        response = {"status":False, "message":"Device not found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    edge_config = edgeController.config_file(data["edgeconfig_code"],config)
+    if edge_config['status']:
+        response = {"status":True, 'message':'Success', 'data':edge_config['data']}
+    else:
+        response = {"status":False, "message":"Configuration not found",'data':json.loads(self.request.body)} 
+
+    self.write(response)
+    return
