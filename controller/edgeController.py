@@ -132,7 +132,7 @@ def config_file(id,config):
     if( edge_data["comm_service"] == "mqtt" and device_data["communication"]["mqtt"] == True):
         mqtt_server = device_data["communication"]["server"]
         if(mqtt_server == "localhost"):
-            mqtt_server = config["MQTT"]["broker"]
+            mqtt_server = config["MQTT"]["edge_server"]
         comm_service = {
             "mqtt":{
                 "server": mqtt_server,

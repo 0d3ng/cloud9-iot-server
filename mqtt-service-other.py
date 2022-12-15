@@ -23,6 +23,8 @@ class Comm:
     def __init__(self, code, broker, port, topic, device_code, collection, index_log):
         self.code = code
         self.broker = broker
+        if(broker == config["MQTT"]["edge_server"] ):
+            self.broker = "localhost"
         self.port = int(port)
         self.topic = topic
         self.device_code = device_code
