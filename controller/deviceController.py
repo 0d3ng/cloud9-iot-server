@@ -52,7 +52,7 @@ def findOne(query):
 def update(query,data):            
     updateData = {}
     queryUpdate = {}
-    if 'code_name' in query: queryUpdate['code_name'] = query['code_name']
+    if 'device_code' in query: queryUpdate['device_code'] = query['device_code']
     if '_id' in query: queryUpdate['_id'] = query['_id']
     
     if 'name' in data: updateData['name'] = data['name']
@@ -115,7 +115,7 @@ def addOther(fillData):
 def updateOther(query,data):            
     updateData = {}
     queryUpdate = {}
-    if 'code_name' in query: queryUpdate['code_name'] = query['code_name']
+    if 'device_code' in query: queryUpdate['device_code'] = query['device_code']
     if '_id' in query: queryUpdate['_id'] = query['_id']
     
     if 'name' in data: updateData['name'] = data['name']
