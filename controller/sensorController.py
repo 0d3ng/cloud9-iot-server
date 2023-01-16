@@ -17,16 +17,16 @@ def add(collection,fillData):
         response = {'status':True,'message':'Success','data':result}
     return cloud9Lib.jsonObject(response)
 
-def find(collection,query, exclude = None, limit = None, skip = None, sort=('$natural',1)):  
-    result = db.find(collection,query,exclude,limit,skip,sort)
+def find(collection,query, exclude = None, limit = None, skip = None, sort=('$natural',1), ShowID=None):  
+    result = db.find(collection,query,exclude,limit,skip,sort,ShowID)
     if result == []:
         response = {"status":False, "data":query}               
     else:
         response = {'status':True, 'data':result}    
     return cloud9Lib.jsonObject(response)
 
-def findOne(collection,query, exclude = None, sort=('$natural',1)):  
-    result = db.findOne(collection,query,exclude,sort)
+def findOne(collection,query, exclude = None, sort=('$natural',1), ShowID=None):  
+    result = db.findOne(collection,query,exclude,sort,ShowID)
     if result == []:
         response = {"status":False, "data":query}               
     else:

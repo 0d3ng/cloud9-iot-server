@@ -6,7 +6,7 @@ import random
 
 broker="103.106.72.181"#"161.117.58.227"#"localhost" #
 port=1883
-topic= '/Project_IPS/client1'#'/simulationIPS/client2'#'message/sensor/xzhu2l''trydevice'#
+topic= 'sensor/edge/fils'#'/Project_IPS/client1'#'/simulationIPS/client2'#'message/sensor/xzhu2l''trydevice'#
 topic2= 'trydevice2'#'Project_IPS/client1'#'message/sensor/xzhu2l'
 
 def on_publish(client,userdata,result): #create function for callback

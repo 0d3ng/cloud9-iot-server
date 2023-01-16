@@ -109,7 +109,7 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
 
 def extract_etl(field,data,collection,device_code,state=False):
     if type(field) is dict:
-        fieldName = list(field.keys())[0]
+        fieldName = list(field.keys())[0]      
         if fieldName in data:
             result = {}
             if field[fieldName] == 'image' :
@@ -120,10 +120,10 @@ def extract_etl(field,data,collection,device_code,state=False):
                         itemName = list(item.keys())[0]
                     else:
                         itemName = item                
-                    result[item],state = extract_etl(item,data[fieldName],collection,device_code,state)
-            return result
+                    result[itemName],state = extract_etl(item,data[fieldName],collection,device_code,state)
+            return result,state
         else:
-            return None
+            return None,state
     else:
         if field in data:
             if state == False :
@@ -163,3 +163,34 @@ def preproces(insert,data):
         return eval(data['process'])
     except:
         return 0 
+
+
+
+def etl_inner(collection,elastic_index,deviceData,device_code,message,receive_time = None):  #info --> , channel_type,topic,token_access,ip_sender,date_add_sensor
+    insertQuery = {}
+    insertQuery['raw_message'] = message
+    insertElastic = copy.copy(insertQuery)
+    insertQuery['date_add_server'] = datetime.datetime.now(timezone('Asia/Tokyo')) #datetime.datetime.utcnow() #datetime.datetime.utcnow()
+    insertQuery['device_code'] = device_code
+    deviceData = deviceData['field']
+    state = True
+    for fieldData in deviceData:
+        if type(fieldData) is dict:
+            fieldName = list(fieldData.keys())[0]
+        else:
+            fieldName = fieldData
+        insertQuery[fieldName],state = extract_etl(fieldData,message,collection,device_code,state)
+    
+    insertQuery['save_unix_time'] = round(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000)
+    result = db.insertData(collection,insertQuery)  
+    if result == []:
+        response = {'status':False, 'message':"Add Failed"}               
+    else:        
+        del insertQuery['raw_message']
+        insertQuery["date_add_server"] = round(insertQuery["date_add_server"].timestamp()*1000)
+        insertQuery["_id"] = str(result)
+        # Tutup sementara
+        # mqttcom.publish("mqtt/output/"+elastic_index,insertQuery)   
+        response = {'status':True,'message':'Success','data':insertQuery} 
+        
+    return cloud9Lib.jsonObject(response)

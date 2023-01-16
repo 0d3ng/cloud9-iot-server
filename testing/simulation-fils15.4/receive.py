@@ -4,8 +4,8 @@ from datetime import datetime
 from datetime import timezone as timezone2
 from pytz import timezone
 
-broker = 'localhost'
-topic = "/simulationIPS/client2/response"
+broker = '103.106.72.181'#'localhost'
+topic = "edge/update/dc312b34" #"/simulationIPS/client2/response"
 device_code = "nu63"
 
 def writeLog(file,value):
@@ -18,12 +18,13 @@ def on_connect(client, userdata, flags, rc):  # The callback for when the client
 
 
 def on_message(client, userdata, message):  # The callback for when a PUBLISH message is received from the server.
-    now = datetime.now()
-    cDate = now.strftime("%Y-%m-%d")
-    cTime = now.strftime("%H:%M:%S")
-    cUnix = int(now.timestamp() * 1000)
-    raw_msg = message.payload.decode("utf-8")
-    writeLog(broker+"_"+device_code+"_"+cDate,cDate+","+cTime+","+str(cUnix)+","+raw_msg)
+    print(message.payload.decode("utf-8"))
+    # now = datetime.now()
+    # cDate = now.strftime("%Y-%m-%d")
+    # cTime = now.strftime("%H:%M:%S")
+    # cUnix = int(now.timestamp() * 1000)
+    # raw_msg = message.payload.decode("utf-8")
+    # writeLog(broker+"_"+device_code+"_"+cDate,cDate+","+cTime+","+str(cUnix)+","+raw_msg)
 
 
 client = mqtt.Client("digi_mqtt_test")  # Create instance of client with client ID “digi_mqtt_test”

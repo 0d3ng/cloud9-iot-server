@@ -28,7 +28,7 @@ class dbmongo:
             return True
         return False
 
-    def find(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1) ):
+    def find(self, col, filter = None, exclude = None, limit = None, skip = None, sort=('$natural',1), showID=None ):
         (sort1,sort2) = sort        
         # if not self.checkCollections(col):
         #     return []
@@ -43,7 +43,7 @@ class dbmongo:
             res = self.col.find(filter,exclude).skip(skip).sort(sort1,sort2)     
         response = []
         for document in res:
-            if('id' in document):
+            if('id' in document or showID == True):
                 document['_id'] = str(document['_id'])
             else:
                 document['id'] = str(document['_id'])
@@ -51,7 +51,7 @@ class dbmongo:
             response.append(document)
         return json.loads(dumps(response))
 
-    def findOne(self, col, filter = None, exclude = None, sort=('$natural',1) ):
+    def findOne(self, col, filter = None, exclude = None, sort=('$natural',1), showID=None  ):
         # if not self.checkCollections(col):
         #     return False        
         self.col = self.db[col]
@@ -59,7 +59,7 @@ class dbmongo:
         response = []
         res = self.col.find_one(filter,exclude,sort=[sort]) 
         if res:       
-            if('id' in res):
+            if('id' in res or showID == True):
                 res['_id'] = str(res['_id'])
             else:
                 res['id'] = str(res['_id'])

@@ -195,6 +195,7 @@ class getSchemaData(RequestHandler):
         if response == "":
             limit =  None
             skip = None
+            showid = None
             sort = ('date_add_auto',-1)
             if 'limit' in data:
                 limit = data['limit']
@@ -231,10 +232,15 @@ class getSchemaData(RequestHandler):
                 data['date_add_auto'] = {"$gte":datesrc_str, "$lt":datesrc_end }
                 del data['date_start']
                 del data['date_end']
+            if 'showid' in data:
+                showid = data['showid']
+                del data['showid']
+
+
             query = data
             exclude = None
             print(query)
-            result = schemaDataController.find(prefix_collection+code,query,exclude,limit,skip,sort)
+            result = schemaDataController.find(prefix_collection+code,query,exclude,limit,skip,sort,showid)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
             else:
@@ -332,11 +338,15 @@ class detailSchemaData(RequestHandler):
     #         del query["id"]
     sort = ('date_add_auto',-1)
     exclude = None
+    showid = None
     if 'sort' in data:
         sort = (data['sort']['field'],data['sort']['type'])            
         del data['sort']
+    if 'showid' in data:
+        showid = data['showid']
+        del data['showid']
     query = data
-    result = schemaDataController.findOne(prefix_collection+schema_code,query,exclude,sort)    
+    result = schemaDataController.findOne(prefix_collection+schema_code,query,exclude,sort,showid)    
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
