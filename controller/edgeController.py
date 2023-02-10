@@ -37,6 +37,8 @@ def add(fillData):
         'data_transmitted':fillData.get('data_transmitted', None),
         'time_interval':fillData.get('time_interval', None),
         'comm_service':fillData.get('comm_service', None),
+        'local_data':fillData.get('local_data', None),
+        'visualization':fillData.get('visualization', None),
         'active':fillData.get('active', False), 
         'date_add': datetime.utcnow(), 
         'add_by':fillData.get('add_by', None)       
@@ -77,6 +79,9 @@ def update(query,data):
     if 'data_transmitted' in data: updateData['data_transmitted'] = data['data_transmitted']
     if 'time_interval' in data: updateData['time_interval'] = data['time_interval']
     if 'comm_service' in data: updateData['comm_service'] = data['comm_service']    
+    
+    if 'local_data' in data: updateData['local_data'] = data['local_data']    
+    if 'visualization' in data: updateData['visualization'] = data['visualization']    
     
     # if 'method' in data: updateData['method'] = data['method']
     # if 'string_sample' in data: updateData['string_sample'] = data['string_sample']
@@ -147,6 +152,17 @@ def config_file(id,config):
             "http_post":api_server+":"+port+"/comdata/sensor/"+device_data["key_access"]
         }
     
+    if("local_data" in edge_data):
+        local_data = edge_data["local_data"]
+    else:
+        local_data = []
+    
+    
+    if("visualization" in edge_data):
+        visualization = edge_data["visualization"]
+    else:
+        visualization = []
+
     edge_config = {
         "device_code": device_data["device_code"],
         "configuration_code":edge_data["edgeconfig_code"],
@@ -158,8 +174,11 @@ def config_file(id,config):
         "interface": edge_data["interface"],
         "data_transmitted":edge_data["data_transmitted"],
         "time_interval":edge_data["time_interval"],
-        "communication_protocol": comm_service
+        "communication_protocol": comm_service,
+        "local_data":local_data,
+        "visualization":visualization
     }
+    
     response = {'status':True,'message':'Success','data':edge_config}
     return cloud9Lib.jsonObject(response)
 

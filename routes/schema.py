@@ -286,7 +286,7 @@ class countSchemaData(RequestHandler):
             if 'date' in data:
                 date_time_str = str(data['date'])
                 datesrc_str = datetime.strptime(date_time_str+" 00:00:00",'%Y-%m-%d %H:%M:%S') - td
-                datesrc_end = datetime.strptime(date_time_end+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
+                datesrc_end = datetime.strptime(date_time_str+" 23:59:59",'%Y-%m-%d %H:%M:%S') - td
                 data['date_add_auto'] = {"$gte":datesrc_str, "$lt":datesrc_end }
                 del data['date']
             if 'date_start' in data and 'date_end' in data:
