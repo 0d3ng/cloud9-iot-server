@@ -22,7 +22,7 @@ def default(o):
     if isinstance(o, (datetime.date, datetime.datetime)):
         return o.isoformat()
 
-def publish(topic,message):
+def publish(topic,message, print_out=True):
 	client = mqttClient.Client("CloudIoTMQTT"+randomString(4))
 	try:
 		def on_publish(client,userdata,result):             #create function for callback
@@ -33,11 +33,11 @@ def publish(topic,message):
 		client.connect(broker_address, port=port)
 		time.sleep(2)
 		client.publish(topic,json.dumps(message,default=default))
-		print("------MQTT------")
-		print(topic)
-		print(message)
-		print("----------------")
-		sys.stdout.flush()
+		if print_out == True :
+			print("------MQTT------")
+			print(topic)
+			print(message)
+			print("----------------")		
 		client.disconnect()
 	except  Exception as e:
 		print("failed")

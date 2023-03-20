@@ -44,7 +44,7 @@ def save_image(message,field,group,device_name):
 
 def etl(collection,elastic_index,info,device_code,message,receive_time = None):  #info --> , channel_type,topic,token_access,ip_sender,date_add_sensor
     insertQuery = info
-    insertQuery['raw_message'] = message
+    insertQuery['raw_message'] = copy.copy(message)
     insertElastic = copy.copy(insertQuery)
     insertQuery['date_add_server'] = datetime.datetime.now(timezone('Asia/Tokyo')) #datetime.datetime.utcnow() #datetime.datetime.utcnow()
     #round(datetime.datetime.now(timezone('Asia/Tokyo')).timestamp() * 1000) #round(datetime.datetime.utcnow().timestamp() * 1000) #datetime.datetime.utcnow()
@@ -59,6 +59,7 @@ def etl(collection,elastic_index,info,device_code,message,receive_time = None): 
     }
     deviceData = deviceController.findOne(queryDevice)
     state = False
+    message = keys_lower(message)
     if deviceData['status'] == True :
         deviceProcess = False
         if 'field_process' in deviceData['data']:
@@ -125,7 +126,7 @@ def extract_etl(field,data,collection,device_code,state=False):
         else:
             return None,state
     else:
-        if field in data:
+        if field in data: ##This Code should change to lowercase
             if state == False :
                 if len(str(data[field])) > 0:
                     state = True
@@ -164,16 +165,15 @@ def preproces(insert,data):
     except:
         return 0 
 
-
-
 def etl_inner(collection,elastic_index,deviceData,device_code,message,receive_time = None):  #info --> , channel_type,topic,token_access,ip_sender,date_add_sensor
     insertQuery = {}
-    insertQuery['raw_message'] = message
+    insertQuery['raw_message'] = copy.copy(message)
     insertElastic = copy.copy(insertQuery)
     insertQuery['date_add_server'] = datetime.datetime.now(timezone('Asia/Tokyo')) #datetime.datetime.utcnow() #datetime.datetime.utcnow()
     insertQuery['device_code'] = device_code
     deviceData = deviceData['field']
     state = True
+    message = keys_lower(message)
     for fieldData in deviceData:
         if type(fieldData) is dict:
             fieldName = list(fieldData.keys())[0]
@@ -194,3 +194,12 @@ def etl_inner(collection,elastic_index,deviceData,device_code,message,receive_ti
         response = {'status':True,'message':'Success','data':insertQuery} 
         
     return cloud9Lib.jsonObject(response)
+
+def keys_lower(test_dict):
+    res = dict()
+    for key in test_dict.keys():
+        if type(test_dict[key]) is dict:
+            res[key.lower()] = keys_lower(test_dict[key])
+        else:
+            res[key.lower()] = test_dict[key]
+    return res

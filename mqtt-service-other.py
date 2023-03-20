@@ -52,12 +52,19 @@ class Comm:
         hack = False
         receive_unix_time2 = round(datetime.now(timezone('Asia/Tokyo')).timestamp()*1000)
         receive_unix_time = round(datetime.now(timezone2.utc).timestamp()*1000)
-        raw_msg = message.payload.decode("utf-8")        
-        raw_msg2 = message.payload.decode("utf-8")        
+        try:
+            raw_msg = message.payload.decode("utf-8")        
+            raw_msg2 = message.payload.decode("utf-8")        
+        except:
+            raw_msg = str(message.payload)
+            hack = True
+
         if "ts" not in raw_msg and "::t" not in raw_msg:
             cDate = datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d")
             cTime = datetime.now(timezone('Asia/Tokyo')).strftime("%H:%M:%S")
             writeLog(self.broker+"_"+self.device_code+"_"+cDate,cDate+","+cTime+","+str(receive_unix_time2)+","+raw_msg)
+        
+        
         # self.client.publish(self.topic+"/feedback",payload=raw_msg)
         # print(self.device_code)
         # print("--RAW MESSAGE---")
