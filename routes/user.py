@@ -497,11 +497,13 @@ class token(RequestHandler):
                 token = jwt.encode({
                     'exp': datetime.utcnow() + timedelta(hours=1),
                     'iat': datetime.utcnow()
-                }, SECRET_KEY, algorithm='HS256')
+                }, SECRET_KEY, algorithm='HS256')                
                 output = {
                     'token':token
                 }
                 response = {"status":True, 'message':'Login Success','data':output}
+                print(response)
+                sys.stdout.flush()
         else:
             response = {"status":False, 'message':'Wrong password','data':json.loads(self.request.body)}
     
