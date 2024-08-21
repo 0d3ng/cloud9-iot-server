@@ -15,3 +15,5 @@ pandas
 ntplib
 detect_delimiter
 scipy
+bcrypt
+psycopg2-binary

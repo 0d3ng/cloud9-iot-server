@@ -31,6 +31,8 @@ class Comm:
         self.collection = collection
         self.index_log = index_log
         self.Conected = False
+        self.username = "*"
+        self.password = "*"
         
     
     def on_connect(self,client, userdata, flags, rc):
@@ -103,12 +105,18 @@ class Comm:
         dc = self.device_code           
         print(dc,"data published \n")
         pass
+    
+    def set_username(self,username, password):
+        self.username = username
+        self.password = password
 
     def connect(self):
         self.client = mqttClient.Client(self.code+cloud9Lib.randomOnlyString(4))
         self.client.on_connect=self.on_connect
         self.client.on_message=self.on_message
-        # self.client.on_publish = self.on_publish 
+        # self.client.on_publish = self.on_publish
+        if(self.username != "*"): 
+            self.client.username_pw_set(self.username, self.password)    #set username and password
         try:
             self.client.connect(self.broker,self.port) #connect to broker
             self.client.loop_start()
@@ -148,6 +156,8 @@ def subscribe_list():
                 'device_code':val['device_code']
             }
             comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
+            if('mqtt_username' in val):
+               comm_subs[val['channel_code']].set_username(val['mqtt_username'],val['mqtt_pass']) 
             comm_subs[val['channel_code']].connect()
 
 def on_connect(client, userdata, flags, rc):
@@ -198,6 +208,8 @@ def on_message_subscribe(message):
                     print(KeyError)
                     pass
             comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
+            if('mqtt_username' in val):
+               comm_subs[val['channel_code']].set_username(val['mqtt_username'],val['mqtt_pass'])
             comm_subs[val['channel_code']].connect()
 
 def on_message_unsubscribe(message):

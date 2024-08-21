@@ -167,7 +167,10 @@ def addOther(fillData):
     else:
         response = {'status':True,'message':'Success','data':result}
         if insertQuery['active'] == True and ( insertQuery['channel_type'] == 'mqtt'):
-            triggerOther(insertQuery['channel_type'],insertQuery['server'],insertQuery['port'],insertQuery['topic'],insertQuery['channel_code'],'active')
+            if(insertQuery["port"] == "1885"):
+                triggerOther(insertQuery['channel_type'],insertQuery['server'],insertQuery['port'],insertQuery['topic'],insertQuery['channel_code'],'active', insertQuery["mqtt_username"],insertQuery["mqtt_pass"])
+            else:
+                triggerOther(insertQuery['channel_type'],insertQuery['server'],insertQuery['port'],insertQuery['topic'],insertQuery['channel_code'],'active')
 
     return cloud9Lib.jsonObject(response)
 
@@ -226,7 +229,7 @@ def deleteOther(query):
                     triggerOther(listItem['channel_type'],listItem['server'],listItem['port'],listItem['topic'],listItem['channel_code'],'nonactive')
     return cloud9Lib.jsonObject(response)
 
-def triggerOther(channel_type,server,port,topic,channel_code,status):
+def triggerOther(channel_type,server,port,topic,channel_code,status, mqtt_username="*", mqtt_pass="*"):
     print(channel_type)
     print(server+":"+str(port)+" -> "+topic+" "+status)
     sys.stdout.flush()
@@ -237,6 +240,11 @@ def triggerOther(channel_type,server,port,topic,channel_code,status):
             'port':port,
             'channel_code':channel_code
         }
+        if(port == "1885"):
+            send["mqtt_username"] = mqtt_username
+            send["mqtt_pass"] = mqtt_pass
+
+
         if status == 'active':
             mqttcom.publish("mqtt/service-other/subscribe",send)
             return
