@@ -17,3 +17,4 @@ detect_delimiter
 scipy
 bcrypt
 psycopg2-binary
+pyjwt

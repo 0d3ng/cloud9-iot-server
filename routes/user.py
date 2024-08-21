@@ -7,8 +7,15 @@ from function import *
 from controller import userController
 from datetime import datetime  
 from datetime import timedelta
+import jwt
+
+from configparser import ConfigParser
+config = ConfigParser()
+config.read("config.ini")
 
 users = []
+
+SECRET_KEY = config["JWT"]["secret_key"]
 
 #PRIMARY VARIABLE - DONT DELETE
 define_url = [
@@ -21,7 +28,9 @@ define_url = [
     ['activation/','activation'],
     ['forgetpassword/','forgetpassword'],
     ['edit/','update'],
-    ['delete/','delete']
+    ['delete/','delete'],
+    ['token/','token']
+    
 ]
 ####['delete/([^/]+)','delete']
 class add(RequestHandler):
@@ -455,6 +464,44 @@ class changepass(RequestHandler):
                 response = {"status":False, 'message':'Update password failed','data':json.loads(self.request.body)}
             else :
                 response = {"status":True, 'message':'Update password success','data':json.loads(self.request.body)}
+        else:
+            response = {"status":False, 'message':'Wrong password','data':json.loads(self.request.body)}
+    
+    self.write(response)
+
+class token(RequestHandler):
+  def post(self):    
+    data = json.loads(self.request.body)
+    if 'email' not in data:
+        response = {"status":False, "message":"Email Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+
+    if 'password' not in data:
+        response = {"status":False, "message":"Password Not Found",'data':json.loads(self.request.body)}               
+        self.write(response)
+        return
+    
+    query = {'email':data['email']}
+    result = userController.findOne(query)
+    if not result['status']:
+        response = {"status":False, "message":"User Not Found",'data':json.loads(self.request.body)}               
+    else:
+        password_db = cloud9Lib.decrypt(result['data']['password'])
+        print(password_db)
+        password = data['password']
+        if password == password_db:
+            if result['data']['active'] == False:
+                response = {"status":False, 'message':'Account not active','data':json.loads(self.request.body)}
+            else :
+                token = jwt.encode({
+                    'exp': datetime.utcnow() + timedelta(hours=1),
+                    'iat': datetime.utcnow()
+                }, SECRET_KEY, algorithm='HS256')
+                output = {
+                    'token':token
+                }
+                response = {"status":True, 'message':'Login Success','data':output}
         else:
             response = {"status":False, 'message':'Wrong password','data':json.loads(self.request.body)}
     

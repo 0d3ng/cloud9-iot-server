@@ -12,7 +12,8 @@ from controller import userController
 from controller import commETLController
 from datetime import datetime
 from pytz import timezone
-
+from functools import wraps
+import jwt
 
 from configparser import ConfigParser
 config = ConfigParser()
@@ -21,8 +22,10 @@ config.read("config.ini")
 from datetime import timedelta
 td = timedelta(hours=int(config["SERVER"]["timediff"]))
 prefix_collection = "sensor_data_"
+SECRET_KEY = config["JWT"]["secret_key"]
 
 groups = []
+
 
 #PRIMARY VARIABLE - DONT DELETE
 define_url = [
@@ -40,8 +43,29 @@ define_url = [
     ['data/([^/]+)/delete','deleteSensorData']
 ]
 
+def token_required(handler_function):
+    @wraps(handler_function)
+    def decorator(self, *args, **kwargs):
+        token = self.request.headers.get('Authorization').split(' ')[1]        
+        if not token:
+            self.set_status(401)
+            self.write({"status":False,'message': 'Token is missing'})
+            return
+        try:
+            jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            self.set_status(401)
+            self.write({"status":False,'message': 'Token has expired'})
+            return
+        except jwt.InvalidTokenError:
+            self.set_status(401)
+            self.write({"status":False,'message': 'Invalid token'})
+            return
+        return handler_function(self, *args, **kwargs)
+    return decorator
 
 class getSensorData(RequestHandler):
+  @token_required
   def post(self,device):    
     data = json.loads(self.request.body)
     response = ""
@@ -112,6 +136,7 @@ class getSensorData(RequestHandler):
     self.write(response)
 
 class countSensorData(RequestHandler):
+  @token_required
   def post(self,device):    
     data = json.loads(self.request.body)
     response = ""
@@ -182,6 +207,7 @@ class countSensorData(RequestHandler):
     self.write(response)
 
 class detailSensorData(RequestHandler):
+  @token_required
   def post(self,device_code):    
     data = json.loads(self.request.body)    
     if not device_code:
@@ -221,6 +247,7 @@ class detailSensorData(RequestHandler):
     self.write(response)
 
 class addSensorData(RequestHandler):
+  @token_required
   def post(self,device_code):    
     data = json.loads(self.request.body)
     if not device_code:
@@ -250,6 +277,7 @@ class addSensorData(RequestHandler):
 
 
 class updateSensorData(RequestHandler):
+  @token_required
   def post(self,device_code):    
     data = json.loads(self.request.body)
     if not device_code:
@@ -301,6 +329,7 @@ class updateSensorData(RequestHandler):
     self.write(response)
 
 class deleteSensorData(RequestHandler):
+  @token_required
   def post(self,device_code):        
     data = json.loads(self.request.body)
     if not device_code:
