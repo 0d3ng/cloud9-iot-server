@@ -6,6 +6,7 @@ import json
 from function import *
 import datetime
 
+from controller import postgreMosquittoController
 
 sensors = []
 db = db.dbmongo()
@@ -22,6 +23,8 @@ def add(fillData):
         'collection_name':fillData.get('collection_name', None),
         'date_add': datetime.datetime.utcnow(),
         'index_log':fillData.get('index_log', None),
+        'mqtt_username':fillData.get('mqtt_username', None),
+        'mqtt_pass':fillData.get('mqtt_pass', None),
         'add_by':fillData.get('add_by', None)        
     }
     # print("------------------")
@@ -67,6 +70,8 @@ def update(query,data):
     if 'channel_type' in data: updateData['channel_type'] = data['channel_type']
     if 'collection_name' in data: updateData['collection_name'] = data['collection_name']
     if 'active' in data: updateData['active'] = data['active']
+    if 'mqtt_username' in data: updateData['mqtt_username'] = data['mqtt_username']
+    if 'mqtt_pass' in data: updateData['mqtt_pass'] = data['mqtt_pass']
     
     last = findOne(queryUpdate)['data']
     
@@ -147,7 +152,9 @@ def addOther(fillData):
         'collection_name':fillData.get('collection_name', None),
         'device_code':fillData.get('device_code', None),
         'date_add': datetime.datetime.utcnow(),
-        'index_log':fillData.get('index_log', None),
+        'index_log':fillData.get('index_log', None),        
+        'mqtt_username':fillData.get('mqtt_username', None),
+        'mqtt_pass':fillData.get('mqtt_pass', None),
         'add_by':fillData.get('add_by', None)        
     }
     print("------------------")
@@ -177,6 +184,8 @@ def updateOther(query,data):
     if 'channel_type' in data: updateData['channel_type'] = data['channel_type']
     if 'collection_name' in data: updateData['collection_name'] = data['collection_name']
     if 'active' in data: updateData['active'] = data['active']
+    if 'mqtt_username' in data: updateData['mqtt_username'] = data['mqtt_username']
+    if 'mqtt_pass' in data: updateData['mqtt_pass'] = data['mqtt_pass']
     
     print(queryUpdate)
     print(updateData)
