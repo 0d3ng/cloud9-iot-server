@@ -58,8 +58,10 @@ def addUser(fillData):
     queryUser = """ INSERT INTO "public"."MqttUsers" ("id", "userName", "passwordHash", "isAdmin", "isActive","createdAt","updatedAt") 
     VALUES(%s, %s, %s, %s, %s, %s, %s)"""
     ###For Checking Only
-    # print(queryUser, (str(uuid.uuid4()),userName,passHash,"f","t",dt.now(),dt.now(),))
-    # sys.stdout.flush()
+    print("---------------------")
+    print(queryUser, (str(uuid.uuid4()),userName,passHash,"f","t",dt.now(),dt.now(),))
+    print("---------------------")
+    sys.stdout.flush()
 
     cursor.execute(queryUser, (str(uuid.uuid4()),userName,passHash,"f","t",dt.now(),dt.now(),))
     conn.commit()
