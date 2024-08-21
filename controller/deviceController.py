@@ -6,6 +6,7 @@ import json
 from function import *
 import datetime
 from controller import comChannelController
+from controller import postgreMosquittoController
 
 sensors = []
 db = db.dbmongo()
@@ -180,7 +181,17 @@ def communication_add(fillData):
         insertMqtt['port'] = fillData['port']
         insertMqtt['topic'] = fillData['topic']
         insertMqtt['active'] = fillData['mqtt']
+        if insertMqtt['port'] == "1885" :
+            print("---------POSTGRESQL 1--------")
+            insertMqtt["mqtt_username"] = "device-"+insertcomm['device_code']
+            insertMqtt["mqtt_pass"] = cloud9Lib.randomString(6)            
+
         comChannelController.addOther(insertMqtt)
+        if insertMqtt['port'] == "1885" :
+            print("---------POSTGRESQL 2--------")
+            postgreMosquittoController.addUser(insertMqtt)
+            print("---------POSTGRESQL 3--------")
+
 
     # if 'nats' in fillData :
     #     insertNats = insertcomm;
