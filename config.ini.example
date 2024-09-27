@@ -1,0 +1,32 @@
+[SERVER]
+port = 3001
+timediff = 9
+
+[MQTT]
+broker = localhost
+port = 1883
+user = OGRhNTI5MzE1YjY0ZWRlN2EwNjI2Mzg1
+pass = hdMFWDGTnfbhfoxoW7YXU8IwyAhFbD
+subscribe = mqtt/service/subscribe
+unsubscribe = mqtt/service/unsubscribe
+other_subscribe = mqtt/service-other/subscribe
+other_unsubscribe = mqtt/service-other/unsubscribe
+datasync_stream_start = datasync/service/start
+datasync_stream_stop = datasync/service/stop
+datasync_stream_master = datasync/service/
+edge_server = mqtt/edge
+
+
+filter_start = filter/service/start
+filter_remove = filter/service/remove
+
+[MAIL]
+sender = iotserver@deltadigitalid.com
+password = iotserver123
+
+[DB]
+host=localhost
+port = 27017
+uname = *
+pwd = *
+db = iot-server
