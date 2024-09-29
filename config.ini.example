@@ -24,9 +24,19 @@ filter_remove = filter/service/remove
 sender = iotserver@deltadigitalid.com
 password = iotserver123
 
-[DB]
+[PSQL]
 host=localhost
 port = 27017
 uname = *
 pwd = *
 db = iot-server
+
+[DB]
+host=localhost
+port = 27017
+uname = root
+pwd = example_password
+db = iot-server
+
+[JWT]
+secret_key=
