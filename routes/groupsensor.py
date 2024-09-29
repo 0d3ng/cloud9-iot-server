@@ -3,7 +3,7 @@ sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib
 from controller import groupSensorController
 
 groups = []

@@ -3,11 +3,15 @@ sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib
 from controller import schemaController
 from controller import schemaDataController
 from datetime import datetime
 from pytz import timezone
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+
 from configparser import ConfigParser
 config = ConfigParser()
 config.read("config.ini")
@@ -184,7 +188,7 @@ class getSchemaData(RequestHandler):
         self.write(response)
         return
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     response = ""
     query = {"schema_code":code}
     schemaData = schemaController.findOne(query)
@@ -239,7 +243,7 @@ class getSchemaData(RequestHandler):
 
             query = data
             exclude = None
-            print(query)
+            logger.info(query)
             result = schemaDataController.find(prefix_collection+code,query,exclude,limit,skip,sort,showid)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -256,7 +260,7 @@ class countSchemaData(RequestHandler):
         self.write(response)
         return
 
-    print(data)
+    logger.info(data)
     response = ""
     query = {"schema_code":code}
     schemaData = schemaController.findOne(query)
@@ -454,7 +458,7 @@ class groupSchemaData(RequestHandler):
         self.write(response)
         return
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     response = ""
     query = {"schema_code":code}
     schemaData = schemaController.findOne(query)
@@ -500,7 +504,7 @@ class groupSchemaData(RequestHandler):
                 {"$match":query},
                 {"$group":group}
             ]
-            print(pipeline)
+            logger.info(pipeline)
             result = schemaDataController.aggregate(prefix_collection+code,pipeline)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -528,7 +532,7 @@ def checkSchemaCode(code,execpt=""):
     else:
         query = {"schema_code":code}
         result = schemaController.findOne(query)
-    print(result)
+    logger.info(result)
     if result['status']:
         return True
     else:

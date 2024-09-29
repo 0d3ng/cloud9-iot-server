@@ -3,7 +3,7 @@
 import sys
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib,db
 import datetime
 from controller import comChannelController
 

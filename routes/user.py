@@ -3,11 +3,15 @@ sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib,mail
 from controller import userController
 from datetime import datetime  
 from datetime import timedelta
 import jwt
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+logger.info("Setup logger")
 
 from configparser import ConfigParser
 config = ConfigParser()
@@ -239,11 +243,12 @@ class login(RequestHandler):
 
     query = {'email':data['email']}
     result = userController.findOne(query)
+    logger.info(result)
     if not result['status']:
         response = {"status":False, "message":"User Not Found",'data':json.loads(self.request.body)}               
     else:
         password_db = cloud9Lib.decrypt(result['data']['password'])
-        print(password_db)
+        logger.info(password_db)
         password = data['password']
         if password == password_db:
             if result['data']['active'] == False:

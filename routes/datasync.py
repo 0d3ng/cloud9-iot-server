@@ -4,10 +4,13 @@ sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib
 from controller import datasyncController
 from datetime import datetime,timedelta
 from pytz import timezone
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
 
 groups = []
 
@@ -25,7 +28,7 @@ define_url = [
 class add(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     sys.stdout.flush()
     if 'datasync_code' not in data:
         data['datasync_code'] = generateCode()
@@ -209,7 +212,7 @@ def checkCombiCode(code,execpt=""):
     else:
         query = {"datasync_code":code}
         result = datasyncController.findOne(query)
-    print(result)
+    logger.info(result)
     if result['status']:
         return True
     else:

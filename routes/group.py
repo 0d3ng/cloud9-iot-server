@@ -3,9 +3,12 @@ sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib
 from controller import groupController
 from slugify import slugify
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
 
 groups = []
 
@@ -65,8 +68,8 @@ class list(RequestHandler):
         del data['user_id']
     query = data
     result = groupController.find(query)
-    print(result)
-    print("------------------")
+    logger.info(result)
+    logger.info("------------------")
     sys.stdout.flush()
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -85,8 +88,8 @@ class detail(RequestHandler):
         except:
             del query["id"]
     result = groupController.findOne(query)
-    print(result)
-    print("------------------")
+    logger.info(result)
+    logger.info("------------------")
     sys.stdout.flush()
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -187,8 +190,8 @@ class addMember(RequestHandler):
         return
 
     result = groupController.getItemMember(query,data["user_id"])
-    print("-----------------------")
-    print(result)
+    logger.info("-----------------------")
+    logger.info(result)
     sys.stdout.flush()
     if result['status']:
         response = {"status":False, "message":"Member exists",'data':json.loads(self.request.body)}

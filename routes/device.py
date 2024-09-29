@@ -3,7 +3,7 @@ sys.path.append('../')
 from tornado.web import RequestHandler
 from bson import ObjectId
 import json 
-from function import *
+from function import cloud9Lib, mqttcom
 from controller import deviceController
 from controller import groupSensorController
 from controller import sensorController
@@ -12,6 +12,8 @@ from controller import userController
 from datetime import datetime
 from pytz import timezone
 
+from logger import setup_logger
+logger = setup_logger(to_file=False)
 
 from configparser import ConfigParser
 config = ConfigParser()
@@ -53,7 +55,7 @@ define_url = [
 class add(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     sys.stdout.flush()
     if 'group_code_name' not in data:
         response = {"status":False, "message":"Parameter group_code_name not exists",'data':json.loads(self.request.body)}               
@@ -280,7 +282,7 @@ class getdata(RequestHandler):
             query = data
             query["device_code"] = device
             exclude = {'raw_message':0}
-            print(query)
+            logger.info(query)
             result = sensorController.find(collection,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
@@ -291,7 +293,7 @@ class getdata(RequestHandler):
 class countdata(RequestHandler):
   def post(self,device):    
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     response = ""
     query = {"device_code":device}
     deviceData = deviceController.findOne(query)
@@ -352,7 +354,7 @@ class countdata(RequestHandler):
             query = data
             query["device_code"] = device
             exclude = {'raw_message':0}
-            print(query)
+            logger.info(query)
             result = sensorController.count(collection,query,exclude,limit,skip,sort)
             if not result['status']:
                 response = {"status":False, "message":"Data Not Found",'data':0}               
@@ -363,7 +365,7 @@ class countdata(RequestHandler):
 class addOther(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     sys.stdout.flush()
 
     if 'key_access' not in data:
@@ -454,7 +456,7 @@ def checkKeyAccess(key,execpt=""):
         query = {"key_access":key}
         result = deviceController.findOne(query)
     
-    print(result)
+    logger.info(result)
 
     if result['status']:
         return True
@@ -489,12 +491,12 @@ def generateEdgeCode(code=""):
 
 def generateAccess():
     code = cloud9Lib.randomStringLower(16)
-    print(code)
+    logger.info(code)
 
     result = checkKeyAccess(code)
     
-    print(result)
-    print("------------------")
+    logger.info(result)
+    logger.info("------------------")
     sys.stdout.flush()
     if result:
         return generateAccess()

@@ -8,6 +8,11 @@ import json
 import sys
 import asyncio
 import os
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+logger.info("Setup logger")
+
 from configparser import ConfigParser
 config = ConfigParser()
 config.read("config.ini")
@@ -25,8 +30,8 @@ def make_app():
 if __name__ == '__main__':
   app = make_app()
   app.listen(port)
-  print("***********************")
-  print ("Restart App")
-  print("***********************")
+  logger.info("***********************")
+  logger.info ("Restart App")
+  logger.info("***********************")
   sys.stdout.flush()
   IOLoop.instance().start()
