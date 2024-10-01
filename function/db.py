@@ -15,7 +15,8 @@ port = int(config["DB"]["port"])
 uname = config["DB"]["uname"]
 pwd = config["DB"]["pwd"]
 db = config["DB"]["db"]
-client = pymongo.MongoClient(host=host, port=port, username=uname, password=pwd, authSource="admin")
+uri = f"mongodb://{uname}:{pwd}@{host}:{port}/"
+client = pymongo.MongoClient(uri)
 db = client[db]
 
 
