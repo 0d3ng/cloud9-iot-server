@@ -49,7 +49,7 @@ define_url = [
 class add(RequestHandler):
   def post(self):    
     data = json.loads(self.request.body)
-    print(data)
+    logger.info(data)
     sys.stdout.flush()
     if 'schema_code' not in data:
         data['schema_code'] = generateCode()

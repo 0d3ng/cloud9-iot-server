@@ -2,11 +2,11 @@
 
 import sys
 from bson import ObjectId
-import json 
-from function import *
+import json
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+from function import cloud9Lib, db, mqttcom, kafkacom, natscom
 import datetime
-
-from controller import postgreMosquittoController
 
 sensors = []
 db = db.dbmongo()
@@ -30,7 +30,7 @@ def add(fillData):
     # print("------------------")
     # sys.stdout.flush()
     result = db.insertData(collection,insertQuery)
-    if result == []:
+    if not result:
         response = {'status':False, 'message':"Add Failed"}               
     else:
         response = {'status':True,'message':'Success','data':result}
@@ -41,11 +41,12 @@ def add(fillData):
 
 def find(query):  
     result = db.find(collection,query)
-    print("------------------")
-    print(query)
-    print("------------------")
+    logger.info(result)
+    logger.info("------------------")
+    logger.info(query)
+    logger.info("------------------")
     sys.stdout.flush()
-    if result == []:
+    if not result:
         response = {"status":False, "data":query}               
     else:
         response = {'status':True, 'data':result}    
@@ -101,8 +102,8 @@ def delete(query):
     return cloud9Lib.jsonObject(response)
 
 def trigger(channel_type,topic,channel_code,status):
-    print(channel_type)
-    print(topic)
+    logger.info(channel_type)
+    logger.info(topic)
     sys.stdout.flush()
     if channel_type == 'mqtt':        
         send = {
@@ -157,9 +158,9 @@ def addOther(fillData):
         'mqtt_pass':fillData.get('mqtt_pass', None),
         'add_by':fillData.get('add_by', None)        
     }
-    print("------------------")
-    print(insertQuery)
-    print("------------------")
+    logger.info("------------------")
+    logger.info(insertQuery)
+    logger.info("------------------")
     # sys.stdout.flush()
     result = db.insertData(collection,insertQuery)
     if result == []:
@@ -190,8 +191,8 @@ def updateOther(query,data):
     if 'mqtt_username' in data: updateData['mqtt_username'] = data['mqtt_username']
     if 'mqtt_pass' in data: updateData['mqtt_pass'] = data['mqtt_pass']
     
-    print(queryUpdate)
-    print(updateData)
+    logger.info(queryUpdate)
+    logger.info(updateData)
     sys.stdout.flush()
     last = findOne(queryUpdate)['data']
     if updateData == {}:
@@ -230,8 +231,8 @@ def deleteOther(query):
     return cloud9Lib.jsonObject(response)
 
 def triggerOther(channel_type,server,port,topic,channel_code,status, mqtt_username="*", mqtt_pass="*"):
-    print(channel_type)
-    print(server+":"+str(port)+" -> "+topic+" "+status)
+    logger.info(channel_type)
+    logger.info(server+":"+str(port)+" -> "+topic+" "+status)
     sys.stdout.flush()
     if channel_type == 'mqtt':        
         send = {
@@ -240,7 +241,7 @@ def triggerOther(channel_type,server,port,topic,channel_code,status, mqtt_userna
             'port':port,
             'channel_code':channel_code
         }
-        if(port == "1885"):
+        if port == "1885":
             send["mqtt_username"] = mqtt_username
             send["mqtt_pass"] = mqtt_pass
 

@@ -7,6 +7,10 @@ from controller import commLogController
 from datetime import datetime
 from pytz import timezone
 from configparser import ConfigParser
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+
 config = ConfigParser()
 config.read("config.ini")
 #Config
@@ -19,16 +23,16 @@ password = config["MQTT"]["pass"]
 
 
 def on_connect(client, userdata, flags, rc):
-    print("rc: "+str(rc))
+    logger.info("rc: "+str(rc))
     sys.stdout.flush()
     if rc == 0:
-        print("Connected to broker")
+        logger.info("Connected to broker")
         sys.stdout.flush()
         global Connected                
         Connected = True   
         subscribe_list()             
     else:
-        print("Connection failed")
+        logger.error("Connection failed")
         sys.stdout.flush()
  
 def on_message(client, userdata, message):
@@ -50,14 +54,14 @@ def on_message_subscribe(message):
     channel_code = message['channel_code']
     topic_list[topic] = channel_code
     client.subscribe(topic)
-    print("Subscribe Topic: "+topic)
+    logger.info("Subscribe Topic: "+topic)
 
 def on_message_unsubscribe(message):
     topic = message['topic']
     channel_code = message['channel_code']
     topic_list[topic] = channel_code
     client.unsubscribe(topic)
-    print("Unsubscribe Topic: "+topic)
+    logger.info("Unsubscribe Topic: "+topic)
     try:
         del topic_list[topic]
     except KeyError:
@@ -70,18 +74,19 @@ def subscribe_list():
         "server":{'$exists': False}
     }
     result = comChannelController.find(query)
+    logger.info(result)
     if result['status']:        
 
         for val in result['data']:
             topic_list[val['topic']] = val['channel_code']
             client.subscribe(val['topic'])
-            print("Subscribe Topic: "+val['topic'])
+            logger.info("Subscribe Topic: "+val['topic'])
             sys.stdout.flush()
  
 
 def message_insert(topic,message,messageStr):
     #Log Insert#
-    print("Topic: "+topic)
+    logger.info("Topic: "+topic)
     sys.stdout.flush()
     insertLog = {
         'topic' : topic,
@@ -121,7 +126,7 @@ def message_insert(topic,message,messageStr):
             else:
                 infoMqtt['date_add_sensor'] = datetime.strptime(message['date_add'],'%Y-%m-%d %H:%M:%S')
         except:
-            print("error")
+            logger.info("error")
             sys.stdout.flush()
             infoMqtt['date_add_sensor'] = message['date_add']
     else :
@@ -140,7 +145,7 @@ def message_insert(topic,message,messageStr):
     commLogController.add(insertLog)
 
 
-client = mqttClient.Client("Python3"+cloud9Lib.randomOnlyString(4))               
+client = mqttClient.Client()
 # client.username_pw_set(username=user, password=password)    #set username and password
 client.on_connect= on_connect                      
 client.on_message= on_message                      
@@ -158,6 +163,6 @@ try:
         time.sleep(1)
  
 except KeyboardInterrupt:
-    print("exiting")
+    logger.info("exiting")
     client.disconnect()
     client.loop_stop()

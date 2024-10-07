@@ -3,6 +3,10 @@ import paho.mqtt.client as mqttClient #Must Install Req
 import datetime
 from configparser import ConfigParser
 import random,string
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+
 config = ConfigParser()
 config.read("config.ini")
 #Config
@@ -11,6 +15,10 @@ broker_address= config["MQTT"]["broker"]
 port = int(config["MQTT"]["port"])                         
 # user = config["MQTT"]["user"]
 # password = config["MQTT"]["pass"]  
+
+client = mqttClient.Client()
+client.connect(broker_address, port=port)
+logger.info(client.is_connected())
 
 def randomString(stringLength=8):
     letters1 = string.ascii_lowercase
@@ -23,24 +31,21 @@ def default(o):
         return o.isoformat()
 
 def publish(topic,message, print_out=True):
-	client = mqttClient.Client("CloudIoTMQTT"+randomString(4))
 	try:
 		def on_publish(client,userdata,result):             #create function for callback
-			print("data published \n")
+			logger.info("data published \n")
 			pass
-		if(topic == config["MQTT"]["datasync_stream_start"] or topic == config["MQTT"]["datasync_stream_stop"] or topic == config["MQTT"]["other_subscribe"] or topic == config["MQTT"]["other_unsubscribe"]):
+		if topic == config["MQTT"]["datasync_stream_start"] or topic == config["MQTT"]["datasync_stream_stop"] or topic == config["MQTT"]["other_subscribe"] or topic == config["MQTT"]["other_unsubscribe"]:
 			client.on_publish= on_publish
-		client.connect(broker_address, port=port)
-		time.sleep(2)
 		client.publish(topic,json.dumps(message,default=default))
-		if print_out == True :
-			print("------MQTT------")
-			print(topic)
-			print(message)
-			print("----------------")		
+		if print_out:
+			logger.info("------MQTT------")
+			logger.info(topic)
+			logger.info(message)
+			logger.info("----------------")
 		client.disconnect()
 	except  Exception as e:
-		print("failed")
+		logger.info("failed")
 		print(e)
 
 	return
