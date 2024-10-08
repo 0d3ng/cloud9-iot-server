@@ -152,6 +152,7 @@ def subscribe_list():
         "topic":{ "$nin": [ None, "" ] }
     }
     result = comChannelController.find(query)
+    logger.info(result)
     if result['status']:        
         for val in result['data']:
             comm_list[val['channel_code']] = {
@@ -161,6 +162,7 @@ def subscribe_list():
                 'collection_name':val['collection_name'],
                 'device_code':val['device_code']
             }
+            logger.info(f"server: {val['server']} port: {val['port']} topic: {val['topic']} topic: {val['topic']}")
             comm_subs[val['channel_code']] = Comm(val['channel_code'],val['server'],val['port'],val['topic'],val['device_code'],val['collection_name'],val['index_log'])
             if 'mqtt_username' in val:
                comm_subs[val['channel_code']].set_username(val['mqtt_username'],val['mqtt_pass']) 

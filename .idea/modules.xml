@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../cloud9-iot-consumer/.idea/cloud9-iot-consumer.iml" filepath="$PROJECT_DIR$/../cloud9-iot-consumer/.idea/cloud9-iot-consumer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/cloud9-iot-server.iml" filepath="$PROJECT_DIR$/.idea/cloud9-iot-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/../edge-framework/.idea/edge-framework.iml" filepath="$PROJECT_DIR$/../edge-framework/.idea/edge-framework.iml" />
     </modules>
