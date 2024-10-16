@@ -116,7 +116,8 @@ class detail(RequestHandler):
             del query["id"]
         except:
             del query["id"]
-    result = schemaController.findOne(query)    
+    result = schemaController.findOne(query)
+    logger.info(result)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:

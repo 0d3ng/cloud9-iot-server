@@ -23,7 +23,7 @@ def add(fillData):
         'information':fillData.get('information', None), #array[detail, purpose]        
     }
     result = db.insertData(collection,insertQuery)
-    if result == []:
+    if not result:
         response = {'status':False, 'message':"Add Failed"}               
     else:
         response = {'status':True,'message':'Success','data':result}
@@ -31,7 +31,7 @@ def add(fillData):
 
 def find(query):  
     result = db.find(collection,query)
-    if result == []:
+    if not result:
         response = {"status":False, "data":query}               
     else:
         response = {'status':True, 'data':result}    

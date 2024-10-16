@@ -53,6 +53,8 @@ class list(RequestHandler):
         del data['purpose']
     query = data    
     result = datasyncController.find(query)
+    print(result)
+    logger.info(result)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:
@@ -95,7 +97,8 @@ class detail(RequestHandler):
             del query["id"]
         except:
             del query["id"]
-    result = datasyncController.findOne(query)    
+    result = datasyncController.findOne(query)
+    logger.info(result)
     if not result['status']:
         response = {"status":False, "message":"Data Not Found",'data':json.loads(self.request.body)}               
     else:

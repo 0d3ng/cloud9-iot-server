@@ -3,7 +3,7 @@
 import sys
 from bson import ObjectId
 import json 
-from function import *
+from function import db,cloud9Lib
 from controller import schemaController
 from datetime import datetime
 from pytz import timezone
@@ -22,7 +22,7 @@ def add(collection,fillData):
 
 def find(collection,query, exclude = None, limit = None, skip = None, sort=('$natural',1), showID=None):  
     result = db.find(collection,query,exclude,limit,skip,sort, showID)
-    if result == []:
+    if not result:
         response = {"status":False, "data":query}               
     else:
         response = {'status':True, 'data':result}    

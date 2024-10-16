@@ -13,7 +13,11 @@ import statistics
 
 from configparser import ConfigParser
 
-from function import cloud9Lib
+from function import cloud9Lib, mqttcom, db
+
+from logger import setup_logger
+logger = setup_logger(to_file=False)
+
 config = ConfigParser()
 config.read("config.ini")
 
@@ -39,17 +43,19 @@ def add(fillData):
         'information':fillData.get('information', None), #array[detail, purpose]        
     }
     result = db.insertData(collection,insertQuery)
-    if result == []:
+    logger.info(result)
+    if not result:
         response = {'status':False, 'message':"Add Failed"}               
     else:
         response = {'status':True,'message':'Success','data':result}
-        if insertQuery['stream'] == True:
+        if insertQuery['stream']:
             triggerService(insertQuery["datasync_code"],insertQuery["time_loop"],True)
     return cloud9Lib.jsonObject(response)
 
 def find(query):  
     result = db.find(collection,query)
-    if result == []:
+    logger.info(result)
+    if not result:
         response = {"status":False, "data":query}               
     else:
         response = {'status':True, 'data':result}    
@@ -57,6 +63,7 @@ def find(query):
 
 def findOne(query):  
     result = db.findOne(collection,query, None)
+    logger.info(result)
     if result is None or result is False:
         response = {"status":False, "data":query}               
     else:
@@ -79,13 +86,14 @@ def update(query,data):
     if 'time_loop' in data: updateData['time_loop'] = data['time_loop']
     if 'updated_by' in data: updateData['updated_by'] = data['updated_by']
 
-    if updateData == []:
+    if not updateData:
         return {"status":False, "message":"UPDATE NONE"}   
     last = findOne(queryUpdate)['data'] 
     # print(updateData)
     # print(last)
     # sys.stdout.flush()    
     result = db.updateData(collection,queryUpdate,updateData)
+    logger.info(result)
     if not result :
         response = {"status":False, "message":"UPDATE FAILED"}               
     else:
