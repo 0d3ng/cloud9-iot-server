@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 import sys
-from bson import ObjectId
-import json
+
 from logger import setup_logger
+
 logger = setup_logger(to_file=False)
 from function import cloud9Lib, db, mqttcom, kafkacom, natscom
 import datetime
